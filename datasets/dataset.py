@@ -3,7 +3,7 @@ import pandas as pd
 
 class Dataset:
     def __init__(self, name: str, path: str, original_file_name: str,
-                 user_column: str, item_column: str, rating_column: str,
+                 user_column: str, item_column: str, rating_column: str, binarize=True,
                  k_folds=5):
         """
         Dataset class definition. The Dataset class has three main attributes.
@@ -13,6 +13,7 @@ class Dataset:
         :param user_column: name of the user column on the dataset
         :param item_column: name of the item column on the dataset
         :param rating_column: name of the rating column on the dataset
+        :param binarize: if true transform explicit ratings into 1 to binarize
         :param k_folds: number of folds in which the dataset was divided
         """
         self.__name = name
@@ -27,6 +28,7 @@ class Dataset:
         self.train = pd.DataFrame()
         self.validation = pd.DataFrame()
         self.test = pd.DataFrame()
+        self.binarize = binarize
 
     def load_original(self) -> pd.DataFrame:
         """
@@ -48,7 +50,33 @@ class Dataset:
         self.test = pd.read_csv(path + '''test.csv''')
         self.fold_loaded = i
 
+        if self.binarize:
+            self.train[self.rating_column] = 1
+            self.validation[self.rating_column] = 1
+            self.test[self.rating_column] = 1
+
         return self.train, self.validation, self.test
+
+    def get_cornac_train(self) -> list:
+        """
+        Returns train set in the format of list of tuples so cornac can use
+        :return: train set as a list of tuples (user, item , rating, (optional) timestamp)
+        """
+        return list(self.train.itertuples(index=False, name=None))
+
+    def get_cornac_validation(self) -> list:
+        """
+        Returns validation set in the format of list of tuples so cornac can use
+        :return: validation set as a list of tuples (user, item , rating, (optional) timestamp)
+        """
+        return list(self.validation.itertuples(index=False, name=None))
+
+    def get_cornac_test(self) -> list:
+        """
+        Returns test set in the format of list of tuples so cornac can use
+        :return: test set as a list of tuples (user, item , rating, (optional) timestamp)
+        """
+        return list(self.validation.itertuples(index=False, name=None))
 
     def load_all_folds(self) -> list:
         """
