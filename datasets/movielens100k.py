@@ -1,6 +1,6 @@
-from datasets.dataset import Dataset
+from datasets.dataset_experiment import DatasetExperiment
 
-class MovieLens100K(Dataset):
+class MovieLens100K(DatasetExperiment):
 
     __K_FOLDS = 5
 

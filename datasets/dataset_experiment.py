@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
+from cornac.data import Reader, Dataset
 
-class Dataset:
+class DatasetExperiment:
     def __init__(self, name: str, path: str, original_file_name: str,
-                 user_column: str, item_column: str, rating_column: str, binarize=True,
-                 k_folds=5):
+                 user_column: str, item_column: str, rating_column: str, binarize=0,
+                 read_format="UIRT", k_folds=5, seed=42):
         """
         Dataset class definition. The Dataset class has three main attributes.
         :param name: name of the dataset
@@ -13,8 +14,10 @@ class Dataset:
         :param user_column: name of the user column on the dataset
         :param item_column: name of the item column on the dataset
         :param rating_column: name of the rating column on the dataset
-        :param binarize: if true transform explicit ratings into 1 to binarize
+        :param binarize: if above value transform into 1, else exclude
+        :param read_format: can be 'UIRT' for user item rating and timestamp or 'UIR' for user item rating
         :param k_folds: number of folds in which the dataset was divided
+        :param seed: seed number
         """
         self.__name = name
         self.__path = path
@@ -25,10 +28,12 @@ class Dataset:
         self.k_folds = k_folds
         self.folds_set = []
         self.fold_loaded = -1
-        self.train = pd.DataFrame()
-        self.validation = pd.DataFrame()
-        self.test = pd.DataFrame()
+        self.train = None
+        self.validation = None
+        self.test = None
         self.binarize = binarize
+        self.read_format = read_format
+        self.seed = seed
 
     def load_original(self) -> pd.DataFrame:
         """
@@ -37,46 +42,41 @@ class Dataset:
         """
         return pd.read_csv(self.__path + '''/''' + self.__original_file_name)
 
-    def load_fold(self, i: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def load_fold(self, i: int) -> tuple[Dataset, Dataset, Dataset]:
         """
         Function to load a fold of the dataset
         :param i: number of the fold to load
         :return: train, validation and test sets as a tuple of DataFrames
         """
         assert(i <= self.k_folds), f'''The dataset {self.__name} has five folds (0 to {self.k_folds-1})'''
+        assert self.read_format in ["UIRT", "UIR"], f'''Format should be UIRT or UIR'''
+
+        reader = Reader(bin_threshold=self.binarize)
         path = self.__path + f'''/folds/{i}/'''
-        self.train = pd.read_csv(path + '''train.csv''')
-        self.validation = pd.read_csv(path + '''validation.csv''')
-        self.test = pd.read_csv(path + '''test.csv''')
+
+        if self.read_format == "UIRT":
+            self.train = Dataset.from_uirt(
+                reader.read(path + '''train.csv''', sep=',', skip_lines=1, fmt=self.read_format),
+                seed=self.seed)
+            self.validation = Dataset.from_uirt(
+                reader.read(path + '''validation.csv''', sep=',', skip_lines=1, fmt=self.read_format),
+                seed=self.seed)
+            self.test = Dataset.from_uirt(
+                reader.read(path + '''test.csv''', sep=',', skip_lines=1, fmt=self.read_format),
+                seed=self.seed)
+        else:
+            self.train = Dataset.from_uir(
+                reader.read(path + '''train.csv''', sep=',', skip_lines=1, fmt=self.read_format),
+                seed=self.seed)
+            self.validation = Dataset.from_uir(
+                reader.read(path + '''validation.csv''', sep=',', skip_lines=1, fmt=self.read_format),
+                seed=self.seed)
+            self.test = Dataset.from_uir(
+                reader.read(path + '''test.csv''', sep=',', skip_lines=1, fmt=self.read_format),
+                seed=self.seed)
+
         self.fold_loaded = i
-
-        if self.binarize:
-            self.train[self.rating_column] = 1
-            self.validation[self.rating_column] = 1
-            self.test[self.rating_column] = 1
-
         return self.train, self.validation, self.test
-
-    def get_cornac_train(self) -> list:
-        """
-        Returns train set in the format of list of tuples so cornac can use
-        :return: train set as a list of tuples (user, item , rating, (optional) timestamp)
-        """
-        return list(self.train.itertuples(index=False, name=None))
-
-    def get_cornac_validation(self) -> list:
-        """
-        Returns validation set in the format of list of tuples so cornac can use
-        :return: validation set as a list of tuples (user, item , rating, (optional) timestamp)
-        """
-        return list(self.validation.itertuples(index=False, name=None))
-
-    def get_cornac_test(self) -> list:
-        """
-        Returns test set in the format of list of tuples so cornac can use
-        :return: test set as a list of tuples (user, item , rating, (optional) timestamp)
-        """
-        return list(self.validation.itertuples(index=False, name=None))
 
     def load_all_folds(self) -> list:
         """
@@ -98,7 +98,7 @@ class Dataset:
         """
 
         if fold_number == -1:
-            assert ((self.train.shape[0] > 0) & (self.validation.shape[0] > 0) & (self.test.shape[0] > 0)), \
+            assert ((self.train.num_ratings > 0) & (self.validation.num_ratings > 0) & (self.test.num_ratings > 0)), \
                     f'''Train/Validation/Test set was initialized, use the function load_fold or 
                     set the fold_number parameter on this function'''
             train_set = self.train
@@ -114,34 +114,31 @@ class Dataset:
             test_set = self.folds_set[fold_number][2]
             fold_loaded = fold_number
 
-        trn_s = train_set.shape[0]
-        val_s = validation_set.shape[0]
-        tst_s = test_set.shape[0]
+        trn_s = train_set.num_ratings
+        val_s = validation_set.num_ratings
+        tst_s = test_set.num_ratings
         total = trn_s + val_s + tst_s
         full_df = self.load_original()
         full = full_df.shape[0]
 
         print(f'''#### Fold {fold_loaded} statistics ####''')
         print('''--- Training Raw Stats ---''')
-        print(f'''Number of users:\t {train_set[self.user_column].unique().size}''')
-        print(f'''Number of items:\t {train_set[self.item_column].unique().size}''')
+        print(f'''Number of users:\t {train_set.num_users}''')
+        print(f'''Number of items:\t {train_set.num_items}''')
         print(f'''Number of ratings:\t {trn_s}''')
-        print(f'''Average of rating:\t {train_set[self.rating_column].mean()}''')
-        print(f'''Std of rating:\t\t {train_set[self.rating_column].std()}\n''')
+        print(f'''Average of rating:\t {train_set.global_mean}\n''')
 
         print('''--- Validation Raw Stats ---''')
-        print(f'''Number of users:\t {validation_set[self.user_column].unique().size}''')
-        print(f'''Number of items:\t {validation_set[self.item_column].unique().size}''')
+        print(f'''Number of users:\t {validation_set.num_users}''')
+        print(f'''Number of items:\t {validation_set.num_items}''')
         print(f'''Number of ratings:\t {val_s}''')
-        print(f'''Average of rating:\t {validation_set[self.rating_column].mean()}''')
-        print(f'''Std of rating:\t\t {validation_set[self.rating_column].std()}\n''')
+        print(f'''Average of rating:\t {validation_set.global_mean}\n''')
 
         print('''--- Test Raw Stats ---''')
-        print(f'''Number of users:\t {test_set[self.user_column].unique().size}''')
-        print(f'''Number of items:\t {test_set[self.item_column].unique().size}''')
+        print(f'''Number of users:\t {test_set.num_users}''')
+        print(f'''Number of items:\t {test_set.num_items}''')
         print(f'''Number of ratings:\t {tst_s}''')
-        print(f'''Average of rating:\t {test_set[self.rating_column].mean()}''')
-        print(f'''Std of rating:\t\t {test_set[self.rating_column].std()}\n''')
+        print(f'''Average of rating:\t {test_set.global_mean}\n''')
 
         print('''--- Dataset Percentage Stats ---''')
         print(f'''Training percentage:\t {trn_s/total}''')

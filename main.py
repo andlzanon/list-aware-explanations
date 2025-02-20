@@ -29,27 +29,25 @@ parser.add_argument("--alg",
 
 args = parser.parse_args()
 
-ds = None
-train_set = None
-validation_set = None
-test_set = None
-seed = 42
-
 ml = MovieLens100K()
 ds = ml.load_fold(args.fold)
-train_set = Dataset.from_uirt(ml.get_cornac_train(), seed=seed)
-validation_set = Dataset.from_uirt(ml.get_cornac_validation(), seed=seed)
-test_set = Dataset.from_uirt(ml.get_cornac_test(), seed=seed)
-print(ml.fold_percentage())
+ml.load_all_folds()
+ml.fold_percentage(0)
+ml.fold_percentage(1)
+ml.fold_percentage(2)
+ml.fold_percentage(3)
+ml.fold_percentage(4)
+
+print('--- Train Set ---')
+print('Number of users: {}'.format(ml.train.num_users))
+print('Number of items: {}'.format(ml.train.num_items))
+print('Number of ratings: {}'.format(ml.train.num_ratings))
+
+print(ml.test.global_mean)
+print(ml.test.max_rating)
+print(ml.test.min_rating)
+print(ml.test.dok_matrix)
 
 if args.dataset == "ml":
     ml = MovieLens100K()
     ds = ml.load_fold(args.fold)
-    train_set = Dataset.from_uirt(ml.get_cornac_train(), seed=seed)
-    validation_set = Dataset.from_uirt(ml.get_cornac_validation(), seed=seed)
-    test_set = Dataset.from_uirt(ml.get_cornac_test(), seed=seed)
-
-    print('--- Train Set ---')
-    print('Number of users: {}'.format(train_set.num_users))
-    print('Number of items: {}'.format(train_set.num_items))
-    print('Number of ratings: {}'.format(train_set.num_ratings))
