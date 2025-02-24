@@ -51,8 +51,6 @@ def __explod_ranked_paths(prop_set: pd.DataFrame, ranked_items: list, items_hist
     # get properties from historic and recommended items
     hist_props = prop_set.loc[items_historic]
     prop_cols = prop_set.columns
-    hist_lists = []
-    prop_lists = []
     for r in ranked_items:
         rec_props = prop_set.loc[int(r)]
 
@@ -93,7 +91,6 @@ def __explod_ranked_paths(prop_set: pd.DataFrame, ranked_items: list, items_hist
         origin = origin[:-2]
 
         path_sentence = " that share the attribute "
-        prop_lists.append(max_props)
         for n in max_props:
             path_sentence = path_sentence + "\"" + n + "\" "
         destination = ", watch \"" + rec_name + "\" that has the same attribute"
