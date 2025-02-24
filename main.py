@@ -81,22 +81,22 @@ def __explod_ranked_paths(prop_set: pd.DataFrame, ranked_items: list, items_hist
         hist_ids = list(user_item.sort_values(by=user_item.columns[-1], ascending=False)[:3][user_item.columns[0]].astype(int))
         hist_names = hist_props.loc[hist_ids][prop_cols[0]].unique()
         try:
-            rec_name = prop_set.loc[int(r)][prop_cols[1]].unique()[0]
+            rec_name = prop_set.loc[int(r)]['title'].unique()[0]
         except AttributeError:
-            rec_name = prop_set.loc[r][prop_cols[1]]
+            rec_name = prop_set.loc[int(r)][prop_cols[0]]
 
-        print("\nPaths for the Recommended Item: " + str(r))
-        origin = ""
+        print("\nRecommended Item: " + str(r) + ": " + str(rec_name))
+        origin = "Because you watched "
         # check for others with same value
         for i in hist_names:
             origin = origin + "\"" + i + "\"; "
         origin = origin[:-2]
 
-        path_sentence = " nodes: "
+        path_sentence = " that share the attribute "
         prop_lists.append(max_props)
         for n in max_props:
             path_sentence = path_sentence + "\"" + n + "\" "
-        destination = "destination: \"" + rec_name + "\""
+        destination = ", watch \"" + rec_name + "\" that has the same attribute"
         print(origin + path_sentence + destination)
 
 parser = argparse.ArgumentParser()
@@ -133,7 +133,7 @@ bpr = cornac.models.BPR(k=10, max_iter=200, learning_rate=0.001, lambda_reg=0.01
 bpr.fit(train_set=ml.train, val_set=ml.validation)
 
 user_id = '1'
-recs = bpr.recommend(user_id=user_id, k=1, train_set=ml.train, remove_seen=True)
+recs = bpr.recommend(user_id=user_id, k=3, train_set=ml.train, remove_seen=True)
 
 u_hist = [next((int(k) for k, v in ml.train.iid_map.items() if v == u_item), None) for u_item in ml.train.chrono_user_data[ml.train.uid_map[user_id]][0]]
 sem_pro = user_semantic_profile(ml.prop_set, u_hist)
