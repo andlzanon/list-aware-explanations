@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from datasets.dataset_experiment import DatasetExperiment
+from dataset_experiment.dataset_experiment import DatasetExperiment
 from sklearn.model_selection import KFold
 from recommenders.datasets.python_splitters import python_stratified_split
 import warnings
@@ -17,14 +17,13 @@ class MovieLens100K(DatasetExperiment):
         MovieLens 100k class constructor
         :param gen_dataset: if true generate the dataset on class constructor
         """
+        prop_set = pd.read_csv("./knowledge-graphs/props_wikidata_movielens_small.csv",
+                                    usecols=['movieId', 'title', 'prop', 'obj']).set_index('movieId')
+
         super().__init__(name="MovieLens100k", path="./datasets/ml-latest-small",
                          user_column="userId", item_column="movieId", rating_column="rating",
-                         original_file_name="ratings_processed.csv", k_folds=self.__K_FOLDS,
-                         split_percentage=0.8, gen_dataset=gen_dataset)
-
-        self.prop_set = pd.read_csv("./knowledge-graphs/props_wikidata_movielens_small.csv",
-                                    usecols=['movieId', 'title', 'prop', 'obj'])
-        self.prop_set = self.prop_set.set_index('movieId')
+                         prop_set=prop_set, original_file_name="ratings_processed.csv",
+                         k_folds=self.__K_FOLDS, split_percentage=0.8, gen_dataset=gen_dataset)
 
         if gen_dataset:
             self.generate_dataset()

@@ -3,7 +3,8 @@ import cornac
 import numpy as np
 import pandas as pd
 
-from datasets.movielens100k import MovieLens100K
+from dataset_experiment.movielens100k import MovieLens100K
+from explanations.explod import ExpLOD
 
 
 def user_semantic_profile(prop_set: pd.DataFrame, historic: list) -> dict:
@@ -129,12 +130,16 @@ ml.fold_percentage()
 bpr = cornac.models.BPR(k=10, max_iter=200, learning_rate=0.001, lambda_reg=0.01, seed=123, verbose=True)
 bpr.fit(train_set=ml.train, val_set=ml.validation)
 
-user_id = '1'
-recs = bpr.recommend(user_id=user_id, k=3, train_set=ml.train, remove_seen=True)
+user_id = '5'
+recs = bpr.recommend(user_id=user_id, k=10, train_set=ml.train, remove_seen=True)
 
 u_hist = [next((int(k) for k, v in ml.train.iid_map.items() if v == u_item), None) for u_item in ml.train.chrono_user_data[ml.train.uid_map[user_id]][0]]
 sem_pro = user_semantic_profile(ml.prop_set, u_hist)
 __explod_ranked_paths(ml.prop_set, list(recs), u_hist, sem_pro, int(user_id), ml.load_fold_asdf(-1)[0])
+
+print("### class ###")
+explod = ExpLOD(ml, bpr)
+explod.user_explanation(user='5', top_k=10, remove_seen=True)
 
 
 if args.dataset == "ml":

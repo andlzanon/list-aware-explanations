@@ -4,7 +4,7 @@ from cornac.data import Reader, Dataset
 
 class DatasetExperiment:
     def __init__(self, name: str, path: str, original_file_name: str,
-                 user_column: str, item_column: str, rating_column: str,
+                 user_column: str, item_column: str, rating_column: str, prop_set: pd.DataFrame,
                  binarize=0, read_format="UIRT", k_folds=5, seed=42,
                  split_percentage=0.8, gen_dataset=False):
         """
@@ -15,6 +15,7 @@ class DatasetExperiment:
         :param user_column: name of the user column on the dataset
         :param item_column: name of the item column on the dataset
         :param rating_column: name of the rating column on the dataset
+        :param prop_set: kg as dataframe with item id as index and 'title', 'prop', 'obj' as triples
         :param binarize: if above value transform into 1, else exclude
         :param read_format: can be 'UIRT' for user item rating and timestamp or 'UIR' for user item rating
         :param k_folds: number of folds in which the dataset was divided
@@ -28,6 +29,7 @@ class DatasetExperiment:
         self.user_column = user_column
         self.item_column = item_column
         self.rating_column = rating_column
+        self.prop_set = prop_set
         self.k_folds = k_folds
         self.folds_set = []
         self.fold_loaded = -1
