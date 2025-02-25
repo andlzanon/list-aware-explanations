@@ -1,7 +1,5 @@
 import argparse
 import cornac
-import numpy as np
-import pandas as pd
 
 from dataset_experiment.movielens100k import MovieLens100K
 from explanations.explod import ExpLOD

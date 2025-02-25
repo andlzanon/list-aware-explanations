@@ -169,6 +169,7 @@ cython_debug/
 
 # Project git ignore
 notebooks/exploration/*
+**/outputs/*
 
 # PyPI configuration file
 .pypirc
