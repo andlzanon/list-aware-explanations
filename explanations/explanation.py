@@ -16,22 +16,24 @@ class ExplanationAlgorithm:
         self.dataset = dataset
         self.model = model
 
-    def user_explanation(self, user: str, top_n: int, remove_seen=True, **kwargs):
+    def user_explanation(self, user: str, top_n: int, remove_seen=True, verbose=True, **kwargs) -> dict:
         """
         Function to generate
         :param user: user id to show explanations to
         :param top_n: number of recommendations to generate explanations to
         :param remove_seen: True if model should exclude seen items, False otherwise
-        :return:
+        :param verbose: True to print explanations
+        :return: dict where key is recommended item and value is explanation
         """
         pass
 
-    def all_users_explanations(self, top_n: int, output_file: str, remove_seen=True):
+    def all_users_explanations(self, top_n: int, output_file: str, remove_seen=True, verbose=True) -> None:
         """
         Function to generate explanations to all users on the train set
         :param top_n: number of recommendations to generate explanations to
         :param output_file: file name to save output
         :param remove_seen: True if model should exclude seen items, False otherwise
-        :return:
+        :param verbose: True to print explanations
+        :return: File with explanations to all users in file system
         """
         pass

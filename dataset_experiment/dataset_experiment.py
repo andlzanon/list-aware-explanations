@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from cornac.data import Reader, Dataset
 
+
 class DatasetExperiment:
     def __init__(self, name: str, path: str, original_file_name: str,
                  user_column: str, item_column: str, rating_column: str, prop_set: pd.DataFrame,
@@ -24,8 +25,8 @@ class DatasetExperiment:
         :param gen_dataset: if true, generate dataset in constructor
         """
         self.__name = name
-        self.__path = path
         self.__original_file_name = original_file_name
+        self.path = path
         self.user_column = user_column
         self.item_column = item_column
         self.rating_column = rating_column
@@ -47,18 +48,18 @@ class DatasetExperiment:
         Load the original dataset without preprocessing, not divided in train/validation/test
         :return: dataframe with the original dataset
         """
-        return pd.read_csv(self.__path + '''/''' + self.__original_file_name)
+        return pd.read_csv(self.path + '''/''' + self.__original_file_name)
 
-    def load_fold_asdf(self, i=-1) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def load_fold_asdf(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Function to load a fold of the dataset as a tuple of DataFrames
-        :param i: number of the fold to load. if -1 load the stratified split and the validation set is an empty df
+        number of the fold to load is the fold_loaded of the class.
+        if it is -1 load the stratified split and the validation set is an empty df.
         :return: train, validation and test sets as a tuple of DataFrames
         """
 
-        if i > 0:
-            assert (i <= self.k_folds), f'''The dataset {self.__name} has five folds (0 to {self.k_folds - 1})'''
-            path = self.__path + f'''/folds/{i}/'''
+        if self.fold_loaded > 0:
+            path = self.path + f'''/folds/{self.fold_loaded}/'''
             train_df = pd.read_csv(path + '''train.csv''', dtype='object')
             validation_df = pd.read_csv(path + '''validation.csv''', dtype='object')
             test_df = pd.read_csv(path + '''test.csv''', dtype='object')
@@ -68,7 +69,7 @@ class DatasetExperiment:
             test_df["rating"] = test_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
 
         else:
-            path = self.__path + f'''/stratified_split/'''
+            path = self.path + f'''/stratified_split/'''
             train_df = pd.read_csv(path + '''train.csv''', dtype='object')
             test_df = pd.read_csv(path + '''test.csv''', dtype='object')
             validation_df = pd.DataFrame()
@@ -93,10 +94,10 @@ class DatasetExperiment:
         fold_split = True
         if i >= 0:
             self.fold_loaded = i
-            path = self.__path + f'''/folds/{i}/'''
+            path = self.path + f'''/folds/{i}/'''
         else:
             self.fold_loaded = -1
-            path = self.__path + f'''/stratified_split/'''
+            path = self.path + f'''/stratified_split/'''
             fold_split = False
 
         if self.read_format == "UIRT":

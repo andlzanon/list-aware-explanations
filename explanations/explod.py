@@ -48,23 +48,25 @@ class ExpLOD(ExplanationAlgorithm):
 
         return fav_prop
         
-    def user_explanation(self, user: str, top_k: int, remove_seen=True, top_n=1):
+    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, top_n=1) -> dict:
         """
         Generate user explanation with ExpLOD algorithm link: https://dl.acm.org/doi/abs/10.1145/2959100.2959173
         :param user: user id
         :param top_k: top k items to explain
         :param remove_seen: True if model should exclude seen items, False otherwise
+        :param verbose: True to print explanations
         :param top_n: number of top attributes to generate the explanation
-        :return: explanations printed
+        :return: explanations as dict where key is recommended item and value is explanation
         """
 
+        user_explanations = {}
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                           for u_item in self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
         ranked_items = list(self.model.recommend(user_id=user, k=top_k,
                                                  train_set=self.dataset.train,
                                                  remove_seen=remove_seen))
         
-        train_set = self.dataset.load_fold_asdf(-1)[0]
+        train_set = self.dataset.load_fold_asdf()[0]
         semantic_profile = self.__user_semantic_profile(items_historic)
 
         # get properties from historic and recommended items
@@ -100,7 +102,6 @@ class ExpLOD(ExplanationAlgorithm):
             except AttributeError:
                 rec_name = self.dataset.prop_set.loc[int(r)][prop_cols[0]]
 
-            print("\nRecommended Item: " + str(r) + ": " + str(rec_name))
             origin = "Because you watched "
             # check for others with same value
             for i in hist_names:
@@ -111,5 +112,16 @@ class ExpLOD(ExplanationAlgorithm):
             for n in max_props:
                 path_sentence = path_sentence + "\"" + n + "\" "
             destination = ", watch \"" + rec_name + "\" that has the same attribute"
-            print(origin + path_sentence + destination)
+            full_sentence = origin + path_sentence + destination
+
+            user_explanations[r] = full_sentence
+            if verbose:
+                print("\nRecommended Item: " + str(r) + ": " + str(rec_name))
+                print(full_sentence)
+
+        return user_explanations
+
+    def all_users_explanations(self, top_n: int, output_file: str, remove_seen=True, verbose=True):
+        # TODO: implement function
+        pass
         
