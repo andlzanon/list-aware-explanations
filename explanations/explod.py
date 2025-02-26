@@ -48,7 +48,8 @@ class ExpLOD(ExplanationAlgorithm):
 
         return fav_prop
         
-    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, top_n=1) -> dict:
+    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, top_n=1,
+                         hitems_per_attr=2) -> dict:
         """
         Generate user explanation with ExpLOD algorithm link: https://dl.acm.org/doi/abs/10.1145/2959100.2959173
         :param user: user id
@@ -56,6 +57,9 @@ class ExpLOD(ExplanationAlgorithm):
         :param remove_seen: True if model should exclude seen items, False otherwise
         :param verbose: True to print explanations
         :param top_n: number of top attributes to generate the explanation
+        :param hitems_per_attr: number of historic items showed per attribute on explanation.
+            In an example such as: I recommend you Titanic since you ofter like drama items as X, Y, Z.
+            hitems_per_attr is 3, because we are using X, Y and Z profile items to support the attribute
         :return: explanations as dict where key is recommended item and value is explanation
         """
 
@@ -89,32 +93,41 @@ class ExpLOD(ExplanationAlgorithm):
             # build sentence
             train_c = train_set.copy()
             train_c = train_c.set_index(train_set.columns[0])
-
             user_df = train_c.loc[str(user)]
-            user_item = user_df[
-                user_df[user_df.columns[0]].isin(
-                    list(hist_props[hist_props['obj'].isin(max_props)].index.unique().astype(str)))]
-            hist_ids = list(
-                user_item.sort_values(by=user_item.columns[-1], ascending=False)[:3][user_item.columns[0]].astype(int))
-            hist_names = hist_props.loc[hist_ids][prop_cols[0]].unique()
             try:
                 rec_name = self.dataset.prop_set.loc[int(r)]['title'].unique()[0]
             except AttributeError:
                 rec_name = self.dataset.prop_set.loc[int(r)][prop_cols[0]]
+            full_sentence = "I recommend you " + "\"" + str(rec_name) + "\" since you often like "
 
-            origin = "Because you watched "
-            # check for others with same value
-            for i in hist_names:
-                origin = origin + "\"" + i + "\"; "
-            origin = origin[:-2]
+            for pi in range(0, len(max_props)):
+                p = max_props[pi]
+                path_sentence = "\"" + p + "\" items as "
+                user_item = user_df[
+                    user_df[user_df.columns[0]].isin(
+                        list(hist_props[hist_props['obj'] == p].index.unique().astype(str)))]
+                hist_ids = list(
+                    user_item.sort_values(by=user_item.columns[-1],
+                                          ascending=False)[:hitems_per_attr][user_item.columns[0]].astype(int))
+                hist_names = hist_props.loc[hist_ids][prop_cols[0]].unique()
 
-            path_sentence = " that share the attribute "
-            for n in max_props:
-                path_sentence = path_sentence + "\"" + n + "\" "
-            destination = ", watch \"" + rec_name + "\" that has the same attribute"
-            full_sentence = origin + path_sentence + destination
+                # check for others with same value
+                hist_sentence = ""
+                for i in range(0, len(hist_names)):
+                    hname = hist_names[i]
+                    hist_sentence += "\"" + hname + "\", "
+                hist_sentence_parts = hist_sentence[:-2].rsplit(", ", 1)
+                hist_sentence = " and ".join(hist_sentence_parts) if len(hist_sentence_parts) > 1 else hist_sentence
+                path_sentence += hist_sentence
 
-            user_explanations[r] = full_sentence
+                full_sentence += path_sentence
+                if top_n > 1 and pi <= top_n-1:
+                    if pi == 0:
+                        full_sentence += ". Moreover, I recommend it because you sometimes like "
+                    else:
+                        full_sentence += " and "
+
+            user_explanations[r] = full_sentence[:-5]
             if verbose:
                 print("\nRecommended Item: " + str(r) + ": " + str(rec_name))
                 print(full_sentence)

@@ -43,7 +43,8 @@ rec_list = rec.recommend_to_user(user_id=user_id, k=10)
 print(rec_list)
 
 explod = ExpLOD(ml, rec.model)
-expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True, verbose=False)
+expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                verbose=False, top_n=3, hitems_per_attr=2)
 
 for key in expls.keys():
     print("\nRecommended Item: " + str(key))
