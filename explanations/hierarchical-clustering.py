@@ -26,6 +26,16 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.n_clusters = n_clusters
 
     def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, **kwargs) -> dict:
+        """
+        Generate explanation based on hierarchical clustering of items based on the simple presence of those
+        We will be able to generate cuts on the dendrogram and generate explanations for the clusters generated
+        :param user: user id
+        :param top_k: top k items to explain
+        :param remove_seen: True if model should exclude seen items, False otherwise
+        :param verbose: True to print explanations
+        :param kwargs: additional arguments
+        :return:
+        """
         user_explanations = {}
 
         # generate user recommendations
@@ -81,4 +91,5 @@ class HierarchicalClustering(ExplanationAlgorithm):
         return user_explanations
 
     def all_users_explanations(self, top_n: int, output_file: str, remove_seen=True, verbose=True) -> None:
+        # TODO: implement function
         pass
