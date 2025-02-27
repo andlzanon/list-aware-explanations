@@ -22,11 +22,12 @@ Or create a conda enviroment with the following command:
     conda env create --f requirements.txt
 
 I advise to remove the library [Recommenders](https://github.com/recommenders-team/recommenders) from the requirements 
-and installing it without the dependencies, otherwise it will request a different version of Cornac and previous 
-versions of other libraries. Since we are using ```recommenders``` only to evaluate recommendations, the dependencies 
+and installing it without the dependencies, otherwise it will request a different version of 
+[Cornac](https://github.com/PreferredAI/cornac) (which was used to implement recommender engines), and previous 
+versions of other libraries. Since we are using ```recommenders``` only to evaluate ranking metrics, the dependencies 
 are not required and already installed. The version of ```recommenders``` used is 1.2.1.
 
-    pip install --no-deps recommenders]
+    pip install --no-deps recommenders
 
 We used [Anaconda](https://www.anaconda.com/) to run the experiments. The version of Python used was the [3.12.3](https://www.python.org/downloads/release/python-3123/).
 
