@@ -2,16 +2,17 @@
 
 ## Description
 The main objective of this project is to generate list
-aware explanations. As a result, explanations consider that
-items are on a list and that explanations may not be for
-single items, but also for a set. In this sense, this it 
-is also important to know the best ways to explain the many
+aware explanations for recommendations. Consequently, this explanation algorithm 
+consider that items are on a list and that explanations may not be only for
+single items, but also for a set. 
+
+Furthermore, this explores also the best ways to explain the many
 possible sub-lists of recommendations within a set of 
 recommendations. Such concept can even be used in carrousels, where tags
-are used to explain a row of items.
+are used to explain a row of recommended items.
 
 ## Reproduction
-### Enviroment 
+### Environment 
 To install the libraries used in this project, use the command: 
     
     pip install requirements
