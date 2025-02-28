@@ -1,4 +1,5 @@
 import inspect
+import os
 
 import cornac.models
 import pandas as pd
@@ -9,7 +10,8 @@ from recommenders.models.cornac.cornac_utils import predict_ranking
 
 
 class RecommenderSystem:
-    def __init__(self, model: cornac.models.Recommender, dataset: DatasetExperiment, remove_seen=True):
+    def __init__(self, model: cornac.models.Recommender, dataset: DatasetExperiment,
+                 load_path=None, remove_seen=True):
         """
         Recommendation class. It generates a list of recommendations for the user and also extract
         metrics. The class uses cornac recommender engines and evaluates with the recommenders library
@@ -28,20 +30,37 @@ class RecommenderSystem:
             name_params = name_params + str(key) + "=" + str(model_params[key]) + "&"
 
         self.model_name = name_params[:-1]
-        self.model = model
         self.dataset = dataset
         self.remove_seen = remove_seen
+        self.load_path = load_path
+        self.model = model
 
-    def fit_model(self) -> cornac.models.Recommender:
+    def fit_model(self, save=True) -> object:
         """
         Function to fit the model into the training dataset
+        :param save: if true, save trained model on file system. This parameter is ignored if load_path on class
+        constructor is not None
         :return: fitted model
         """
-        print("Training model...")
+        if self.load_path is None:
+            print("Training model...")
+        else:
+            path = self.get_path("model") + self.load_path
+            print("Loading model from " + path + " ...")
+            self.model = type(self.model).load(path)
+            self.model.train_set = self.dataset.train
+            return self.model
+
         if self.dataset.validation is not None:
             self.model.fit(train_set=self.dataset.train, val_set=self.dataset.validation)
         else:
             self.model.fit(train_set=self.dataset.train)
+
+        if save:
+            path = self.get_path("model")
+            if not (os.path.exists(path)):
+                os.mkdir(path)
+            self.model.save(save_dir=path, save_trainset=True)
 
         return self.model
 
@@ -72,13 +91,9 @@ class RecommenderSystem:
                         predcol=self.dataset.rating_column, remove_seen=self.remove_seen)
 
         if save_results:
-            path = self.dataset.path
-            if self.dataset.fold_loaded == -1:
-                path = path + "/stratified_split/outputs/"
-            else:
-                path = path + "/folds/" + str(self.dataset.fold_loaded) + "/outputs/"
+            path = self.get_path("outputs")
             path = path + self.model_name + ".csv"
-            predictions.to_csv(path, header=True, index=False)
+            predictions.to_csv(path, header=True, index=False, mode="w+")
 
         print("Generating Metrics...")
         metrics = self.__evaluate(predictions=predictions, test_recs=test_df,
@@ -124,15 +139,24 @@ class RecommenderSystem:
                 print(f'''Recall@{k}: {eval_recall}''')
 
         if save_results:
-            path = self.dataset.path
-            if self.dataset.fold_loaded == -1:
-                path = path + "/stratified_split/results/"
-            else:
-                path = path + "/folds/" + str(self.dataset.fold_loaded) + "/results/"
-
+            path = self.get_path("results")
             path = path + self.model_name + ".txt"
             with open(path, 'w') as f:
                 for key, value in metrics_dict.items():
                     f.write(f'''{key}:{value}\n''')
 
         return metrics_dict
+
+    def get_path(self, last_folder: str) -> str:
+        """
+        Get path to save a file or folder
+        :param last_folder: it will be outputs or model or results to save the file in the appropriate folder
+        :return: path in the file system as str
+        """
+        path = self.dataset.path
+        if self.dataset.fold_loaded == -1:
+            path = path + f'''/stratified_split/{last_folder}/'''
+        else:
+            path = path + f'''/folds/{self.dataset.fold_loaded}/{last_folder}/'''
+
+        return path

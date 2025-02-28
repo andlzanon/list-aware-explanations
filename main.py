@@ -3,6 +3,7 @@ import cornac
 
 from dataset_experiment.movielens100k import MovieLens100K
 from explanations.explod import ExpLOD
+from explanations.hierarchical_clustering import HierarchicalClustering
 from recommender.recommender_system import RecommenderSystem
 
 parser = argparse.ArgumentParser()
@@ -36,19 +37,26 @@ user_id = '5'
 
 rec = RecommenderSystem(model=cornac.models.BPR(k=200, max_iter=200, learning_rate=0.01,
                                                 lambda_reg=1e-3, seed=42, verbose=True),
-                        dataset=ml, remove_seen=True)
+                        dataset=ml, remove_seen=True,
+                        load_path="BPR"
+                        #load_path=None
+                        )
 
-rec.fit_model()
+rec.fit_model(save=True)
 rec_list = rec.recommend_to_user(user_id=user_id, k=10)
 print(rec_list)
 
 explod = ExpLOD(ml, rec.model)
-expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True,
+explod_expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True,
                                 verbose=False, top_n=3, hitems_per_attr=2)
 
-for key in expls.keys():
+cluter = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward', criterion="maxclust")
+cluter_expls = cluter.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                verbose=False)
+
+for key in explod_expls.keys():
     print("\nRecommended Item: " + str(key))
-    print(expls[key])
+    print(explod_expls[key])
     print()
 
 rec.run_experiment([10], True)
