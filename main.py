@@ -46,18 +46,28 @@ rec.fit_model(save=True)
 rec_list = rec.recommend_to_user(user_id=user_id, k=10)
 print(rec_list)
 
+print("--- ExpLOD Algorithm ---")
 explod = ExpLOD(ml, rec.model)
 explod_expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True,
                                 verbose=False, top_n=3, hitems_per_attr=2)
 
-cluter = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward', criterion="maxclust")
-cluter_expls = cluter.user_explanation(user=user_id, top_k=10, remove_seen=True,
-                                verbose=False)
+print("--- Clustering Algorithm with Euclidean Similarity ---")
+cluter_euclid = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward',
+                                       metric="euclidean", criterion="maxclust", vec_method='binary')
+cluter_euclid_expls = cluter_euclid.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                                     verbose=True, show_dendrogram=False)
 
-for key in explod_expls.keys():
-    print("\nRecommended Item: " + str(key))
-    print(explod_expls[key])
-    print()
+print("--- Clustering Algorithm with Cosine Similarity ---")
+cluter_cosine = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average',
+                                       metric="cosine", criterion="maxclust", vec_method='binary')
+cluter_cosine_expls = cluter_cosine.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                                     verbose=True, show_dendrogram=False)
+
+print("--- Clustering Algorithm with TF-IDF ---")
+cluter_rel = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average',
+                                       metric="cosine", criterion="maxclust", vec_method='relevance')
+cluter_rel_expls = cluter_rel.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                               verbose=True, show_dendrogram=False)
 
 rec.run_experiment([10], True)
 
