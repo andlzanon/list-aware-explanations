@@ -113,7 +113,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
             # get items on cluster, then the attributes of the items on the cluster
             i_cluster = [j for j in range(0, len(clusters)) if clusters[j] == i+1]
             cluster_attr = clustering_df.iloc[i_cluster]
-            # TODO: get by popularity or other criteria attributes and interacted items
             # generate explanations based on clusters
             if self.vec_method == 'binary':
                 # sum the rows to check what attributes are common across all items
