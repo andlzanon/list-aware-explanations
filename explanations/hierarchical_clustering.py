@@ -10,7 +10,7 @@ from explanations.explanation import ExplanationAlgorithm
 
 class HierarchicalClustering(ExplanationAlgorithm):
     def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, method: str, criterion: str,
-                 metric: str, n_clusters: int, vec_method='binary'):
+                 metric: str, n_clusters: int, vec_method='binary', random_state=42):
         """
         Hierarchical Clustering explanation algorithm
         :param dataset: dataset used in the recommendation model
@@ -23,6 +23,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         :param vec_method: Method to transform features into vectors. Can be 'binary' to transform into an array
         with zeros and ones, where the 0 represent that the item does not have the feature and 1 that it does, or
         'relevance' to use the Musto graph relevance score
+        :param random_state: random state number for reproducible results
         """
         super().__init__(dataset, model)
         self.method = method
@@ -30,6 +31,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.metric = metric
         self.n_clusters = n_clusters
         self.vec_method = vec_method
+        self.random_state = random_state
+        np.random.seed(self.random_state)
 
     def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) -> dict:
         """
@@ -116,7 +119,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 # sum the rows to check what attributes are common across all items
                 cluster_sum = cluster_attr.sum(axis=0)
                 # get arbitrary the top 2 attributes common across all items in the cluster
-                expl_attr_names = cluster_sum[cluster_sum == len(i_cluster)].index[:2]
+                expl_attr_names = cluster_sum[cluster_sum == len(i_cluster)].sort_index()
+                expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:2]
             elif self.vec_method == 'relevance':
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
@@ -132,7 +136,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
             pro_df = self.dataset.prop_set.loc[list(pro_items.astype(int))]
             pro_item_ids = pro_df.groupby(level=0)[obj_column].apply(lambda x: set(expl_attr_names).issubset(set(x)))
             pro_item_ids = pro_item_ids[pro_item_ids == True].index.astype(int)
-            pro_item_names = self.dataset.prop_set.loc[pro_item_ids]['title'].unique()[:2]
+            pro_item_names = self.dataset.prop_set.loc[pro_item_ids]['title'].unique()
+            pro_item_names = np.random.choice(pro_item_names, size=pro_item_names.shape[0], replace=False)[:2]
 
             # now we have all elements, lets create the sentence:
             if pro_item_names.shape[0] > 0:
