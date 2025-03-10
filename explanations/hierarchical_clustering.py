@@ -10,7 +10,7 @@ from explanations.explanation import ExplanationAlgorithm
 
 class HierarchicalClustering(ExplanationAlgorithm):
     def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, method: str, criterion: str,
-                 metric: str, n_clusters: int, vec_method='binary', random_state=42):
+                 metric: str, n_clusters: int, top_n: int, hitems_per_attr=2, vec_method='binary', random_state=42):
         """
         Hierarchical Clustering explanation algorithm
         :param dataset: dataset used in the recommendation model
@@ -20,6 +20,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
         :param criterion: The criterion to use in forming flat clusters.
         :param metric: The metric used to compute distance between clusters.
         :param n_clusters: Number of clusters
+        :param top_n: number of top attributes to generate the explanation
+        :param hitems_per_attr: number of historic items showed per attribute on explanation.
+            In an example such as: I recommend you Titanic since you ofter like drama items as X, Y, Z.
+            hitems_per_attr is 3, because we are using X, Y and Z profile items to support the attribute
         :param vec_method: Method to transform features into vectors. Can be 'binary' to transform into an array
         with zeros and ones, where the 0 represent that the item does not have the feature and 1 that it does, or
         'relevance' to use the Musto graph relevance score
@@ -30,6 +34,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.criterion = criterion
         self.metric = metric
         self.n_clusters = n_clusters
+        self.top_n = top_n
+        self.hitems_per_attr = hitems_per_attr
         self.vec_method = vec_method
         self.random_state = random_state
         np.random.seed(self.random_state)
@@ -108,7 +114,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         # run hierarchical clustering
         linkage_matrix = linkage(clustering_data, method=self.method, metric=self.metric)
         clusters = fcluster(linkage_matrix, t=self.n_clusters, criterion=self.criterion)
-        print(clusters)
+        if show_dendrogram: print(clusters)
         for i in range(0, self.n_clusters):
             # get items on cluster, then the attributes of the items on the cluster
             i_cluster = [j for j in range(0, len(clusters)) if clusters[j] == i+1]
@@ -119,11 +125,11 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 cluster_sum = cluster_attr.sum(axis=0)
                 # get arbitrary the top 2 attributes common across all items in the cluster
                 expl_attr_names = cluster_sum[cluster_sum == len(i_cluster)].sort_index()
-                expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:2]
+                expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:self.top_n]
             elif self.vec_method == 'relevance':
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
-                expl_attr_names = cluster_nonzero.mean().sort_values(ascending=False).index[:2]
+                expl_attr_names = cluster_nonzero.mean().sort_values(ascending=False).index[:self.top_n]
             else:
                 raise ValueError("Parameter vec_method is misspelled or does not exist.")
 
@@ -136,7 +142,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
             pro_item_ids = pro_df.groupby(level=0)[obj_column].apply(lambda x: set(expl_attr_names).issubset(set(x)))
             pro_item_ids = pro_item_ids[pro_item_ids == True].index.astype(int)
             pro_item_names = self.dataset.prop_set.loc[pro_item_ids]['title'].unique()
-            pro_item_names = np.random.choice(pro_item_names, size=pro_item_names.shape[0], replace=False)[:2]
+            pro_item_names = np.random.choice(pro_item_names,
+                                              size=pro_item_names.shape[0], replace=False)[:self.hitems_per_attr]
 
             # now we have all elements, lets create the sentence:
             if pro_item_names.shape[0] > 0:
