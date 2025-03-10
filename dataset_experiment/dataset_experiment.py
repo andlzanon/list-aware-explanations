@@ -127,6 +127,15 @@ class DatasetExperiment:
 
         return self.train, self.validation, self.test
 
+    def get_users(self):
+        """
+        Function that returns all train users as list
+        :return: train users ids
+        """
+        users = list(self.train.iid_map.keys())
+        users = sorted(users, key=int)
+        return users
+
     def load_all_folds(self) -> list:
         """
         Function that loads all the folds in a list. Each position of the list represent a fold.

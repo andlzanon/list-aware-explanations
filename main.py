@@ -3,6 +3,7 @@ import cornac
 
 from dataset_experiment.movielens100k import MovieLens100K
 from explanations.explod import ExpLOD
+from explanations.hierarchical_clustering import HierarchicalClustering
 from recommender.recommender_system import RecommenderSystem
 
 parser = argparse.ArgumentParser()
@@ -36,19 +37,42 @@ user_id = '5'
 
 rec = RecommenderSystem(model=cornac.models.BPR(k=200, max_iter=200, learning_rate=0.01,
                                                 lambda_reg=1e-3, seed=42, verbose=True),
-                        dataset=ml, remove_seen=True)
+                        dataset=ml, remove_seen=True,
+                        load_path="BPR"
+                        #load_path=None
+                        )
 
-rec.fit_model()
-rec_list = rec.recommend_to_user(user_id=user_id, k=10)
-print(rec_list)
+rec.fit_model(save=True)
+users = ml.get_users()[:10]
+#users = ['5']
 
-explod = ExpLOD(ml, rec.model)
-expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True,
-                                verbose=False, top_n=3, hitems_per_attr=2)
+for user_id in users:
+    print(f'''#### User {user_id} Explanations #### ''')
+    rec_list = rec.recommend_to_user(user_id=user_id, k=10)
 
-for key in expls.keys():
-    print("\nRecommended Item: " + str(key))
-    print(expls[key])
+    print("--- Clustering Algorithm with TF-IDF ---")
+    cluter_rel = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average', top_n=2, hitems_per_attr=2,
+                                        metric="cosine", criterion="maxclust", vec_method='relevance')
+    cluter_rel_expls = cluter_rel.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                                   verbose=True, show_dendrogram=False)
+
+    print("--- Clustering Algorithm with Cosine Similarity ---")
+    cluter_cosine = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average', top_n=2, hitems_per_attr=2,
+                                           metric="cosine", criterion="maxclust", vec_method='binary')
+    cluter_cosine_expls = cluter_cosine.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                                         verbose=True, show_dendrogram=False)
+
+    print("--- Clustering Algorithm with Euclidean Similarity ---")
+    cluter_euclid = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward', top_n=2, hitems_per_attr=2,
+                                           metric="euclidean", criterion="maxclust", vec_method='binary')
+    cluter_euclid_expls = cluter_euclid.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                                         verbose=True, show_dendrogram=False)
+
+    print("--- ExpLOD Algorithm ---")
+    explod = ExpLOD(ml, rec.model)
+    explod_expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True,
+                                           verbose=True, top_n=2, hitems_per_attr=2)
+
     print()
 
 rec.run_experiment([10], True)

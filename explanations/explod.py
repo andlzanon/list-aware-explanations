@@ -127,7 +127,7 @@ class ExpLOD(ExplanationAlgorithm):
                     else:
                         full_sentence += " and "
 
-            user_explanations[r] = full_sentence[:-5]
+            user_explanations[int(r)] = full_sentence[:-5]
             if verbose:
                 print("\nRecommended Item: " + str(r) + ": " + str(rec_name))
                 print(full_sentence)
