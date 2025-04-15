@@ -1,10 +1,12 @@
 import inspect
 import os
+import traceback
 
 import cornac.models
 import pandas as pd
 
 from dataset_experiment.dataset_experiment import DatasetExperiment
+from dataset_experiment import metrics
 from recommenders.evaluation.python_evaluation import map, ndcg_at_k, precision_at_k, recall_at_k
 from recommenders.models.cornac.cornac_utils import predict_ranking
 
@@ -75,7 +77,7 @@ class RecommenderSystem:
                                     train_set=self.dataset.train,
                                     remove_seen=self.remove_seen)
 
-    def run_experiment(self, k_list: list, save_results=True) -> dict:
+    def run_experiment(self, k_list: list, expl_resuls: dict, save_results=True) -> dict:
         """
         Run experiment where the recommender system will score all items to all users and extract results.
         This function can also save the score of items for all user, item tuples and the metrics in the file
@@ -96,9 +98,30 @@ class RecommenderSystem:
             predictions.to_csv(path, header=True, index=False, mode="w+")
 
         print("Generating Metrics...")
-        metrics = self.__evaluate(predictions=predictions, test_recs=test_df,
+        metrics_value = self.__evaluate(predictions=predictions, test_recs=test_df,
                                   k_list=k_list, save_results=save_results)
-        return metrics
+
+        for key in expl_resuls.keys():
+            try:
+                for k in k_list:
+                    try:
+                        grid_predictions = expl_resuls[key]["grid_items"]
+                    except KeyError:
+                        print(f'''Error model {key} does not outputted the grid predictions''')
+                        continue
+
+                    metrics_value["ndcg2d"] = metrics.ndcg_2d(predictions, grid_predictions, test_df,
+                                                              k, self.dataset.rating_column, key, col_user='userId',
+                                                              col_item='movieId',
+                                                              alpha=1, beta=1, gama=1, rows=1, columns=1, step_x=1,
+                                                              step_y=1,
+                                                              verbose=True, save_results=True)
+
+            except Exception as e:
+                print(f'''Error {e} - Full Error: {traceback.format_exc()} ''')
+                continue
+
+        return metrics_value
 
     def __evaluate(self, predictions: pd.DataFrame, test_recs: pd.DataFrame,
                    k_list: list, verbose=True, save_results=True) -> dict:

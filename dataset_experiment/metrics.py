@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pandas as pd
 from recommenders.evaluation.python_evaluation import merge_ranking_true_pred
@@ -6,9 +8,12 @@ from scipy.spatial.distance import squareform
 from scipy.stats import entropy
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 from sklearn.preprocessing import MinMaxScaler
+import warnings
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 #### EXPLANATION METRICS #####
-def lir_metric(beta: float, user: int, items: list, train_set: pd.DataFrame, col_user: str):
+def lir_metric(beta: float, user: str, items: list, train_set: pd.DataFrame, col_user: str):
     """
     Linking Interaction Recency (LIR): metric proposed in https://dl.acm.org/doi/abs/10.1145/3477495.3532041
     :param beta: parameter for the exponential decay
@@ -40,8 +45,8 @@ def lir_metric(beta: float, user: int, items: list, train_set: pd.DataFrame, col
             if row[last_col] == last_value:
                 interacted.at[i, "lir"] = last_lir
             else:
-                lir = (1 - beta) * last_lir + beta * row[last_col]
-                interacted.at[i, "lir"] = int(lir)
+                lir = (1 - beta) * float(last_lir) + beta * float(row[last_col])
+                interacted.at[i, "lir"] = lir
                 last_value = row[last_col]
                 last_lir = lir
 
@@ -50,26 +55,7 @@ def lir_metric(beta: float, user: int, items: list, train_set: pd.DataFrame, col
         np.asarray(interacted[interacted.columns[-1]]).astype(np.float64).reshape(-1, 1)).reshape(-1)
 
     # initialize mean variables
-    total_sum = 0
-    total_n = 0
-    for pro_list in items:
-        items_sum = 0
-        items_n = 0
-        for item in pro_list:
-            try:
-                value = interacted[interacted[interacted.columns[1]] == item]['normalized']
-                items_sum = items_sum + value
-                items_n = items_n + 1
-            except TypeError:
-                pass
-
-        try:
-            total_sum = total_sum + (items_sum / items_n)
-            total_n = total_n + 1
-        except ZeroDivisionError:
-            total_n = total_n + 1
-
-    return total_sum / total_n
+    return interacted[interacted["movieId"].isin([str(i) for i in items])]['normalized'].mean()
 
 def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict):
     """
@@ -122,7 +108,7 @@ def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict)
                         if row[0] == last_value:
                             count_link.at[i, "sep"] = last_sep
                         else:
-                            sep = (1 - beta) * last_sep + beta * row[0]
+                            sep = (1 - beta) * float(last_sep) + beta * float(row[0])
                             count_link.at[i, "sep"] = sep
                             last_value = row[0]
                             last_sep = sep
@@ -133,6 +119,7 @@ def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict)
                         np.asarray(count_link[count_link.columns[-1]]).astype(np.float64).reshape(-1, 1)).reshape(-1)
                 except ValueError:
                     continue
+
                 p_sep_value = count_link.loc[p][-1]
                 for l in links:
                     memo_sep[l] = count_link
@@ -168,10 +155,17 @@ def items_per_cluster(cluster_list: list):
     Explanation metrics related to the number of items in each cluster:
     This function returns, the mean of items per cluster, their std deviation, the entropy and
     an array with each position as the len of the cluster
-    :param cluster_list: list with clusters e.g.: [[1,3,4], [2,5,6], [7], [8]]
+    :param cluster_list: list with cluster number for each element on the position e.g.: [1,2,2,3,4]
     :return: mean and std of the quantity of items per cluster, entropy and the clusters by themselves
     """
-    cluster_len = np.array([len(c) for c in cluster_list])
+    n_clusters = max(cluster_list)
+    items_on_cluster = []
+    for i in range(0, n_clusters):
+        # get items on cluster, then the attributes of the items on the cluster
+        i_cluster = [j for j in range(0, len(cluster_list)) if cluster_list[j] == i + 1]
+        items_on_cluster.append(i_cluster)
+
+    cluster_len = np.array([len(c) for c in items_on_cluster])
     return cluster_len.mean(), cluster_len.std(), entropy(cluster_len), cluster_len
 
 def hierarchical_clustering_metrics(linkage_matrix: np.array, verbose=False):
@@ -180,7 +174,7 @@ def hierarchical_clustering_metrics(linkage_matrix: np.array, verbose=False):
         - [Cophonet](https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.cophenet.html)
         - [Inconsistency](https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.inconsistent.html)
     :param linkage_matrix: linkage matrix generated by the scipy hierarchical clustering algorithms
-    :param verbose: True to show the matrix generated by cophonet and inconsitency metrics
+    :param verbose: True to show the matrix generated by cophonet and inconsistency metrics
     :return: Cophonet and Inconsistency matrix mean and std as an array of tuples
     """
     sqform = squareform(cophenet(linkage_matrix))
@@ -208,7 +202,7 @@ def clustering_metrics(X: np.array, labels: np.array, verbose=False):
     :param verbose: True to print values
     :param X: feature as matrix format
     :param labels: labels generated by the clustering algorithm
-    :return: the three scores a stuple following the order on the docummentation
+    :return: the three scores a tuple following the order on the documentation
     """
     s = silhouette_score(X, labels)
     c = calinski_harabasz_score(X, labels)
@@ -222,9 +216,39 @@ def clustering_metrics(X: np.array, labels: np.array, verbose=False):
 
 
 #### RANKING METRICS #####
-def two_d_ndcg(predictions: pd.DataFrame, test_recs: pd.DataFrame,
-               k: int, rating_column: str, col_user='userId', col_item='movieId',
-               alpha=1, beta=1, gama=1, rows=1, columns=1, step_x=1, step_y=1,
+
+def fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
+    n = len(values)
+    values_copy = values.copy()
+
+    # Auto-determine grid size if not specified
+    if n > (rows * cols):
+        # Try to make the grid as square as possible
+        cols = np.ceil(np.sqrt(n))
+        rows = np.ceil(n / cols)
+
+    # Initialize empty grid with NaNs
+    positions = []
+
+    # Create list of positions with their Manhattan distance from (0, 0)
+    for i in range(int(rows)):
+        for j in range(int(cols)):
+            dist = i + j
+            positions.append(((i+1, j+1), dist))
+
+    # Sort positions by Manhattan distance
+    positions.sort(key=lambda x: x[1])
+    final_posx = [pos[0][0] for pos in positions][:n]
+    final_posy = [pos[0][1] for pos in positions][:n]
+
+    values_copy["x_irank"] = final_posx
+    values_copy["y_irank"] = final_posy
+
+    return values_copy
+
+def ndcg_2d(predictions: pd.DataFrame, grid_predictions: pd.DataFrame, test_recs: pd.DataFrame,
+               k: int, rating_column: str, alg_name: str, col_user='userId', col_item='movieId',
+               alpha=1, beta=1, gama=1, rows=3, columns=2, step_x=1, step_y=1,
                verbose=True, save_results=True):
     """
     Implementation of the 2D-NDCG According to the paper:
@@ -235,6 +259,7 @@ def two_d_ndcg(predictions: pd.DataFrame, test_recs: pd.DataFrame,
 
     :param predictions: dataframe containing scores for all possible (user item) tuples, therefore, it has
         three columns: user, item and predicted rating
+    :param grid_predictions: recommendations on a grid where each row is based on an explanation
     :param test_recs: testing set as pandas dataframe
     :param k: size at k of recommendations to evaluate
     :param alpha: alpha weighting param on y position based on the paper it is set to 1
@@ -245,6 +270,7 @@ def two_d_ndcg(predictions: pd.DataFrame, test_recs: pd.DataFrame,
     :param step_x: number of items on the row (horizontal swipe) shown when user swipes
     :param step_y: number of items on the column shown when user swipes (vertical swipe)
     :param rating_column: rating column name
+    :param alg_name: algorithms name that generated the grid rerank
     :param col_user: user column name
     :param col_item: item column name
     :param verbose: True to print the results on console, False otherwise
@@ -252,25 +278,32 @@ def two_d_ndcg(predictions: pd.DataFrame, test_recs: pd.DataFrame,
     :return: 2d-NDCG value of k
     """
 
+    test_recs_grid = test_recs.groupby('userId', group_keys=False).apply(
+        lambda group: fill_ideal_grid_by_manhattan(group, rows=rows, cols=columns))
+
     df_hit, _, _ = merge_ranking_true_pred(
         test_recs, predictions, col_user=col_user,
-        col_item=col_item,
+        col_item=col_item, relevancy_method='top_k',
         col_prediction=rating_column, k=k
     )
 
     if df_hit.shape[0] == 0:
         return 0.0
 
+    df_hit = df_hit.merge(test_recs_grid, on=[col_user, col_item], how="outer")
+
     df_dcg = df_hit.merge(predictions, on=[col_user, col_item]).merge(
         test_recs, on=[col_user, col_item], how="outer", suffixes=("_left", None)
     )
+
+    df_dcg = df_dcg.merge(grid_predictions, on=[col_user, col_item], how="outer")
 
     df_dcg["rel"] = 2 ** df_dcg[rating_column] - 1
     discfun = np.log2
     df_dcg["dcg"] = df_dcg["rel"] / discfun(alpha * df_dcg["y_rank"] +
                                             beta * df_dcg["x_rank"] +
-                                            gama * max(0, np.ceil((df_dcg["y_rank"] - columns) / step_y)) +
-                                            gama * max(0, np.ceil((df_dcg["x_rank"] - rows) / step_x))
+                                            gama * np.maximum(0, np.ceil((df_dcg["y_rank"] - columns) / step_y)) +
+                                            gama * np.maximum(0, np.ceil((df_dcg["x_rank"] - rows) / step_x))
                                             )
 
     df_idcg = df_dcg.sort_values([col_user, rating_column], ascending=False)
@@ -279,8 +312,8 @@ def two_d_ndcg(predictions: pd.DataFrame, test_recs: pd.DataFrame,
     ].rank("first", ascending=False)
     df_idcg["idcg"] = df_idcg["rel"] / discfun(alpha * df_dcg["y_irank"] +
                                                beta * df_dcg["x_irank"] +
-                                               gama * max(0, np.ceil((df_dcg["y_irank"] - columns) / step_y)) +
-                                               gama * max(0, np.ceil((df_dcg["x_irank"] - rows) / step_x))
+                                               gama * np.maximum(0, np.ceil((df_dcg["y_irank"] - columns) / step_y)) +
+                                               gama * np.maximum(0, np.ceil((df_dcg["x_irank"] - rows) / step_x))
                                                )
 
     df_user = df_dcg.groupby(col_user, as_index=False, sort=False).agg({"dcg": "sum"})
@@ -297,5 +330,5 @@ def two_d_ndcg(predictions: pd.DataFrame, test_recs: pd.DataFrame,
     # DCG over IDCG is the normalized DCG
     df_user["ndcg"] = df_user["dcg"] / df_user["idcg"]
     two_d_ndcg = df_user["ndcg"].mean()
-    if verbose: print(f'''NDCG-2D@{k}: {two_d_ndcg}''')
+    if verbose: print(f'''{alg_name} - NDCG-2D@{k}: {two_d_ndcg}''')
     return two_d_ndcg

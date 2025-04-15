@@ -2,17 +2,29 @@ import cornac.models
 import numpy as np
 import pandas as pd
 
+from dataset_experiment import metrics
 from dataset_experiment.dataset_experiment import DatasetExperiment
 from explanations.explanation import ExplanationAlgorithm
 
 
 class ExpLOD(ExplanationAlgorithm):
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender):
+    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_n=1, hitems_per_attr=2):
+        """
+        :param dataset:
+        :param model:
+        :param top_n: number of top attributes to generate the explanation
+        :param hitems_per_attr: number of historic items showed per attribute on explanation.
+            In an example such as: I recommend you Titanic since you ofter like drama items as X, Y, Z.
+            hitems_per_attr is 3, because we are using X, Y and Z profile items to support the attribute
+        """
         super().__init__(dataset, model)
+        self.top_n = top_n
+        self.hitems_per_attr = hitems_per_attr
+        self.model_name = f'''ExpLOD&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}'''
 
     def __user_semantic_profile(self, historic: list) -> dict:
         """
-        Generate the user semantic profile, where all the values of properties (e.g.: George Lucas, action films, etc)
+        Generate the user semantic profile, where all the values of properties (e.g.: George Lucas, action films, etc.)
         are ordered by a score that is calculated as:
             score = (npi/i) * log(N/dft)
         where npi are the number of edges to a value, i the number of interacted items,
@@ -48,22 +60,20 @@ class ExpLOD(ExplanationAlgorithm):
 
         return fav_prop
         
-    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, top_n=1,
-                         hitems_per_attr=2) -> dict:
+    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, **kwargs) -> dict:
         """
         Generate user explanation with ExpLOD algorithm link: https://dl.acm.org/doi/abs/10.1145/2959100.2959173
         :param user: user id
         :param top_k: top k items to explain
         :param remove_seen: True if model should exclude seen items, False otherwise
-        :param verbose: True to print explanations
-        :param top_n: number of top attributes to generate the explanation
-        :param hitems_per_attr: number of historic items showed per attribute on explanation.
-            In an example such as: I recommend you Titanic since you ofter like drama items as X, Y, Z.
-            hitems_per_attr is 3, because we are using X, Y and Z profile items to support the attribute
+        :param verbose: True to print sentences
         :return: explanations as dict where key is recommended item and value is explanation
         """
 
         user_explanations = {}
+        interacted_items = []
+        attributes = []
+
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                           for u_item in self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
         ranked_items = list(self.model.recommend(user_id=user, k=top_k,
@@ -88,7 +98,7 @@ class ExpLOD(ExplanationAlgorithm):
                 r_sem_dict[p] = semantic_profile[p]
 
             props_sorted = sorted(r_sem_dict.items(), key=lambda item: item[1], reverse=True)
-            max_props = [k for k, _ in props_sorted[:top_n]]
+            max_props = [k for k, _ in props_sorted[:self.top_n]]
 
             # build sentence
             train_c = train_set.copy()
@@ -108,7 +118,7 @@ class ExpLOD(ExplanationAlgorithm):
                         list(hist_props[hist_props['obj'] == p].index.unique().astype(str)))]
                 hist_ids = list(
                     user_item.sort_values(by=user_item.columns[-1],
-                                          ascending=False)[:hitems_per_attr][user_item.columns[0]].astype(int))
+                                          ascending=False)[:self.hitems_per_attr][user_item.columns[0]].astype(int))
                 hist_names = hist_props.loc[hist_ids][prop_cols[0]].unique()
 
                 # check for others with same value
@@ -121,18 +131,35 @@ class ExpLOD(ExplanationAlgorithm):
                 path_sentence += hist_sentence
 
                 full_sentence += path_sentence
-                if top_n > 1 and pi <= top_n-1:
+                if self.top_n > 1 and pi <= self.top_n-1:
                     if pi == 0:
                         full_sentence += ". Moreover, I recommend it because you sometimes like "
                     else:
                         full_sentence += " and "
+
+                interacted_items.append(hist_ids)
+                attributes.append(max_props)
 
             user_explanations[int(r)] = full_sentence[:-5]
             if verbose:
                 print("\nRecommended Item: " + str(r) + ": " + str(rec_name))
                 print(full_sentence)
 
-        return user_explanations
+        unique_items = list(set([item for sublist in interacted_items for item in sublist]))
+        unique_attributes = list(set([item for sublist in attributes for item in sublist]))
+
+        lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
+                                     train_set=self.dataset.load_fold_asdf()[0],
+                                     col_user=self.dataset.user_column)
+        sep = metrics.sep_metric(beta=0.3, props=unique_attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
+        etd = metrics.etd_metric(unique_attributes, top_k, len(self.dataset.prop_set['obj'].unique()))
+
+        ret_obj = {
+            "explanations": user_explanations,
+            "attribute_metrics": (lir, sep, etd)
+        }
+
+        return ret_obj
 
     def all_users_explanations(self, top_n: int, output_file: str, remove_seen=True, verbose=True):
         # TODO: implement function

@@ -1,6 +1,7 @@
 import argparse
 import cornac
 
+from dataset_experiment import metrics
 from dataset_experiment.movielens100k import MovieLens100K
 from explanations.explod import ExpLOD
 from explanations.hierarchical_clustering import HierarchicalClustering
@@ -41,41 +42,52 @@ rec = RecommenderSystem(model=cornac.models.BPR(k=200, max_iter=200, learning_ra
                         load_path="BPR"
                         #load_path=None
                         )
-
 rec.fit_model(save=True)
+
+cluter_rel = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average', top_n=2, hitems_per_attr=2,
+                                            metric="cosine", criterion="maxclust", vec_method='relevance')
+
+cluter_cosine = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average', top_n=2, hitems_per_attr=2,
+                                               metric="cosine", criterion="maxclust", vec_method='binary')
+
+cluter_euclid = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward', top_n=2, hitems_per_attr=2,
+                                               metric="euclidean", criterion="maxclust", vec_method='binary')
+
+explod = ExpLOD(ml, rec.model)
+
 users = ml.get_users()[:10]
-#users = ['5']
+users = ['5']
+explain = True
+res = {}
+K = 10
 
 for user_id in users:
-    print(f'''#### User {user_id} Explanations #### ''')
-    rec_list = rec.recommend_to_user(user_id=user_id, k=10)
+    if explain:
+        print(f'''#### User {user_id} Explanations #### \n''')
+        rec_list = rec.recommend_to_user(user_id=user_id, k=K)
 
-    print("--- Clustering Algorithm with TF-IDF ---")
-    cluter_rel = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average', top_n=2, hitems_per_attr=2,
-                                        metric="cosine", criterion="maxclust", vec_method='relevance')
-    cluter_rel_expls = cluter_rel.user_explanation(user=user_id, top_k=10, remove_seen=True,
-                                                   verbose=True, show_dendrogram=False)
+        print("--- Clustering Algorithm with TF-IDF ---\n")
+        cluter_rel_expls = cluter_rel.user_explanation(user=user_id, top_k=K, remove_seen=True,
+                                                       verbose=True, show_dendrogram=False)
+        res[cluter_rel.model_name] = cluter_rel_expls
 
-    print("--- Clustering Algorithm with Cosine Similarity ---")
-    cluter_cosine = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average', top_n=2, hitems_per_attr=2,
-                                           metric="cosine", criterion="maxclust", vec_method='binary')
-    cluter_cosine_expls = cluter_cosine.user_explanation(user=user_id, top_k=10, remove_seen=True,
-                                                         verbose=True, show_dendrogram=False)
+        print("--- Clustering Algorithm with Cosine Similarity ---\n")
+        cluter_cosine_expls = cluter_cosine.user_explanation(user=user_id, top_k=K, remove_seen=True,
+                                                             verbose=True, show_dendrogram=False)
+        res[cluter_cosine.model_name] = cluter_cosine_expls
 
-    print("--- Clustering Algorithm with Euclidean Similarity ---")
-    cluter_euclid = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward', top_n=2, hitems_per_attr=2,
-                                           metric="euclidean", criterion="maxclust", vec_method='binary')
-    cluter_euclid_expls = cluter_euclid.user_explanation(user=user_id, top_k=10, remove_seen=True,
-                                                         verbose=True, show_dendrogram=False)
+        print("--- Clustering Algorithm with Euclidean Similarity ---\n")
+        cluter_euclid_expls = cluter_euclid.user_explanation(user=user_id, top_k=K, remove_seen=True,
+                                                             verbose=True, show_dendrogram=False)
+        res[cluter_euclid.model_name] = cluter_euclid_expls
 
-    print("--- ExpLOD Algorithm ---")
-    explod = ExpLOD(ml, rec.model)
-    explod_expls = explod.user_explanation(user=user_id, top_k=10, remove_seen=True,
-                                           verbose=True, top_n=2, hitems_per_attr=2)
+        print("--- ExpLOD Algorithm ---")
+        explod_expls = explod.user_explanation(user=user_id, top_k=K, remove_seen=True,
+                                               verbose=True, top_n=2, hitems_per_attr=2)
 
-    print()
+        print()
 
-rec.run_experiment([10], True)
+rec.run_experiment([K], res, True)
 
 args = parser.parse_args()
 

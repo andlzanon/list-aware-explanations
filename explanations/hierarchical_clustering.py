@@ -4,6 +4,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 
+from dataset_experiment import metrics
 from dataset_experiment.dataset_experiment import DatasetExperiment
 from explanations.explanation import ExplanationAlgorithm
 
@@ -39,8 +40,13 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.vec_method = vec_method
         self.random_state = random_state
         np.random.seed(self.random_state)
+        self.model_name = (f'''Hierarchical&method={str(self.method)}&criterion={str(self.criterion)}
+                            &metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}
+                            &hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}
+                            &random_state={str(self.random_state)}''')
 
-    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) -> dict:
+    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) \
+            -> dict:
         """
         Generate explanation based on hierarchical clustering of items based on the simple presence of those
         We will be able to generate cuts on the dendrogram and generate explanations for the clusters generated
@@ -54,6 +60,9 @@ class HierarchicalClustering(ExplanationAlgorithm):
         """
         user_explanations = {}
         obj_column = self.dataset.prop_set.columns[-1]
+        interacted_items = []
+        attributes = []
+        ranked_clusters = []
 
         # generate user recommendations
         ranked_items = list(self.model.recommend(user_id=user, k=top_k,
@@ -139,14 +148,18 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
             # get profile item names that have the explanation attributes
             pro_df = self.dataset.prop_set.loc[list(pro_items.astype(int))]
-            pro_item_ids = pro_df.groupby(level=0)[obj_column].apply(lambda x: set(expl_attr_names).issubset(set(x)))
+            pro_item_ids = pro_df.groupby(pro_df.index)["obj"].apply(set)
+            pro_item_ids = pro_item_ids.apply(lambda attrs: set(attrs).issuperset(set(expl_attr_names)))
             pro_item_ids = pro_item_ids[pro_item_ids == True].index.astype(int)
-            pro_item_names = self.dataset.prop_set.loc[pro_item_ids]['title'].unique()
-            pro_item_names = np.random.choice(pro_item_names,
-                                              size=pro_item_names.shape[0], replace=False)[:self.hitems_per_attr]
+            pro_item_ids = np.random.choice(pro_item_ids,
+                                              size=pro_item_ids.shape[0], replace=False)[:self.hitems_per_attr]
+            pro_item_names = self.dataset.prop_set.loc[pro_item_ids]['title'].unique().tolist()
+
+            interacted_items.append(pro_item_ids)
+            attributes.append(expl_attr_names)
 
             # now we have all elements, lets create the sentence:
-            if pro_item_names.shape[0] > 0:
+            if len(pro_item_names) > 0:
                 expl = f'''If you are in the mood for {", ".join(expl_attr_names)} items such as 
                     {", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n'''
             else:
@@ -167,9 +180,47 @@ class HierarchicalClustering(ExplanationAlgorithm):
             plt.legend()
             plt.show()
 
-        return user_explanations
+        hier_metrics = metrics.hierarchical_clustering_metrics(linkage_matrix, verbose=False)
+        clu_metrics = metrics.clustering_metrics(clustering_data, clusters, verbose=False)
+        item_cluster_metrics = metrics.items_per_cluster(clusters.tolist())
 
-    def all_users_explanations(self, top_n: int, output_file: str, remove_seen=True, verbose=True) -> None:
+        unique_items = list(set([item for sublist in interacted_items for item in sublist]))
+        unique_attributes = list(set([item for sublist in attributes for item in sublist]))
+        lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
+                                 train_set=self.dataset.load_fold_asdf()[0],
+                                 col_user=self.dataset.user_column)
+        sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
+        etd = metrics.etd_metric(unique_attributes, top_k, len(self.dataset.prop_set['obj'].unique()))
+
+        # generate re-ranking based on clustering
+        retrieved_cluster = []
+        for i in range(0, len(ranked_items)):
+            item_cluster = clusters[i]
+            if item_cluster not in retrieved_cluster:
+                retrieved_cluster.append(item_cluster)
+                cluster_indexes = [i for i, n in enumerate(clusters) if n == item_cluster]
+                ranked_clusters.append([ranked_items[cluster_indexes[i]] for i in range(0, len(cluster_indexes))])
+
+        rerank = pd.DataFrame(columns=[self.dataset.user_column, self.dataset.item_column, "x_rank", "y_rank"])
+        matrix = pd.DataFrame(ranked_clusters).to_numpy()
+        for x in range(0, matrix.shape[0]):
+            for y in range(0, matrix.shape[1]):
+                item = matrix[x][y]
+                if item is not None:
+                    rerank.loc[len(rerank)] = [user, item, x+1, y+1]
+
+        ret_obj = {
+            "grid_items": rerank,
+            "explanations": user_explanations,
+            "clusters": clusters,
+            "hierarchical_metrics": hier_metrics,
+            "items_cluster_metrics": item_cluster_metrics,
+            "cluster_metrics": clu_metrics,
+            "attribute_metrics": (lir, sep, etd)
+        }
+        return ret_obj
+
+    def all_users_explanations(self, top_k: int, output_file: str, remove_seen=True, verbose=True) -> None:
         # TODO: implement function
         pass
 
