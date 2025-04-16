@@ -40,10 +40,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.vec_method = vec_method
         self.random_state = random_state
         np.random.seed(self.random_state)
-        self.model_name = (f'''Hierarchical&method={str(self.method)}&criterion={str(self.criterion)}
-                            &metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}
-                            &hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}
-                            &random_state={str(self.random_state)}''')
+        self.model_name = (f"Hierarchical&method={str(self.method)}&criterion={str(self.criterion)}"
+                            f"&metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}"
+                            f"&hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}"
+                            f"&random_state={str(self.random_state)}")
 
     def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) \
             -> dict:
@@ -192,6 +192,12 @@ class HierarchicalClustering(ExplanationAlgorithm):
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
         etd = metrics.etd_metric(unique_attributes, top_k, len(self.dataset.prop_set['obj'].unique()))
 
+        attr_metrics = {
+            "SEP": sep,
+            "LIR": lir,
+            "ETD": etd
+        }
+
         # generate re-ranking based on clustering
         retrieved_cluster = []
         for i in range(0, len(ranked_items)):
@@ -209,14 +215,18 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 if item is not None:
                     rerank.loc[len(rerank)] = [user, item, x+1, y+1]
 
+        expl_metrics = {
+            "hierarchical_metrics": hier_metrics,
+            "items_cluster_metrics": item_cluster_metrics,
+            "cluster_metrics": clu_metrics,
+            "attribute_metrics": attr_metrics
+        }
+
         ret_obj = {
             "grid_items": rerank,
             "explanations": user_explanations,
             "clusters": clusters,
-            "hierarchical_metrics": hier_metrics,
-            "items_cluster_metrics": item_cluster_metrics,
-            "cluster_metrics": clu_metrics,
-            "attribute_metrics": (lir, sep, etd)
+            "metrics": expl_metrics
         }
         return ret_obj
 

@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 import cornac.models
 
 from dataset_experiment.dataset_experiment import DatasetExperiment

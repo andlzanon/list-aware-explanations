@@ -1,4 +1,100 @@
-MAP@10:0.06652183905982624
-NDCG@10:0.26402331482342045
-Precision@10:0.23770491803278687
-Recall@10:0.11925884665384252
+{
+    "MAP@10": 0.06652183905982624,
+    "NDCG@10": 0.26402331482342045,
+    "Precision@10": 0.23770491803278687,
+    "Recall@10": 0.11925884665384252,
+    "Algorithm BPR NDCG - 2D@10": 0.3958807450715974,
+    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&random_state=42 NDCG - 2D@10": 0.00047763136322517456,
+    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.0005701795820452582,
+    "Algorithm Hierarchical&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.0005113088246337286,
+    "explanation_algoritms": [
+        {
+            "name": "Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&random_state=42",
+            "explanation_metrics": {
+                "hierarchical_metrics": {
+                    "Cophenet Matrix Mean": 0.5773861423014703,
+                    "Cophenet Matrix Std": 0.0,
+                    "Inconsistency Matrix Mean": 0.7389145695913192,
+                    "Inconsistency Matrix Std": 0.8153309000951328
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 2.0,
+                    "Std Items Per Cluster": 1.5491933384829668,
+                    "Clusters Entropy": 1.3592367006650063
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.049825941039563025,
+                    "Calinski\u2013Harabasz Index": 1.4932183287335845,
+                    "Davies\u2013Bouldin Index:": 0.8454019481657538
+                },
+                "attribute_metrics": {
+                    "SEP": 0.6344858821421823,
+                    "LIR": 0.44027360462738824,
+                    "ETD": 0.8
+                }
+            }
+        },
+        {
+            "name": "Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42",
+            "explanation_metrics": {
+                "hierarchical_metrics": {
+                    "Cophenet Matrix Mean": 0.696376420684456,
+                    "Cophenet Matrix Std": 0.0,
+                    "Inconsistency Matrix Mean": 0.7674511630531915,
+                    "Inconsistency Matrix Std": 0.8459291954737477
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 2.0,
+                    "Std Items Per Cluster": 1.0954451150103321,
+                    "Clusters Entropy": 1.4708084763221112
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.0020483519793719623,
+                    "Calinski\u2013Harabasz Index": 1.4201492537313434,
+                    "Davies\u2013Bouldin Index:": 1.21393869809319
+                },
+                "attribute_metrics": {
+                    "SEP": 0.39714001407023447,
+                    "LIR": 0.5394213515333831,
+                    "ETD": 0.8
+                }
+            }
+        },
+        {
+            "name": "Hierarchical&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42",
+            "explanation_metrics": {
+                "hierarchical_metrics": {
+                    "Cophenet Matrix Mean": 6.212194171500718,
+                    "Cophenet Matrix Std": 0.0,
+                    "Inconsistency Matrix Mean": 2.181941842579276,
+                    "Inconsistency Matrix Std": 2.327376478704773
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 2.0,
+                    "Std Items Per Cluster": 1.5491933384829668,
+                    "Clusters Entropy": 1.3592367006650063
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.05073600808397807,
+                    "Calinski\u2013Harabasz Index": 2.0728083209509656,
+                    "Davies\u2013Bouldin Index:": 0.9630529885724617
+                },
+                "attribute_metrics": {
+                    "SEP": 0.47014683064537055,
+                    "LIR": 0.6742766894167289,
+                    "ETD": 0.9
+                }
+            }
+        },
+        {
+            "name": "ExpLOD&top_n=1&hitems_per_attr=2",
+            "explanation_metrics": {
+                "expl_metrics": {
+                    "SEP": 0.6922908909925992,
+                    "LIR": 0.8270319787718888,
+                    "ETD": 0.4
+                }
+            }
+        }
+    ]
+}

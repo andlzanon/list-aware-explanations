@@ -151,12 +151,20 @@ class ExpLOD(ExplanationAlgorithm):
         lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
                                      train_set=self.dataset.load_fold_asdf()[0],
                                      col_user=self.dataset.user_column)
-        sep = metrics.sep_metric(beta=0.3, props=unique_attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
+        sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
         etd = metrics.etd_metric(unique_attributes, top_k, len(self.dataset.prop_set['obj'].unique()))
+
+        expl_metrics = {
+            "expl_metrics": {
+                "SEP": sep,
+                "LIR": lir,
+                "ETD": etd
+            }
+        }
 
         ret_obj = {
             "explanations": user_explanations,
-            "attribute_metrics": (lir, sep, etd)
+            "metrics": expl_metrics
         }
 
         return ret_obj

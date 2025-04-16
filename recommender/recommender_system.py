@@ -1,6 +1,6 @@
 import inspect
+import json
 import os
-import traceback
 
 import cornac.models
 import pandas as pd
@@ -77,13 +77,17 @@ class RecommenderSystem:
                                     train_set=self.dataset.train,
                                     remove_seen=self.remove_seen)
 
-    def run_experiment(self, k_list: list, expl_resuls: dict, save_results=True) -> dict:
+    def run_experiment(self, k_list: list, expl_results: dict, rows=3, cols=2, save_results=False, verbose=True) -> dict:
         """
         Run experiment where the recommender system will score all items to all users and extract results.
         This function can also save the score of items for all user, item tuples and the metrics in the file
         system if the flag save_results is set to True.
         :param k_list: list of top k to evaluate
+        :param expl_results: dictionary with explanation results from the explanation algorithms
+        :param rows: number of rows on grid to evaluate ndcg-2d
+        :param cols: number of columns on grid to evaluate ndcg-2d
         :param save_results: True if results should be saved in the datasets folder as file, False otherwise
+        :param verbose: True to display results on the console
         :return: metrics as dictionary and saved files on file system
         """
         print("Generating Predictions...")
@@ -97,34 +101,44 @@ class RecommenderSystem:
             path = path + self.model_name + ".csv"
             predictions.to_csv(path, header=True, index=False, mode="w+")
 
-        print("Generating Metrics...")
-        metrics_value = self.__evaluate(predictions=predictions, test_recs=test_df,
-                                  k_list=k_list, save_results=save_results)
+        print("Generating Ranking Metrics...")
+        metrics_value = self.__evaluate(predictions=predictions, test_recs=test_df, k_list=k_list, verbose=verbose)
 
-        for key in expl_resuls.keys():
-            try:
-                for k in k_list:
-                    try:
-                        grid_predictions = expl_resuls[key]["grid_items"]
-                    except KeyError:
-                        print(f'''Error model {key} does not outputted the grid predictions''')
-                        continue
+        for k in k_list:
+            metrics_value[f'''Algorithm {self.model.name} NDCG - 2D@{k}'''] = \
+                (metrics.ndcg_2d(predictions=predictions, grid_predictions=None, test_recs=test_df,
+                                k=k, alg_name=self.model.name, col_rating=self.dataset.rating_column, col_user='userId',
+                                col_item='movieId', alpha=1, beta=1, gama=1, rows=rows, columns=cols, step_x=1,
+                                 step_y=1, verbose=verbose))
 
-                    metrics_value["ndcg2d"] = metrics.ndcg_2d(predictions, grid_predictions, test_df,
-                                                              k, self.dataset.rating_column, key, col_user='userId',
-                                                              col_item='movieId',
-                                                              alpha=1, beta=1, gama=1, rows=1, columns=1, step_x=1,
-                                                              step_y=1,
-                                                              verbose=True, save_results=True)
+            for key in expl_results.keys():
+                try:
+                    grid_predictions = expl_results[key]["grid_items"]
+                except KeyError:
+                    print(f'''Error model {key} does not outputted the grid predictions''')
+                    continue
 
-            except Exception as e:
-                print(f'''Error {e} - Full Error: {traceback.format_exc()} ''')
-                continue
+                metrics_value[f'''Algorithm {key} NDCG - 2D@{k}'''] = metrics.ndcg_2d(predictions=predictions,
+                                                        grid_predictions=grid_predictions, test_recs=test_df,
+                                                        k=k, alg_name=key, col_rating=self.dataset.rating_column,
+                                                        col_user='userId', col_item='movieId', alpha=1, beta=1,
+                                                        gama=1, rows=rows, columns=cols, step_x=1, step_y=1,
+                                                        verbose=True)
+
+        explanation_algorithms = []
+        for key, value in expl_results.items():
+            explanation_algorithms.append({"name": key, "explanation_metrics": value["metrics"]})
+        metrics_value["explanation_algoritms"] = explanation_algorithms
+
+        if save_results:
+            path = self.get_path("results")
+            path = path + self.model_name + ".txt"
+            with open(path, 'w') as f:
+                json.dump(metrics_value, f, indent=4)
 
         return metrics_value
 
-    def __evaluate(self, predictions: pd.DataFrame, test_recs: pd.DataFrame,
-                   k_list: list, verbose=True, save_results=True) -> dict:
+    def __evaluate(self, predictions: pd.DataFrame, test_recs: pd.DataFrame, k_list: list, verbose=True) -> dict:
         """
         Function that evaluate the predictions generated by the recommender system on top k items
         :param predictions: dataframe containing scores for all possible (user item) tuples, therefore, it has
@@ -132,7 +146,6 @@ class RecommenderSystem:
         :param test_recs: testing set as pandas dataframe
         :param k_list: list of top k recommendations to extract metrics
         :param verbose: True to print the results on console, False otherwise
-        :param save_results: True to save the results on file system, false otherwise
         :return: metrics as dictionary
         """
         metrics_dict = {}
@@ -160,13 +173,6 @@ class RecommenderSystem:
                 print(f'''NDCG@{k}: {eval_ndcg}''')
                 print(f'''Precision@{k}: {eval_precision}''')
                 print(f'''Recall@{k}: {eval_recall}''')
-
-        if save_results:
-            path = self.get_path("results")
-            path = path + self.model_name + ".txt"
-            with open(path, 'w') as f:
-                for key, value in metrics_dict.items():
-                    f.write(f'''{key}:{value}\n''')
 
         return metrics_dict
 

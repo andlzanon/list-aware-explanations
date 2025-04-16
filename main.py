@@ -1,7 +1,6 @@
 import argparse
 import cornac
 
-from dataset_experiment import metrics
 from dataset_experiment.movielens100k import MovieLens100K
 from explanations.explod import ExpLOD
 from explanations.hierarchical_clustering import HierarchicalClustering
@@ -30,12 +29,14 @@ parser.add_argument("--alg",
                     default="None",
                     help="Algorithm to run")
 
+# dataset definition
 ml = MovieLens100K(gen_dataset=True)
 ds = ml.load_fold(-1)
 ml.fold_percentage()
 
 user_id = '5'
 
+# declaration of the recommender systems
 rec = RecommenderSystem(model=cornac.models.BPR(k=200, max_iter=200, learning_rate=0.01,
                                                 lambda_reg=1e-3, seed=42, verbose=True),
                         dataset=ml, remove_seen=True,
@@ -44,6 +45,7 @@ rec = RecommenderSystem(model=cornac.models.BPR(k=200, max_iter=200, learning_ra
                         )
 rec.fit_model(save=True)
 
+# declaration of the explanation algorithms
 cluter_rel = HierarchicalClustering(ml, rec.model, n_clusters=5, method='average', top_n=2, hitems_per_attr=2,
                                             metric="cosine", criterion="maxclust", vec_method='relevance')
 
@@ -55,39 +57,45 @@ cluter_euclid = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward
 
 explod = ExpLOD(ml, rec.model)
 
+# definition of parameters
 users = ml.get_users()[:10]
 users = ['5']
 explain = True
 res = {}
-K = 10
+k_list = [10]
 
 for user_id in users:
     if explain:
-        print(f'''#### User {user_id} Explanations #### \n''')
-        rec_list = rec.recommend_to_user(user_id=user_id, k=K)
+        for k in k_list:
+            print(f'''#### User {user_id} Explanations #### \n''')
+            rec_list = rec.recommend_to_user(user_id=user_id, k=k)
 
-        print("--- Clustering Algorithm with TF-IDF ---\n")
-        cluter_rel_expls = cluter_rel.user_explanation(user=user_id, top_k=K, remove_seen=True,
-                                                       verbose=True, show_dendrogram=False)
-        res[cluter_rel.model_name] = cluter_rel_expls
+            print("--- Clustering Algorithm with TF-IDF ---\n")
+            cluter_rel_expls = cluter_rel.user_explanation(user=user_id, top_k=k, remove_seen=True,
+                                                           verbose=True, show_dendrogram=False)
+            res[cluter_rel.model_name] = cluter_rel_expls
 
-        print("--- Clustering Algorithm with Cosine Similarity ---\n")
-        cluter_cosine_expls = cluter_cosine.user_explanation(user=user_id, top_k=K, remove_seen=True,
-                                                             verbose=True, show_dendrogram=False)
-        res[cluter_cosine.model_name] = cluter_cosine_expls
+            print("--- Clustering Algorithm with Cosine Similarity ---\n")
+            cluter_cosine_expls = cluter_cosine.user_explanation(user=user_id, top_k=k, remove_seen=True,
+                                                                 verbose=True, show_dendrogram=False)
+            res[cluter_cosine.model_name] = cluter_cosine_expls
 
-        print("--- Clustering Algorithm with Euclidean Similarity ---\n")
-        cluter_euclid_expls = cluter_euclid.user_explanation(user=user_id, top_k=K, remove_seen=True,
-                                                             verbose=True, show_dendrogram=False)
-        res[cluter_euclid.model_name] = cluter_euclid_expls
+            print("--- Clustering Algorithm with Euclidean Similarity ---\n")
+            cluter_euclid_expls = cluter_euclid.user_explanation(user=user_id, top_k=k, remove_seen=True,
+                                                                 verbose=True, show_dendrogram=False)
+            res[cluter_euclid.model_name] = cluter_euclid_expls
 
-        print("--- ExpLOD Algorithm ---")
-        explod_expls = explod.user_explanation(user=user_id, top_k=K, remove_seen=True,
-                                               verbose=True, top_n=2, hitems_per_attr=2)
+            print("--- ExpLOD Algorithm ---")
+            explod_expls = explod.user_explanation(user=user_id, top_k=k, remove_seen=True,
+                                                   verbose=True, top_n=2, hitems_per_attr=2)
+            res[explod.model_name] = explod_expls
 
-        print()
+            print()
 
-rec.run_experiment([K], res, True)
+# printing offline and explanation metrics
+all_metrics = rec.run_experiment(k_list, res, rows=3, cols=2, verbose=False, save_results=True)
+for key, value in all_metrics.items():
+    print(f'''{key}: {value}''')
 
 args = parser.parse_args()
 
