@@ -171,6 +171,7 @@ cython_debug/
 notebooks/exploration/*
 **/outputs/*
 **/model/*
+**/explanations/*
 
 /knowledge-graphs/*
 

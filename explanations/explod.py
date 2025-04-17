@@ -1,3 +1,5 @@
+import os
+
 import cornac.models
 import numpy as np
 import pandas as pd
@@ -21,6 +23,8 @@ class ExpLOD(ExplanationAlgorithm):
         self.top_n = top_n
         self.hitems_per_attr = hitems_per_attr
         self.model_name = f'''ExpLOD&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}'''
+        self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
+        if os.path.exists(self.expl_file_path): open(self.expl_file_path, 'w', encoding='utf-8').close()
 
     def __user_semantic_profile(self, historic: list) -> dict:
         """
@@ -86,6 +90,9 @@ class ExpLOD(ExplanationAlgorithm):
         # get properties from historic and recommended items
         hist_props = self.dataset.prop_set.loc[items_historic]
         prop_cols = self.dataset.prop_set.columns
+
+        with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
+            f.write(f'''--- Explanations User Id {user} ---\n''')
         if verbose: print(f'''--- Explanations User Id {user} ---''')
         for r in ranked_items:
             rec_props = self.dataset.prop_set.loc[int(r)]
@@ -142,6 +149,10 @@ class ExpLOD(ExplanationAlgorithm):
                 attributes.append(max_props)
 
             user_explanations[int(r)] = full_sentence[:-5]
+
+            with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
+                f.write("Recommended Item: " + str(r) + ": " + str(rec_name) + "\n")
+                f.write(full_sentence + "\n\n")
             if verbose:
                 print("Recommended Item: " + str(r) + ": " + str(rec_name))
                 print(full_sentence + "\n")

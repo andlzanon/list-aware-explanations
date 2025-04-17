@@ -13,6 +13,13 @@ class ExplanationAlgorithm:
         """
         self.dataset = dataset
         self.model = model
+
+        path = self.dataset.path
+        if self.dataset.fold_loaded == -1:
+            self.expl_file_path = path + f'''/stratified_split/explanations/'''
+        else:
+            self.expl_file_path = path + f'''/folds/{self.dataset.fold_loaded}/explanations/'''
+
         self.memo_sep = {}
 
     def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, **kwargs) -> dict:

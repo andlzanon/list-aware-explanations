@@ -1,3 +1,5 @@
+import os
+
 import cornac
 import numpy as np
 import pandas as pd
@@ -44,6 +46,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
                             f"&metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}"
                             f"&hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}"
                             f"&random_state={str(self.random_state)}")
+        self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
+        if os.path.exists(self.expl_file_path): open(self.expl_file_path, 'w', encoding='utf-8').close()
 
     def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) \
             -> dict:
@@ -92,6 +96,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
         # create clustering dataset based on intersection
         clustering_df = pd.DataFrame(columns=inter)
+        with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
+            f.write(f'''--- Explanations User Id {user} ---\n''')
         if verbose: print(f'''--- Explanations User Id {user} ---''')
         for rec_item in ranked_items:
             # initialize vector array of recommended item with all 0 and get recommended attributes
@@ -160,13 +166,15 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
             # now we have all elements, lets create the sentence:
             if len(pro_item_names) > 0:
-                expl = f'''If you are in the mood for {", ".join(expl_attr_names)} items such as 
-                    {", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n'''
+                expl = (f"If you are in the mood for {", ".join(expl_attr_names)} items such as "
+                        f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
             else:
-                expl = f'''If you are in the mood for {", ".join(expl_attr_names)} items,
-                 I recommend {", ".join(rec_item_names)}\n'''
+                expl = (f"If you are in the mood for {", ".join(expl_attr_names)} items, "
+                        f"I recommend {", ".join(rec_item_names)}\n")
 
             if verbose: print(expl)
+            with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
+                f.write(expl)
             for rec in rec_item_ids:
                 user_explanations[rec] = expl
 

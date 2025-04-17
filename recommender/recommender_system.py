@@ -134,7 +134,7 @@ class RecommenderSystem:
         if save_results:
             path = self.get_path("results")
             path = path + self.model_name + ".txt"
-            with open(path, 'w') as f:
+            with open(path, 'w', encoding='utf-8') as f:
                 json.dump(metrics_value, f, indent=4)
 
         return metrics_value
