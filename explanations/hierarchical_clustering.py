@@ -92,7 +92,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
         # create clustering dataset based on intersection
         clustering_df = pd.DataFrame(columns=inter)
-
+        if verbose: print(f'''--- Explanations User Id {user} ---''')
         for rec_item in ranked_items:
             # initialize vector array of recommended item with all 0 and get recommended attributes
             rec_attr = self.dataset.prop_set.loc[int(rec_item)][obj_column]
@@ -230,9 +230,58 @@ class HierarchicalClustering(ExplanationAlgorithm):
         }
         return ret_obj
 
-    def all_users_explanations(self, top_k: int, output_file: str, remove_seen=True, verbose=True) -> None:
-        # TODO: implement function
-        pass
+    def all_users_explanations(self, top_k: int, remove_seen=True, verbose=True) -> tuple[dict, dict]:
+        """
+        Method to run explanations to all users and extract explanation metrics
+        :param top_k: top k recommendations to generate explanations and put it on a grid to users
+        :param remove_seen: remove seen items on evaluation
+        :param verbose: True to display log, False otherwise
+        :return: tuple of two dictionaries: one containing the metrics and the other one with all outputs of all users.
+        """
+        ret_obj = {
+            "grid_items": pd.DataFrame(),
+            "metrics": {
+                "attribute_metrics":
+                    {"SEP": [],
+                    "LIR": [],
+                    "ETD": [] },
+                "items_cluster_metrics":
+                    {"Mean Items Per Cluster": [],
+                    "Std Items Per Cluster": [],
+                    "Clusters Entropy": []},
+                "hierarchical_metrics":
+                    {"Cophenet Matrix Mean": [],
+                    "Cophenet Matrix Std": [],
+                    "Inconsistency Matrix Mean": [],
+                    "Inconsistency Matrix Std": []},
+                "cluster_metrics":{
+                    "Silhouette": [],
+                    "Calinski Harabasz Index": [],
+                    "Davies Bouldin Index:": []
+                    }
+            }
+        }
+
+        all_user_ret = {}
+        users = self.dataset.get_users('test')
+        if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
+        # TODO: Change here
+        for user_id in users[:3]:
+            expl_obj = self.user_explanation(user=user_id, top_k=top_k, remove_seen=remove_seen,
+                                                           verbose=verbose, show_dendrogram=False)
+            all_user_ret[user_id] = expl_obj
+            ret_obj["grid_items"] = pd.concat([ret_obj["grid_items"].copy(),
+                                               expl_obj["grid_items"]], ignore_index=True)
+
+            for key in ret_obj["metrics"].keys():
+                for key1, value1 in expl_obj['metrics'][key].items():
+                    ret_obj['metrics'][key][key1].append(value1)
+
+        for key in ret_obj["metrics"].keys():
+            for key1, value_list in ret_obj['metrics'][key].items():
+                ret_obj['metrics'][key][key1] = np.array(value_list).mean()
+
+        return ret_obj, all_user_ret
 
     def __user_semantic_profile(self, historic: list) -> dict:
         """
@@ -257,6 +306,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         items_per_obj = self.dataset.prop_set.reset_index().drop_duplicates(
             subset=[self.dataset.prop_set.columns[0], self.dataset.prop_set.columns[-1]]).set_index(
             self.dataset.prop_set.columns[-1])
+
         df_dict = items_per_obj.index.value_counts().to_dict()
 
         # generate the dft column based on items per property and score column base on all new created columns

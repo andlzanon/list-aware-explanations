@@ -107,9 +107,10 @@ class RecommenderSystem:
         for k in k_list:
             metrics_value[f'''Algorithm {self.model.name} NDCG - 2D@{k}'''] = \
                 (metrics.ndcg_2d(predictions=predictions, grid_predictions=None, test_recs=test_df,
-                                k=k, alg_name=self.model.name, col_rating=self.dataset.rating_column, col_user='userId',
-                                col_item='movieId', alpha=1, beta=1, gama=1, rows=rows, columns=cols, step_x=1,
-                                 step_y=1, verbose=verbose))
+                                k=k, alg_name=self.model.name, col_rating=self.dataset.rating_column,
+                                col_user=self.dataset.user_column, col_item=self.dataset.item_column,
+                                alpha=1, beta=1, gama=1, rows=rows, columns=cols, step_x=1,
+                                step_y=1, verbose=verbose))
 
             for key in expl_results.keys():
                 try:
@@ -123,7 +124,7 @@ class RecommenderSystem:
                                                         k=k, alg_name=key, col_rating=self.dataset.rating_column,
                                                         col_user='userId', col_item='movieId', alpha=1, beta=1,
                                                         gama=1, rows=rows, columns=cols, step_x=1, step_y=1,
-                                                        verbose=True)
+                                                        verbose=verbose)
 
         explanation_algorithms = []
         for key, value in expl_results.items():

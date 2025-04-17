@@ -58,11 +58,22 @@ cluter_euclid = HierarchicalClustering(ml, rec.model, n_clusters=5, method='ward
 explod = ExpLOD(ml, rec.model)
 
 # definition of parameters
-users = ml.get_users()[:10]
 users = ['5']
-explain = True
+explain = False
 res = {}
 k_list = [10]
+
+expl_alg_results, _ = cluter_rel.all_users_explanations(top_k=k_list[0], remove_seen=True, verbose=True)
+res[cluter_rel.model_name] = expl_alg_results
+
+cluter_cosine_expls, _ = cluter_cosine.all_users_explanations(top_k=k_list[0], remove_seen=True, verbose=True)
+res[cluter_cosine.model_name] = cluter_cosine_expls
+
+cluter_euclid_expls, _ = cluter_euclid.all_users_explanations(top_k=k_list[0], remove_seen=True, verbose=True)
+res[cluter_euclid.model_name] = cluter_euclid_expls
+
+explod_expls, _ = explod.all_users_explanations(top_k=k_list[0], remove_seen=True, verbose=True)
+res[explod.model_name] = explod_expls
 
 for user_id in users:
     if explain:
@@ -94,8 +105,6 @@ for user_id in users:
 
 # printing offline and explanation metrics
 all_metrics = rec.run_experiment(k_list, res, rows=3, cols=2, verbose=False, save_results=True)
-for key, value in all_metrics.items():
-    print(f'''{key}: {value}''')
 
 args = parser.parse_args()
 

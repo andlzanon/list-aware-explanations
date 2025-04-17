@@ -4,95 +4,95 @@
     "Precision@10": 0.23770491803278687,
     "Recall@10": 0.11925884665384252,
     "Algorithm BPR NDCG - 2D@10": 0.3958807450715974,
-    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&random_state=42 NDCG - 2D@10": 0.00047763136322517456,
-    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.0005701795820452582,
-    "Algorithm Hierarchical&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.0005113088246337286,
+    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&random_state=42 NDCG - 2D@10": 0.0011860796676228219,
+    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.0011860796676228219,
+    "Algorithm Hierarchical&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.001167643038134582,
     "explanation_algoritms": [
         {
             "name": "Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&random_state=42",
             "explanation_metrics": {
-                "hierarchical_metrics": {
-                    "Cophenet Matrix Mean": 0.5773861423014703,
-                    "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 0.7389145695913192,
-                    "Inconsistency Matrix Std": 0.8153309000951328
+                "attribute_metrics": {
+                    "SEP": 0.5513719704928665,
+                    "LIR": 0.23115912539039898,
+                    "ETD": 0.9
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
-                    "Std Items Per Cluster": 1.5491933384829668,
-                    "Clusters Entropy": 1.3592367006650063
+                    "Std Items Per Cluster": 1.1488533115279982,
+                    "Clusters Entropy": 1.444944486889436
+                },
+                "hierarchical_metrics": {
+                    "Cophenet Matrix Mean": 0.6663032750778702,
+                    "Cophenet Matrix Std": 0.0,
+                    "Inconsistency Matrix Mean": 0.7433810462004217,
+                    "Inconsistency Matrix Std": 0.822060858835214
                 },
                 "cluster_metrics": {
-                    "Silhouette": 0.049825941039563025,
-                    "Calinski\u2013Harabasz Index": 1.4932183287335845,
-                    "Davies\u2013Bouldin Index:": 0.8454019481657538
-                },
-                "attribute_metrics": {
-                    "SEP": 0.6344858821421823,
-                    "LIR": 0.44027360462738824,
-                    "ETD": 0.8
+                    "Silhouette": 0.04361519587357401,
+                    "Calinski Harabasz Index": 1.9506654554048455,
+                    "Davies Bouldin Index:": 0.9047819696314896
                 }
             }
         },
         {
             "name": "Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42",
             "explanation_metrics": {
-                "hierarchical_metrics": {
-                    "Cophenet Matrix Mean": 0.696376420684456,
-                    "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 0.7674511630531915,
-                    "Inconsistency Matrix Std": 0.8459291954737477
+                "attribute_metrics": {
+                    "SEP": 0.6496545575202862,
+                    "LIR": 0.2196438635442136,
+                    "ETD": 0.8333333333333334
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
-                    "Std Items Per Cluster": 1.0954451150103321,
-                    "Clusters Entropy": 1.4708084763221112
+                    "Std Items Per Cluster": 0.7197794183557559,
+                    "Clusters Entropy": 1.5396714932654938
+                },
+                "hierarchical_metrics": {
+                    "Cophenet Matrix Mean": 0.7400578782951787,
+                    "Cophenet Matrix Std": 0.0,
+                    "Inconsistency Matrix Mean": 0.7798000946847875,
+                    "Inconsistency Matrix Std": 0.8310681726617938
                 },
                 "cluster_metrics": {
-                    "Silhouette": 0.0020483519793719623,
-                    "Calinski\u2013Harabasz Index": 1.4201492537313434,
-                    "Davies\u2013Bouldin Index:": 1.21393869809319
-                },
-                "attribute_metrics": {
-                    "SEP": 0.39714001407023447,
-                    "LIR": 0.5394213515333831,
-                    "ETD": 0.8
+                    "Silhouette": -0.0077991938861594985,
+                    "Calinski Harabasz Index": 1.499185296234512,
+                    "Davies Bouldin Index:": 1.1972920155706395
                 }
             }
         },
         {
             "name": "Hierarchical&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42",
             "explanation_metrics": {
-                "hierarchical_metrics": {
-                    "Cophenet Matrix Mean": 6.212194171500718,
-                    "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 2.181941842579276,
-                    "Inconsistency Matrix Std": 2.327376478704773
+                "attribute_metrics": {
+                    "SEP": 0.5399473334858662,
+                    "LIR": 0.17912445062791896,
+                    "ETD": 0.8333333333333334
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
-                    "Std Items Per Cluster": 1.5491933384829668,
-                    "Clusters Entropy": 1.3592367006650063
+                    "Std Items Per Cluster": 1.5482128178310994,
+                    "Clusters Entropy": 1.3525248628147768
+                },
+                "hierarchical_metrics": {
+                    "Cophenet Matrix Mean": 6.284658762944204,
+                    "Cophenet Matrix Std": 0.0,
+                    "Inconsistency Matrix Mean": 2.0861361860586576,
+                    "Inconsistency Matrix Std": 2.201470094979928
                 },
                 "cluster_metrics": {
-                    "Silhouette": 0.05073600808397807,
-                    "Calinski\u2013Harabasz Index": 2.0728083209509656,
-                    "Davies\u2013Bouldin Index:": 0.9630529885724617
-                },
-                "attribute_metrics": {
-                    "SEP": 0.47014683064537055,
-                    "LIR": 0.6742766894167289,
-                    "ETD": 0.9
+                    "Silhouette": 0.08349144610806984,
+                    "Calinski Harabasz Index": 2.3348096809019214,
+                    "Davies Bouldin Index:": 0.8177394776992722
                 }
             }
         },
         {
             "name": "ExpLOD&top_n=1&hitems_per_attr=2",
             "explanation_metrics": {
-                "expl_metrics": {
-                    "SEP": 0.6922908909925992,
-                    "LIR": 0.8270319787718888,
-                    "ETD": 0.4
+                "attribute_metrics": {
+                    "SEP": 0.5724918503804022,
+                    "LIR": 0.4702127282675271,
+                    "ETD": 0.5666666666666667
                 }
             }
         }

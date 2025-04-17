@@ -86,6 +86,7 @@ class ExpLOD(ExplanationAlgorithm):
         # get properties from historic and recommended items
         hist_props = self.dataset.prop_set.loc[items_historic]
         prop_cols = self.dataset.prop_set.columns
+        if verbose: print(f'''--- Explanations User Id {user} ---''')
         for r in ranked_items:
             rec_props = self.dataset.prop_set.loc[int(r)]
 
@@ -142,8 +143,8 @@ class ExpLOD(ExplanationAlgorithm):
 
             user_explanations[int(r)] = full_sentence[:-5]
             if verbose:
-                print("\nRecommended Item: " + str(r) + ": " + str(rec_name))
-                print(full_sentence)
+                print("Recommended Item: " + str(r) + ": " + str(rec_name))
+                print(full_sentence + "\n")
 
         unique_items = list(set([item for sublist in interacted_items for item in sublist]))
         unique_attributes = list(set([item for sublist in attributes for item in sublist]))
@@ -155,7 +156,7 @@ class ExpLOD(ExplanationAlgorithm):
         etd = metrics.etd_metric(unique_attributes, top_k, len(self.dataset.prop_set['obj'].unique()))
 
         expl_metrics = {
-            "expl_metrics": {
+            "attribute_metrics": {
                 "SEP": sep,
                 "LIR": lir,
                 "ETD": etd
@@ -169,7 +170,38 @@ class ExpLOD(ExplanationAlgorithm):
 
         return ret_obj
 
-    def all_users_explanations(self, top_n: int, output_file: str, remove_seen=True, verbose=True):
-        # TODO: implement function
-        pass
+    def all_users_explanations(self, top_k: int, remove_seen=True, verbose=True) -> tuple[dict, dict]:
+        """
+        Method to run explanations to all users and extract explanation metrics
+        :param top_k: top k recommendations to generate explanations and put it on a grid to users
+        :param remove_seen: remove seen items on evaluation
+        :param verbose: True to display log, False otherwise
+        :return: tuple of two dictionaries: one containing the metrics and the other one with all outputs of all users.
+        """
+        ret_obj = {
+            "metrics": {
+                "attribute_metrics":
+                    {"SEP": [],
+                     "LIR": [],
+                     "ETD": []}
+            }
+        }
+
+        all_user_ret = {}
+        users = self.dataset.get_users('test')
+        if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
+        # TODO: Change here
+        for user_id in users[:3]:
+            expl_obj = self.user_explanation(user=user_id, top_k=top_k, remove_seen=remove_seen,  verbose=verbose)
+            all_user_ret[user_id] = expl_obj
+
+            for key in ret_obj["metrics"].keys():
+                for key1, value1 in expl_obj['metrics'][key].items():
+                    ret_obj['metrics'][key][key1].append(value1)
+
+        for key in ret_obj["metrics"].keys():
+            for key1, value_list in ret_obj['metrics'][key].items():
+                ret_obj['metrics'][key][key1] = np.array(value_list).mean()
+
+        return ret_obj, all_user_ret
         

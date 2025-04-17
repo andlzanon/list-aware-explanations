@@ -26,13 +26,12 @@ class ExplanationAlgorithm:
         """
         pass
 
-    def all_users_explanations(self, top_k: int, output_file: str, remove_seen=True, verbose=True) -> None:
+    def all_users_explanations(self, top_k: int, remove_seen=True, verbose=True) -> tuple[dict, dict]:
         """
-        Function to generate explanations to all users on the train set
-        :param top_k: number of recommendations to generate explanations to
-        :param output_file: file name to save output
-        :param remove_seen: True if model should exclude seen items, False otherwise
-        :param verbose: True to print explanations
-        :return: File with explanations to all users in file system
+        Method to run explanations to all users and extract explanation metrics
+        :param top_k: top k recommendations to generate explanations and put it on a grid to users
+        :param remove_seen: remove seen items on evaluation
+        :param verbose: True to display log, False otherwise
+        :return: tuple of two dictionaries: one containing the metrics and the other one with all outputs of all users.
         """
         pass

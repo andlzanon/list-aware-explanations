@@ -126,13 +126,23 @@ class DatasetExperiment:
 
         return self.train, self.validation, self.test
 
-    def get_users(self):
+    def get_users(self, dset: str):
         """
         Function that returns all train users as list
+        :param dset: 'train' to return training users, 'val' for validation and any 'test' for test users
         :return: train users ids
         """
-        users = list(self.train.iid_map.keys())
+        users = list()
+        if dset == 'train':
+            users = list(self.train.iid_map.keys())
+        elif dset == 'val':
+            users = list(self.validation.iid_map.keys())
+        elif dset == 'test':
+            users = list(self.test.iid_map.keys())
+
+        assert len(users) > 0, "dset should be either train, val or test"
         users = sorted(users, key=int)
+
         return users
 
     def load_all_folds(self) -> list:

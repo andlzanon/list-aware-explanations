@@ -218,13 +218,13 @@ def clustering_metrics(X: np.array, labels: np.array, verbose=False) -> dict:
     d = davies_bouldin_score(X, labels)
     if verbose:
         print(f'''Silhouette: {s}\n''')
-        print(f'''Calinski–Harabasz Index: {c}\n''')
-        print(f'''Davies–Bouldin Index: {d}\n''')
+        print(f'''Calinski Harabasz Index: {c}\n''')
+        print(f'''Davies Bouldin Index: {d}\n''')
 
     out = {
         "Silhouette": s,
-        "Calinski–Harabasz Index": c,
-        "Davies–Bouldin Index:": d
+        "Calinski Harabasz Index": c,
+        "Davies Bouldin Index:": d
     }
 
     return out
