@@ -14,7 +14,10 @@
                 "attribute_metrics": {
                     "SEP": 0.5513719704928665,
                     "LIR": 0.23115912539039898,
-                    "ETD": 0.9
+                    "ETD": 0.9,
+                    "TID": 21,
+                    "TPD": 22,
+                    "MID": 1.7333333333333334
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
@@ -24,13 +27,13 @@
                 "hierarchical_metrics": {
                     "Cophenet Matrix Mean": 0.6663032750778702,
                     "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 0.7433810462004217,
-                    "Inconsistency Matrix Std": 0.822060858835214
+                    "Inconsistency Matrix Mean": 0.7433810462004207,
+                    "Inconsistency Matrix Std": 0.8220608588352141
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.04361519587357399,
-                    "Calinski Harabasz Index": 1.950665455404846,
-                    "Davies Bouldin Index:": 0.9047819710199928
+                    "Calinski Harabasz Index": 1.9506654554048455,
+                    "Davies Bouldin Index:": 0.9047819704768424
                 }
             }
         },
@@ -40,7 +43,10 @@
                 "attribute_metrics": {
                     "SEP": 0.6674575349256336,
                     "LIR": 0.2196438635442136,
-                    "ETD": 0.8333333333333334
+                    "ETD": 0.8333333333333334,
+                    "TID": 18,
+                    "TPD": 19,
+                    "MID": 1.2666666666666668
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
@@ -66,7 +72,10 @@
                 "attribute_metrics": {
                     "SEP": 0.5560271484974875,
                     "LIR": 0.17912445062791896,
-                    "ETD": 0.8333333333333334
+                    "ETD": 0.8333333333333334,
+                    "TID": 17,
+                    "TPD": 20,
+                    "MID": 1.3333333333333333
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
@@ -81,7 +90,7 @@
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.08349144610806984,
-                    "Calinski Harabasz Index": 2.3348096809019214,
+                    "Calinski Harabasz Index": 2.33480968090192,
                     "Davies Bouldin Index:": 0.8177394776992722
                 }
             }
@@ -92,7 +101,10 @@
                 "attribute_metrics": {
                     "SEP": 0.5724918503804022,
                     "LIR": 0.4702127282675271,
-                    "ETD": 0.5666666666666667
+                    "ETD": 0.5666666666666667,
+                    "TID": 21,
+                    "TPD": 12,
+                    "MID": 2.0
                 }
             }
         }

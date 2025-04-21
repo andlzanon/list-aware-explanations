@@ -3,6 +3,7 @@ import os
 import cornac
 import numpy as np
 import pandas as pd
+from fontTools.varLib.models import subList
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 
@@ -194,6 +195,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
         unique_items = list(set([item for sublist in interacted_items for item in sublist]))
         unique_attributes = list(set([item for sublist in attributes for item in sublist]))
+        mid = np.array([len(sublist) for sublist in interacted_items]).mean()
         lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
                                  train_set=self.dataset.load_fold_asdf()[0],
                                  col_user=self.dataset.user_column)
@@ -203,7 +205,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
         attr_metrics = {
             "SEP": sep,
             "LIR": lir,
-            "ETD": etd
+            "ETD": etd,
+            "TID": unique_items,
+            "TPD": unique_attributes,
+            "MID": mid
         }
 
         # generate re-ranking based on clustering
@@ -252,7 +257,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 "attribute_metrics":
                     {"SEP": [],
                     "LIR": [],
-                    "ETD": [] },
+                    "ETD": [],
+                    "TID": [],
+                    "TPD": [],
+                    "MID": []},
                 "items_cluster_metrics":
                     {"Mean Items Per Cluster": [],
                     "Std Items Per Cluster": [],
@@ -287,7 +295,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
         for key in ret_obj["metrics"].keys():
             for key1, value_list in ret_obj['metrics'][key].items():
-                ret_obj['metrics'][key][key1] = np.array(value_list).mean()
+                if key1 != "TPD" and key1 != "TID":
+                    ret_obj['metrics'][key][key1] = np.array(value_list).mean()
+                else:
+                    ret_obj['metrics'][key][key1] = len({item for sublist in value_list for item in sublist})
 
         return ret_obj, all_user_ret
 

@@ -8,26 +8,53 @@ from recommender.recommender_system import RecommenderSystem
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--mode",
-                    type=str,
-                    default="recommend",
-                    help="Set 'recommend' to run recommendation algorithms or 'explain' to "
-                         "run explanation algorithms")
-
 parser.add_argument("--dataset",
                     type=str,
                     default="ml100k",
-                    help="Data set. Either 'ml' for the movielens dataset or 'lastfm' for the lastfm dataset")
+                    help="Data set. Either 'ml100k' for the movielens 100k dataset or 'lastfm' for the lastfm dataset")
 
-parser.add_argument("--fold",
+parser.add_argument("--split",
                     type=int,
-                    default=4,
-                    help="Fold to start the experiment")
+                    default=0,
+                    help="Split of the dataset. If 0, then use train/test split set to 80/20, if 1 use the Kfold with "
+                         "train, validation and test sets. If -1 then use the users parameters to run the pipeline for "
+                         "the users parameter on the train/test split")
+
+parser.add_argument("--start-fold",
+                    type=int,
+                    default=0,
+                    help="Start fold to run the experiments if split is 1")
+
+parser.add_argument("--end-fold",
+                    type=int,
+                    default=0,
+                    help="End fold to run the experiments if split is 1")
+
+parser.add_argument("--users",
+                    type=int,
+                    default=5,
+                    help="User to generate only explanations to. Recommendations will be generated to all users")
 
 parser.add_argument("--alg",
                     type=str,
+                    default="bpr-mf",
+                    help="Name of the recommendation algorithm to be executed")
+
+parser.add_argument("--alg-param",
+                    type=str,
                     default="None",
-                    help="Algorithm to run")
+                    help="Name of the file with the parameters to run the recommendation algorithm")
+
+parser.add_argument("--expl-alg",
+                    type=str,
+                    default="None",
+                    help="Explanation algorithm to run. To run multiple explanation algorithms use spacing between each"
+                         "name")
+
+parser.add_argument("--expl-params",
+                    type=str,
+                    default="None",
+                    help="Name of the file with the parameters to run the recommendation algorithm")
 
 # dataset definition
 ml = MovieLens100K(gen_dataset=True)
