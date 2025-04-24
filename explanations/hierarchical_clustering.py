@@ -3,7 +3,6 @@ import os
 import cornac
 import numpy as np
 import pandas as pd
-from fontTools.varLib.models import subList
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 
@@ -13,12 +12,13 @@ from explanations.explanation import ExplanationAlgorithm
 
 
 class HierarchicalClustering(ExplanationAlgorithm):
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, method: str, criterion: str,
+    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int, method: str, criterion: str,
                  metric: str, n_clusters: int, top_n: int, hitems_per_attr=2, vec_method='binary', random_state=42):
         """
         Hierarchical Clustering explanation algorithm
         :param dataset: dataset used in the recommendation model
         :param model: cornac model used to generate recommendations
+        :param top_k: top k items to explain
         :param method: methods are used to compute the distance between two clusters. It will be used in the scipy
             method linkage.
         :param criterion: The criterion to use in forming flat clusters.
@@ -33,7 +33,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         'relevance' to use the Musto graph relevance score
         :param random_state: random state number for reproducible results
         """
-        super().__init__(dataset, model)
+        super().__init__(dataset, model, top_k)
         self.method = method
         self.criterion = criterion
         self.metric = metric
@@ -43,20 +43,19 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.vec_method = vec_method
         self.random_state = random_state
         np.random.seed(self.random_state)
-        self.model_name = (f"Hierarchical&method={str(self.method)}&criterion={str(self.criterion)}"
+        self.model_name = (f"HCluster&method={str(self.method)}&criterion={str(self.criterion)}"
                             f"&metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}"
                             f"&hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}"
-                            f"&random_state={str(self.random_state)}")
+                            f"&rs={str(self.random_state)}&top_k={str(self.top_k)}")
         self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
-        if os.path.exists(self.expl_file_path): open(self.expl_file_path, 'w', encoding='utf-8').close()
+        open(self.expl_file_path, 'w+').close()
 
-    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) \
+    def user_explanation(self, user: str, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) \
             -> dict:
         """
         Generate explanation based on hierarchical clustering of items based on the simple presence of those
         We will be able to generate cuts on the dendrogram and generate explanations for the clusters generated
         :param user: user id
-        :param top_k: top k items to explain
         :param remove_seen: True if model should exclude seen items, False otherwise
         :param verbose: True to print explanations
         :param show_dendrogram: True to print the generated dendrogram
@@ -70,7 +69,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         ranked_clusters = []
 
         # generate user recommendations
-        ranked_items = list(self.model.recommend(user_id=user, k=top_k,
+        ranked_items = list(self.model.recommend(user_id=user, k=self.top_k,
                                                  train_set=self.dataset.train,
                                                  remove_seen=remove_seen))
 
@@ -198,9 +197,9 @@ class HierarchicalClustering(ExplanationAlgorithm):
         mid = np.array([len(sublist) for sublist in interacted_items]).mean()
         lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
                                  train_set=self.dataset.load_fold_asdf()[0],
-                                 col_user=self.dataset.user_column)
+                                 col_user=self.dataset.user_column, col_item=self.dataset.item_column)
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
-        etd = metrics.etd_metric(unique_attributes, top_k, len(self.dataset.prop_set['obj'].unique()))
+        etd = metrics.etd_metric(unique_attributes, self.top_k, len(self.dataset.prop_set['obj'].unique()))
 
         attr_metrics = {
             "SEP": sep,
@@ -243,10 +242,9 @@ class HierarchicalClustering(ExplanationAlgorithm):
         }
         return ret_obj
 
-    def all_users_explanations(self, top_k: int, remove_seen=True, verbose=True) -> tuple[dict, dict]:
+    def all_users_explanations(self, remove_seen=True, verbose=True) -> tuple[dict, dict]:
         """
         Method to run explanations to all users and extract explanation metrics
-        :param top_k: top k recommendations to generate explanations and put it on a grid to users
         :param remove_seen: remove seen items on evaluation
         :param verbose: True to display log, False otherwise
         :return: tuple of two dictionaries: one containing the metrics and the other one with all outputs of all users.
@@ -283,8 +281,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
         if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
         # TODO: Change here
         for user_id in users[:3]:
-            expl_obj = self.user_explanation(user=user_id, top_k=top_k, remove_seen=remove_seen,
-                                                           verbose=verbose, show_dendrogram=False)
+            expl_obj = self.user_explanation(user=user_id, remove_seen=remove_seen, verbose=verbose,
+                                             show_dendrogram=False)
             all_user_ret[user_id] = expl_obj
             ret_obj["grid_items"] = pd.concat([ret_obj["grid_items"].copy(),
                                                expl_obj["grid_items"]], ignore_index=True)
@@ -293,6 +291,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 for key1, value1 in expl_obj['metrics'][key].items():
                     ret_obj['metrics'][key][key1].append(value1)
 
+        ret_obj["top_k"] = self.top_k
         for key in ret_obj["metrics"].keys():
             for key1, value_list in ret_obj['metrics'][key].items():
                 if key1 != "TPD" and key1 != "TID":
@@ -304,7 +303,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
     def __user_semantic_profile(self, historic: list) -> dict:
         """
-        Generate the user semantic profile, where all the values of properties (e.g.: George Lucas, action films, etc)
+        Generate the user semantic profile, where all the values of properties (e.g.: George Lucas, action films, etc.)
         are ordered by a score that is calculated as:
             score = (npi/i) * log(N/dft)
         where npi are the number of edges to a value, i the number of interacted items,

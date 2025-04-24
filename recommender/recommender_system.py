@@ -34,6 +34,8 @@ class RecommenderSystem:
         self.model_name = name_params[:-1]
         self.dataset = dataset
         self.remove_seen = remove_seen
+        if load_path == "None":
+            load_path = None
         self.load_path = load_path
         self.model = model
 
@@ -77,13 +79,15 @@ class RecommenderSystem:
                                     train_set=self.dataset.train,
                                     remove_seen=self.remove_seen)
 
-    def run_experiment(self, k_list: list, expl_results: dict, rows=3, cols=2, save_results=False, verbose=True) -> dict:
+    def run_experiment(self, k_list: list, expl_results: dict, expr_file: str, rows=3, cols=2, save_results=False,
+                       verbose=True) -> dict:
         """
         Run experiment where the recommender system will score all items to all users and extract results.
         This function can also save the score of items for all user, item tuples and the metrics in the file
         system if the flag save_results is set to True.
         :param k_list: list of top k to evaluate
         :param expl_results: dictionary with explanation results from the explanation algorithms
+        :param expr_file: name of the file with the algorithms parameters passed on command line arguments
         :param rows: number of rows on grid to evaluate ndcg-2d
         :param cols: number of columns on grid to evaluate ndcg-2d
         :param save_results: True if results should be saved in the datasets folder as file, False otherwise
@@ -129,8 +133,11 @@ class RecommenderSystem:
         explanation_algorithms = []
         for key, value in expl_results.items():
             explanation_algorithms.append({"name": key, "explanation_metrics": value["metrics"]})
-        metrics_value["explanation_algoritms"] = explanation_algorithms
+        metrics_value["explanation_algorithms"] = explanation_algorithms
 
+        metrics_value["experiment_file"] = expr_file
+        metrics_value["rows"] = rows
+        metrics_value["columns"] = cols
         if save_results:
             path = self.get_path("results")
             path = path + self.model_name + ".txt"
@@ -180,7 +187,7 @@ class RecommenderSystem:
     def get_path(self, last_folder: str) -> str:
         """
         Get path to save a file or folder
-        :param last_folder: it will be outputs or model or results to save the file in the appropriate folder
+        :param last_folder: it will be 'outputs' or 'model' or 'results' to save the file in the appropriate folder
         :return: path in the file system as str
         """
         path = self.dataset.path

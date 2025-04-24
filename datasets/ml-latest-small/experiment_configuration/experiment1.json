@@ -1,0 +1,59 @@
+{
+    "recommender": {
+        "name": "BPR-MF",
+        "parameters": {
+            "k": 200,
+            "max_iter": 200,
+            "learning_rate": 0.01,
+            "lambda_reg": 0.001,
+            "seed": 42,
+            "verbose": true
+        }
+    },
+
+    "explainers": [
+        {
+            "name": "HierarchicalClustering",
+            "parameters": {
+                "n_clusters": 5,
+                "method": "average",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "relevance"
+            }
+        },
+        {
+            "name": "HierarchicalClustering",
+            "parameters": {
+                "n_clusters": 5,
+                "method": "average",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "binary"
+            }
+        },
+        {
+            "name": "HierarchicalClustering",
+            "parameters": {
+                "n_clusters": 5,
+                "method": "ward",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "euclidean",
+                "criterion": "maxclust",
+                "vec_method": "binary"
+            }
+        },
+        {
+            "name": "ExpLOD",
+            "parameters": {
+                "top_n": 1,
+                "hitems_per_attr":2
+            }
+        }
+    ]
+}

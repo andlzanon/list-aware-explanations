@@ -11,7 +11,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 #### EXPLANATION METRICS #####
-def lir_metric(beta: float, user: str, items: list, train_set: pd.DataFrame, col_user: str):
+def lir_metric(beta: float, user: str, items: list, train_set: pd.DataFrame, col_user: str, col_item: str):
     """
     Linking Interaction Recency (LIR): metric proposed in https://dl.acm.org/doi/abs/10.1145/3477495.3532041
     :param beta: parameter for the exponential decay
@@ -19,6 +19,7 @@ def lir_metric(beta: float, user: str, items: list, train_set: pd.DataFrame, col
     :param items: list of items used for each recommendation explanation path
     :param train_set: training set of user item interactions
     :param col_user: user column name
+    :param col_item: item column name
     :return: the LIR metric for the user, the lir for every recommendation is the mean of the lir of every recommendation
         and the lir for every recommendation is the mean of the lir for every item in the explanation path
     """
@@ -53,7 +54,7 @@ def lir_metric(beta: float, user: str, items: list, train_set: pd.DataFrame, col
         np.asarray(interacted[interacted.columns[-1]]).astype(np.float64).reshape(-1, 1)).reshape(-1)
 
     # initialize mean variables
-    return interacted[interacted["movieId"].isin([str(i) for i in items])]['normalized'].mean()
+    return interacted[interacted[col_item].isin([str(i) for i in items])]['normalized'].mean()
 
 def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict):
     """
@@ -65,24 +66,19 @@ def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict)
     :return: the sep metric for the user, the sep for every recommendation is the mean of the sep of every recommendation
         and the sep for every recommendation is the mean of the sep for every item in the explanation path
     """
-
     # user variables for the mean sep of each explanation and scaler
-    total_sum = 0
-    total_n = 0
-    scaler = MinMaxScaler()
+    sep_values = []
     # for every list of properties in the user list of explanations
     for expl_props in props:
-        # explanation variables for the mean sep of each explanation
-        items_sum = 0
-        items_n = 0
+        local_sep_values = []
         # for every property list of each explanation
         for p in expl_props:
             # obtain the most popular link to of the property e.g. link actor from property Brad Pitt
-            links = list(set(prop_set[prop_set["obj"] == p]['prop'].values))
-            l_memo = list(set(memo_sep.keys()).intersection(set(links)))
+            links = sorted(list(set(prop_set[prop_set["obj"] == p]['prop'].values)))
+            l_memo = sorted(list(set(memo_sep.keys()).intersection(set(links))))
             if len(l_memo) > 0:
                 memo_df = memo_sep[l_memo[0]]
-                p_sep_value = memo_df.loc[p][-1]
+                p_sep_value = memo_df.loc[p]['normalized']
             else:
                 link_df = prop_set[prop_set["prop"].isin(links)]
                 # generate dataset with property as index and count as column
@@ -113,28 +109,22 @@ def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict)
 
                 # generate normalized sep column
                 try:
+                    scaler = MinMaxScaler()
                     count_link['normalized'] = scaler.fit_transform(
                         np.asarray(count_link[count_link.columns[-1]]).astype(np.float64).reshape(-1, 1)).reshape(-1)
                 except ValueError:
                     continue
 
-                p_sep_value = count_link.loc[p][-1]
+                p_sep_value = count_link.loc[p]['normalized']
                 for l in links:
                     memo_sep[l] = count_link
 
             # obtain sep value for the property and calculate mean
-            items_sum = items_sum + p_sep_value
-            items_n = items_n + 1
+            local_sep_values.append(p_sep_value)
 
-        # calculate total mean
-        try:
-            total_sum = total_sum + (items_sum / items_n)
-            total_n = total_n + 1
-        except ZeroDivisionError:
-            total_n = total_n + 1
+        sep_values.append(np.array(local_sep_values).mean())
 
-    return total_sum / total_n
-
+    return np.array(sep_values).mean()
 
 def etd_metric(explanation_types: list, k: int, total_types: int):
     """

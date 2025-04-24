@@ -4,12 +4,12 @@
     "Precision@10": 0.23770491803278687,
     "Recall@10": 0.11925884665384252,
     "Algorithm BPR NDCG - 2D@10": 0.3958807450715974,
-    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&random_state=42 NDCG - 2D@10": 0.0011860796676228219,
-    "Algorithm Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.0011860796676228219,
-    "Algorithm Hierarchical&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42 NDCG - 2D@10": 0.001167643038134582,
-    "explanation_algoritms": [
+    "Algorithm HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
+    "Algorithm HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
+    "Algorithm HCluster&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10 NDCG - 2D@10": 0.001167643038134582,
+    "explanation_algorithms": [
         {
-            "name": "Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&random_state=42",
+            "name": "HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.5513719704928665,
@@ -27,22 +27,22 @@
                 "hierarchical_metrics": {
                     "Cophenet Matrix Mean": 0.6663032750778702,
                     "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 0.7433810462004207,
-                    "Inconsistency Matrix Std": 0.8220608588352141
+                    "Inconsistency Matrix Mean": 0.7433810462004206,
+                    "Inconsistency Matrix Std": 0.822060858835214
                 },
                 "cluster_metrics": {
-                    "Silhouette": 0.04361519587357399,
-                    "Calinski Harabasz Index": 1.9506654554048455,
-                    "Davies Bouldin Index:": 0.9047819704768424
+                    "Silhouette": 0.04361519587357401,
+                    "Calinski Harabasz Index": 1.950665455404846,
+                    "Davies Bouldin Index:": 0.9047819703790879
                 }
             }
         },
         {
-            "name": "Hierarchical&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42",
+            "name": "HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.6674575349256336,
-                    "LIR": 0.2196438635442136,
+                    "LIR": 0.3368400588471963,
                     "ETD": 0.8333333333333334,
                     "TID": 18,
                     "TPD": 19,
@@ -62,16 +62,16 @@
                 "cluster_metrics": {
                     "Silhouette": -0.0077991938861594985,
                     "Calinski Harabasz Index": 1.499185296234512,
-                    "Davies Bouldin Index:": 1.1972920155706397
+                    "Davies Bouldin Index:": 1.1972920155706395
                 }
             }
         },
         {
-            "name": "Hierarchical&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&random_state=42",
+            "name": "HCluster&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.5560271484974875,
-                    "LIR": 0.17912445062791896,
+                    "LIR": 0.3116119349109044,
                     "ETD": 0.8333333333333334,
                     "TID": 17,
                     "TPD": 20,
@@ -90,13 +90,13 @@
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.08349144610806984,
-                    "Calinski Harabasz Index": 2.33480968090192,
+                    "Calinski Harabasz Index": 2.334809680901921,
                     "Davies Bouldin Index:": 0.8177394776992722
                 }
             }
         },
         {
-            "name": "ExpLOD&top_n=1&hitems_per_attr=2",
+            "name": "ExpLOD&top_n=1&hitems_per_attr=2&top_k=10",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.5724918503804022,
@@ -108,5 +108,8 @@
                 }
             }
         }
-    ]
+    ],
+    "experiment_file": "experiment1.json",
+    "rows": 3,
+    "columns": 2
 }

@@ -10,21 +10,24 @@ from explanations.explanation import ExplanationAlgorithm
 
 
 class ExpLOD(ExplanationAlgorithm):
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_n=1, hitems_per_attr=2):
+    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int,
+                 top_n=1, hitems_per_attr=2):
         """
         :param dataset:
         :param model:
+        :param top_k: top k items to explain
         :param top_n: number of top attributes to generate the explanation
         :param hitems_per_attr: number of historic items showed per attribute on explanation.
             In an example such as: I recommend you Titanic since you ofter like drama items as X, Y, Z.
             hitems_per_attr is 3, because we are using X, Y and Z profile items to support the attribute
         """
-        super().__init__(dataset, model)
+        super().__init__(dataset, model, top_k)
         self.top_n = top_n
         self.hitems_per_attr = hitems_per_attr
-        self.model_name = f'''ExpLOD&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}'''
+        self.model_name = (f"ExpLOD&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}"
+                           f"&top_k={str(self.top_k)}")
         self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
-        if os.path.exists(self.expl_file_path): open(self.expl_file_path, 'w', encoding='utf-8').close()
+        open(self.expl_file_path, 'w+', encoding='utf-8').close()
 
     def __user_semantic_profile(self, historic: list) -> dict:
         """
@@ -39,8 +42,8 @@ class ExpLOD(ExplanationAlgorithm):
 
         # create npi, i and n columns
         interacted_props = self.dataset.prop_set.loc[self.dataset.prop_set.index.isin(historic)].copy()
-        interacted_props['npi'] = interacted_props.groupby(self.dataset.prop_set.columns[-1])[self.dataset.prop_set.columns[-1]].transform(
-            'count')
+        interacted_props['npi'] = interacted_props.groupby(self.dataset.prop_set.columns[-1])[
+            self.dataset.prop_set.columns[-1]].transform('count')
         interacted_props['i'] = len(historic)
         interacted_props['n'] = len(self.dataset.prop_set.index.unique())
 
@@ -64,11 +67,10 @@ class ExpLOD(ExplanationAlgorithm):
 
         return fav_prop
         
-    def user_explanation(self, user: str, top_k: int, remove_seen=True, verbose=True, **kwargs) -> dict:
+    def user_explanation(self, user: str, remove_seen=True, verbose=True, **kwargs) -> dict:
         """
         Generate user explanation with ExpLOD algorithm link: https://dl.acm.org/doi/abs/10.1145/2959100.2959173
         :param user: user id
-        :param top_k: top k items to explain
         :param remove_seen: True if model should exclude seen items, False otherwise
         :param verbose: True to print sentences
         :return: explanations as dict where key is recommended item and value is explanation
@@ -80,7 +82,7 @@ class ExpLOD(ExplanationAlgorithm):
 
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                           for u_item in self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
-        ranked_items = list(self.model.recommend(user_id=user, k=top_k,
+        ranked_items = list(self.model.recommend(user_id=user, k=self.top_k,
                                                  train_set=self.dataset.train,
                                                  remove_seen=remove_seen))
         
@@ -162,9 +164,9 @@ class ExpLOD(ExplanationAlgorithm):
         mid = np.array([len(sublist) for sublist in interacted_items]).mean()
         lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
                                      train_set=self.dataset.load_fold_asdf()[0],
-                                     col_user=self.dataset.user_column)
+                                     col_user=self.dataset.user_column, col_item=self.dataset.item_column)
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
-        etd = metrics.etd_metric(unique_attributes, top_k, len(self.dataset.prop_set['obj'].unique()))
+        etd = metrics.etd_metric(unique_attributes, self.top_k, len(self.dataset.prop_set['obj'].unique()))
 
         expl_metrics = {
             "attribute_metrics": {
@@ -184,10 +186,9 @@ class ExpLOD(ExplanationAlgorithm):
 
         return ret_obj
 
-    def all_users_explanations(self, top_k: int, remove_seen=True, verbose=True) -> tuple[dict, dict]:
+    def all_users_explanations(self, remove_seen=True, verbose=True) -> tuple[dict, dict]:
         """
         Method to run explanations to all users and extract explanation metrics
-        :param top_k: top k recommendations to generate explanations and put it on a grid to users
         :param remove_seen: remove seen items on evaluation
         :param verbose: True to display log, False otherwise
         :return: tuple of two dictionaries: one containing the metrics and the other one with all outputs of all users.
@@ -210,7 +211,7 @@ class ExpLOD(ExplanationAlgorithm):
         if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
         # TODO: Change here
         for user_id in users[:3]:
-            expl_obj = self.user_explanation(user=user_id, top_k=top_k, remove_seen=remove_seen,  verbose=verbose)
+            expl_obj = self.user_explanation(user=user_id, remove_seen=remove_seen,  verbose=verbose)
             all_user_ret[user_id] = expl_obj
 
             for key in ret_obj["metrics"].keys():
