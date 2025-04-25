@@ -37,7 +37,7 @@ def create_recommender(model_name: str, model_params: dict) -> Recommender:
     :param model_params: dict with the model parameters
     :return: the cornac model
     """
-    if model_name == "BPR-MF":
+    if model_name == "BPR":
         return cornac.models.BPR(k=model_params["k"], max_iter=model_params["max_iter"],
                                  learning_rate=model_params["learning_rate"],lambda_reg=model_params["lambda_reg"],
                                  seed=model_params["seed"], verbose=model_params["verbose"])

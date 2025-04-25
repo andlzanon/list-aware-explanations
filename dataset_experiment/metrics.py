@@ -117,7 +117,8 @@ def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict)
 
                 p_sep_value = count_link.loc[p]['normalized']
                 for l in links:
-                    memo_sep[l] = count_link
+                    if l not in memo_sep.keys():
+                        memo_sep[l] = count_link
 
             # obtain sep value for the property and calculate mean
             local_sep_values.append(p_sep_value)

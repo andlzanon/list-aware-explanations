@@ -30,7 +30,7 @@ parser.add_argument("--end_fold",
 parser.add_argument("--k_list",
                     type=str,
                     default="10",
-                    help="Top K items to generate explanations to evaluate on offline metrics. Sparate numbers"
+                    help="Top K items to generate explanations to evaluate on offline metrics. Separate numbers"
                          "with space. E.g.: 1 3 5 10")
 
 parser.add_argument("--users",

@@ -1,6 +1,6 @@
 {
     "recommender": {
-        "name": "BPR-MF",
+        "name": "BPR",
         "parameters": {
             "k": 200,
             "max_iter": 200,

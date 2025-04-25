@@ -27,13 +27,13 @@
                 "hierarchical_metrics": {
                     "Cophenet Matrix Mean": 0.6663032750778702,
                     "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 0.7433810462004206,
-                    "Inconsistency Matrix Std": 0.822060858835214
+                    "Inconsistency Matrix Mean": 0.7433810462004203,
+                    "Inconsistency Matrix Std": 0.8220608588352141
                 },
                 "cluster_metrics": {
-                    "Silhouette": 0.04361519587357401,
+                    "Silhouette": 0.04361519587357396,
                     "Calinski Harabasz Index": 1.950665455404846,
-                    "Davies Bouldin Index:": 0.9047819703790879
+                    "Davies Bouldin Index:": 0.9047819705613788
                 }
             }
         },
@@ -62,7 +62,7 @@
                 "cluster_metrics": {
                     "Silhouette": -0.0077991938861594985,
                     "Calinski Harabasz Index": 1.499185296234512,
-                    "Davies Bouldin Index:": 1.1972920155706395
+                    "Davies Bouldin Index:": 1.1972920155706397
                 }
             }
         },
