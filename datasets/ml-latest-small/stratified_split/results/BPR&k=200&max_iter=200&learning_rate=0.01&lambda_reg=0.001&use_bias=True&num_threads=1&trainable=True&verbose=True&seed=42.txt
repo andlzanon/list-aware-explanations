@@ -24,16 +24,10 @@
                     "Std Items Per Cluster": 1.1488533115279982,
                     "Clusters Entropy": 1.444944486889436
                 },
-                "hierarchical_metrics": {
-                    "Cophenet Matrix Mean": 0.6663032750778702,
-                    "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 0.7433810462004203,
-                    "Inconsistency Matrix Std": 0.8220608588352141
-                },
                 "cluster_metrics": {
-                    "Silhouette": 0.04361519587357396,
+                    "Silhouette": 0.26843984761015754,
                     "Calinski Harabasz Index": 1.950665455404846,
-                    "Davies Bouldin Index:": 0.9047819705613788
+                    "Davies Bouldin Index:": 0.904781970379088
                 }
             }
         },
@@ -53,14 +47,8 @@
                     "Std Items Per Cluster": 0.7197794183557559,
                     "Clusters Entropy": 1.5396714932654938
                 },
-                "hierarchical_metrics": {
-                    "Cophenet Matrix Mean": 0.7400578782951787,
-                    "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 0.7798000946847875,
-                    "Inconsistency Matrix Std": 0.8310681726617938
-                },
                 "cluster_metrics": {
-                    "Silhouette": -0.0077991938861594985,
+                    "Silhouette": 0.14593606708703302,
                     "Calinski Harabasz Index": 1.499185296234512,
                     "Davies Bouldin Index:": 1.1972920155706397
                 }
@@ -82,14 +70,8 @@
                     "Std Items Per Cluster": 1.5482128178310994,
                     "Clusters Entropy": 1.3525248628147768
                 },
-                "hierarchical_metrics": {
-                    "Cophenet Matrix Mean": 6.284658762944204,
-                    "Cophenet Matrix Std": 0.0,
-                    "Inconsistency Matrix Mean": 2.0861361860586576,
-                    "Inconsistency Matrix Std": 2.201470094979928
-                },
                 "cluster_metrics": {
-                    "Silhouette": 0.08349144610806984,
+                    "Silhouette": 0.03310141071557063,
                     "Calinski Harabasz Index": 2.334809680901921,
                     "Davies Bouldin Index:": 0.8177394776992722
                 }

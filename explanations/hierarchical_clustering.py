@@ -1,5 +1,3 @@
-import os
-
 import cornac
 import numpy as np
 import pandas as pd
@@ -188,7 +186,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
             plt.legend()
             plt.show()
 
-        hier_metrics = metrics.hierarchical_clustering_metrics(linkage_matrix, verbose=False)
         clu_metrics = metrics.clustering_metrics(clustering_data, clusters, verbose=False)
         item_cluster_metrics = metrics.items_per_cluster(clusters.tolist())
 
@@ -228,7 +225,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
                     rerank.loc[len(rerank)] = [user, item, x+1, y+1]
 
         expl_metrics = {
-            "hierarchical_metrics": hier_metrics,
             "items_cluster_metrics": item_cluster_metrics,
             "cluster_metrics": clu_metrics,
             "attribute_metrics": attr_metrics
@@ -263,11 +259,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
                     {"Mean Items Per Cluster": [],
                     "Std Items Per Cluster": [],
                     "Clusters Entropy": []},
-                "hierarchical_metrics":
-                    {"Cophenet Matrix Mean": [],
-                    "Cophenet Matrix Std": [],
-                    "Inconsistency Matrix Mean": [],
-                    "Inconsistency Matrix Std": []},
                 "cluster_metrics":{
                     "Silhouette": [],
                     "Calinski Harabasz Index": [],
