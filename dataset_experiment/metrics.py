@@ -233,7 +233,7 @@ def __fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
 
 def ndcg_2d(predictions: pd.DataFrame, grid_predictions: pd.DataFrame|None, test_recs: pd.DataFrame,
                k: int, alg_name: str, col_rating: str, col_user='userId', col_item='movieId',
-               alpha=1, beta=1, gama=1, rows=3, columns=2, step_x=1, step_y=1, verbose=True):
+               alpha=1, beta=1, gama=1, lambd=1, rows=3, columns=2, step_x=1, step_y=1, verbose=True):
     """
     Implementation of the 2D-NDCG According to the paper:
     Felicioni, Nicolò, et al. "Measuring the ranking quality of recommendations in a two-dimensional carousel setting."
@@ -249,7 +249,8 @@ def ndcg_2d(predictions: pd.DataFrame, grid_predictions: pd.DataFrame|None, test
     :param k: size at k of recommendations to evaluate
     :param alpha: alpha weighting param on y position based on the paper it is set to 1
     :param beta: beta weighting param on x position based on the paper it is set to 1
-    :param gama: gama weighting param on user position
+    :param gama: gama weighting param on vertical swipe
+    :param lambd: lambda weighting param on horizontal swipe
     :param rows: row size of the screen
     :param columns: column size of the screen
     :param step_x: number of items on the row (horizontal swipe) shown when user swipes
@@ -292,20 +293,20 @@ def ndcg_2d(predictions: pd.DataFrame, grid_predictions: pd.DataFrame|None, test
 
     df_dcg["rel"] = 2 ** df_dcg[col_rating] - 1
     discfun = np.log2
-    df_dcg["dcg"] = df_dcg["rel"] / discfun(alpha * df_dcg["y_rank"] +
-                                            beta * df_dcg["x_rank"] +
-                                            gama * np.maximum(0, np.ceil((df_dcg["y_rank"] - columns) / step_y)) +
-                                            gama * np.maximum(0, np.ceil((df_dcg["x_rank"] - rows) / step_x))
+    df_dcg["dcg"] = df_dcg["rel"] / discfun(alpha * df_dcg["x_rank"] +
+                                            beta * df_dcg["y_rank"] +
+                                            gama * np.maximum(0, np.ceil((df_dcg["x_rank"] - rows) / step_x)) +
+                                            lambd * np.maximum(0, np.ceil((df_dcg["y_rank"] - columns) / step_y))
                                             )
 
     df_idcg = df_dcg.sort_values([col_user, col_rating], ascending=False)
     df_idcg["irank"] = df_idcg.groupby(col_user, as_index=False, sort=False)[
         col_rating
     ].rank("first", ascending=False)
-    df_idcg["idcg"] = df_idcg["rel"] / discfun(alpha * df_dcg["y_irank"] +
-                                               beta * df_dcg["x_irank"] +
-                                               gama * np.maximum(0, np.ceil((df_dcg["y_irank"] - columns) / step_y)) +
-                                               gama * np.maximum(0, np.ceil((df_dcg["x_irank"] - rows) / step_x))
+    df_idcg["idcg"] = df_idcg["rel"] / discfun(alpha * df_dcg["x_irank"] +
+                                               beta * df_dcg["y_irank"] +
+                                               gama * np.maximum(0, np.ceil((df_dcg["x_irank"] - rows) / step_x)) +
+                                               lambd * np.maximum(0, np.ceil((df_dcg["y_irank"] - columns) / step_y))
                                                )
 
     df_user = df_dcg.groupby(col_user, as_index=False, sort=False).agg({"dcg": "sum"})

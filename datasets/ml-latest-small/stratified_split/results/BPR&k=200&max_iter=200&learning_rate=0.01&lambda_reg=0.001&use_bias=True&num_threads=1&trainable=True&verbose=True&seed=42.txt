@@ -26,8 +26,8 @@
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.26843984761015754,
-                    "Calinski Harabasz Index": 1.950665455404846,
-                    "Davies Bouldin Index:": 0.904781970379088
+                    "Calinski Harabasz Index": 1.9506654554048455,
+                    "Davies Bouldin Index:": 0.9047819702723944
                 }
             }
         },
