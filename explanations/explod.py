@@ -169,6 +169,12 @@ class ExpLOD(ExplanationAlgorithm):
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
         etd = metrics.etd_metric(unique_attributes, self.top_k, len(self.dataset.prop_set['obj'].unique()))
 
+        total_attributes = sum([len(sublist) for sublist in attributes])
+        overlap_attributes = len(unique_attributes) / total_attributes
+
+        total_items = sum([len(sublist) for sublist in interacted_items])
+        overlap_items = len(unique_items) / total_items
+
         expl_metrics = {
             "attribute_metrics": {
                 "SEP": sep,
@@ -176,7 +182,9 @@ class ExpLOD(ExplanationAlgorithm):
                 "ETD": etd,
                 "TID": unique_items,
                 "TPD": unique_attributes,
-                "MID": mid
+                "MID": mid,
+                "Overlap-Attributes": overlap_attributes,
+                "Overlap-Items": overlap_items
             }
         }
 
@@ -202,8 +210,9 @@ class ExpLOD(ExplanationAlgorithm):
                      "ETD": [],
                      "TID": [],
                      "TPD": [],
-                     "MID": []
-                     }
+                     "MID": [],
+                     "Overlap-Attributes": [],
+                     "Overlap-Items": []},
             }
         }
 

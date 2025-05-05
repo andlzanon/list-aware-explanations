@@ -28,7 +28,7 @@
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.26843984761015754,
-                    "Calinski Harabasz Index": 1.9506654554048453,
+                    "Calinski Harabasz Index": 1.950665455404846,
                     "Davies Bouldin Index:": 0.9047819704768424
                 }
             }
@@ -54,7 +54,7 @@
                 "cluster_metrics": {
                     "Silhouette": 0.3424254564492677,
                     "Calinski Harabasz Index": 3.5844648292042685,
-                    "Davies Bouldin Index:": 0.7629029734678502
+                    "Davies Bouldin Index:": 0.76290297346785
                 }
             }
         },
@@ -92,7 +92,9 @@
                     "ETD": 0.5666666666666667,
                     "TID": 21,
                     "TPD": 12,
-                    "MID": 2.0
+                    "MID": 2.0,
+                    "Overlap-Attributes": 0.5666666666666667,
+                    "Overlap-Items": 0.3666666666666667
                 }
             }
         }
