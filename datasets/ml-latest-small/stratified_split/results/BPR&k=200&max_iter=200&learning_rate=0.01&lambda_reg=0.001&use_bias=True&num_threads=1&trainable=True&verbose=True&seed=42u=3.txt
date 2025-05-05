@@ -4,12 +4,12 @@
     "Precision@10": 0.23770491803278687,
     "Recall@10": 0.11925884665384252,
     "Algorithm BPR NDCG - 2D@10": 0.3958807450715974,
-    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
-    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=10 NDCG - 2D@10": 0.001167643038134582,
-    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
+    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10&u=3 NDCG - 2D@10": 0.0011860796676228219,
+    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=10&u=3 NDCG - 2D@10": 0.001167643038134582,
+    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10&u=3 NDCG - 2D@10": 0.0011860796676228219,
     "explanation_algorithms": [
         {
-            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10",
+            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10&u=3",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.5713129068829685,
@@ -28,13 +28,13 @@
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.26843984761015754,
-                    "Calinski Harabasz Index": 1.950665455404846,
-                    "Davies Bouldin Index:": 0.9047819704768423
+                    "Calinski Harabasz Index": 1.9506654554048453,
+                    "Davies Bouldin Index:": 0.9047819704768424
                 }
             }
         },
         {
-            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=10",
+            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=10&u=3",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.8048033620346452,
@@ -52,14 +52,14 @@
                     "Clusters Entropy": 1.4995766835672895
                 },
                 "cluster_metrics": {
-                    "Silhouette": 0.34242545644926775,
+                    "Silhouette": 0.3424254564492677,
                     "Calinski Harabasz Index": 3.5844648292042685,
-                    "Davies Bouldin Index:": 0.7629029734678499
+                    "Davies Bouldin Index:": 0.7629029734678502
                 }
             }
         },
         {
-            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10",
+            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10&u=3",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.6674575349256336,
@@ -79,12 +79,12 @@
                 "cluster_metrics": {
                     "Silhouette": 0.14593606708703302,
                     "Calinski Harabasz Index": 1.499185296234512,
-                    "Davies Bouldin Index:": 1.1972920155706395
+                    "Davies Bouldin Index:": 1.1972920155706397
                 }
             }
         },
         {
-            "name": "ExpLOD&top_n=1&hitems_per_attr=2&top_k=10",
+            "name": "ExpLOD&top_n=1&hitems_per_attr=2&top_k=10&u=3",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.5724918503804022,

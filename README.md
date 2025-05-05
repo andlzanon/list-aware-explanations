@@ -70,7 +70,7 @@ set them, use the following command line parameters:
 - `k_list`: Top K items to generate explanations to evaluate on offline metrics. Separate numbers with space. E.g.: 1 3 5 10
 
 
-- `users`: User to generate only explanations to. Recommendations will be generated to all users
+- `n_users`: User to generate only explanations to. Recommendations will be generated to all users
 
 
 - `rows`: Rows on the grid to generate the NDCG-2D.
@@ -86,7 +86,7 @@ set them, use the following command line parameters:
 
 An example of a command-line argument is:
 
-    python main.py --dataset=ml100k --split=0 --k_list=10 --rows=3 --columns=2 --rec_model_folder=BPR --experiment_file=experiment1.json
+    python main.py --dataset=ml100k --split=0 --k_list=10 --rows=3 --columns=2 --rec_model_folder=BPR --experiment_file=experiment1.json --n_users=3
 
 ## Project Organization
 

@@ -114,5 +114,6 @@ for fold in range(sf, ed):
             res[explainer.model_name] = expl_alg_results
 
     # run offline experiments
-    rec.run_experiment(k_list, res, args.experiment_file,
+    expr_out = rec.run_experiment(k_list, res, args.experiment_file, n_users=n_users,
                        rows=args.rows, cols=args.columns, verbose=False, save_results=True)
+    print(expr_out)

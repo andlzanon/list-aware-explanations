@@ -79,7 +79,7 @@ class RecommenderSystem:
                                     train_set=self.dataset.train,
                                     remove_seen=self.remove_seen)
 
-    def run_experiment(self, k_list: list, expl_results: dict, expr_file: str, rows=3, cols=2, save_results=False,
+    def run_experiment(self, k_list: list, expl_results: dict, expr_file: str, n_users=0, rows=3, cols=2, save_results=False,
                        verbose=True) -> dict:
         """
         Run experiment where the recommender system will score all items to all users and extract results.
@@ -88,6 +88,7 @@ class RecommenderSystem:
         :param k_list: list of top k to evaluate
         :param expl_results: dictionary with explanation results from the explanation algorithms
         :param expr_file: name of the file with the algorithms parameters passed on command line arguments
+        :param n_users: number of users to generate explanations to. If 0 runs to all users
         :param rows: number of rows on grid to evaluate ndcg-2d
         :param cols: number of columns on grid to evaluate ndcg-2d
         :param save_results: True if results should be saved in the datasets folder as file, False otherwise
@@ -140,7 +141,7 @@ class RecommenderSystem:
         metrics_value["columns"] = cols
         if save_results:
             path = self.get_path("results")
-            path = path + self.model_name + ".txt"
+            path = path + self.model_name + "u=" + str(n_users) + ".txt"
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(metrics_value, f, indent=4)
 
