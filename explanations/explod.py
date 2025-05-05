@@ -26,7 +26,7 @@ class ExpLOD(ExplanationAlgorithm):
         self.top_n = top_n
         self.hitems_per_attr = hitems_per_attr
         self.model_name = (f"ExpLOD&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}"
-                           f"&top_k={str(self.top_k)}&u={str(self.n_users)}")
+                           f"&top_k={str(self.top_k)}&u={str(abs(self.n_users))}")
         self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
         open(self.expl_file_path, 'w+', encoding='utf-8').close()
 

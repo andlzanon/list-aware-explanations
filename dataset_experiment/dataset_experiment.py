@@ -134,11 +134,11 @@ class DatasetExperiment:
         """
         users = list()
         if dset == 'train':
-            users = list(self.train.iid_map.keys())
+            users = list(self.train.uid_map.keys())
         elif dset == 'val':
-            users = list(self.validation.iid_map.keys())
+            users = list(self.validation.uid_map.keys())
         elif dset == 'test':
-            users = list(self.test.iid_map.keys())
+            users = list(self.test.uid_map.keys())
 
         assert len(users) > 0, "dset should be either train, val or test"
         users = sorted(users, key=int)

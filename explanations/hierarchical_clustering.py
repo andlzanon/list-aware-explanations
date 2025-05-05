@@ -45,7 +45,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.model_name = (f"HCluster&method={str(self.method)}&criterion={str(self.criterion)}"
                             f"&metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}"
                             f"&hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}"
-                            f"&rs={str(self.random_state)}&top_k={str(self.top_k)}&u={str(self.n_users)}")
+                            f"&rs={str(self.random_state)}&top_k={str(self.top_k)}&u={str(abs(self.n_users))}")
         self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
         open(self.expl_file_path, 'w+').close()
 
