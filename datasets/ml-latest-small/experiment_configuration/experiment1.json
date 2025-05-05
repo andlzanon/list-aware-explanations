@@ -10,13 +10,12 @@
             "verbose": true
         }
     },
-
     "explainers": [
         {
             "name": "HierarchicalClustering",
             "parameters": {
                 "n_clusters": 5,
-                "method": "average",
+                "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
                 "metric": "cosine",
@@ -28,22 +27,22 @@
             "name": "HierarchicalClustering",
             "parameters": {
                 "n_clusters": 5,
-                "method": "average",
+                "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
                 "metric": "cosine",
                 "criterion": "maxclust",
-                "vec_method": "binary"
+                "vec_method": "count"
             }
         },
         {
             "name": "HierarchicalClustering",
             "parameters": {
                 "n_clusters": 5,
-                "method": "ward",
+                "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
-                "metric": "euclidean",
+                "metric": "cosine",
                 "criterion": "maxclust",
                 "vec_method": "binary"
             }

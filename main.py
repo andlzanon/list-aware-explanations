@@ -33,9 +33,9 @@ parser.add_argument("--k_list",
                     help="Top K items to generate explanations to evaluate on offline metrics. Separate numbers"
                          "with space. E.g.: 1 3 5 10")
 
-parser.add_argument("--users",
+parser.add_argument("--n_users",
                     type=int,
-                    default=5,
+                    default=0,
                     help="User to generate only explanations to. Recommendations will be generated to all users")
 
 parser.add_argument("--rows",
@@ -90,6 +90,7 @@ if args.rec_model_folder == "None":
 
 # get the k list from command line argument
 k_list = [int(x) for x in args.k_list.split(" ")]
+n_users = args.n_users
 
 # for every fold
 for fold in range(sf, ed):
@@ -108,7 +109,7 @@ for fold in range(sf, ed):
             expl_name = expl["name"]
             expl_params = expl["parameters"]
 
-            explainer = create_explainer(expl_name, expl_params, ds, rec.model, k)
+            explainer = create_explainer(expl_name, expl_params, ds, rec.model, k, n_users)
             expl_alg_results, _ = explainer.all_users_explanations(remove_seen=True, verbose=True)
             res[explainer.model_name] = expl_alg_results
 

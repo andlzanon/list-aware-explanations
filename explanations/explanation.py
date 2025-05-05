@@ -4,17 +4,20 @@ from dataset_experiment.dataset_experiment import DatasetExperiment
 
 
 class ExplanationAlgorithm:
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int):
+    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int, n_users=0):
         """
         Explanation algorithm class constructor. Every explanation algorithm uses a kg and the train set
         to have access to the users profile items. The model is required to get the recommendations for the explanations
         :param dataset: dataset used in the recommendation model
         :param model: cornac model used to generate recommendations
+        :param top_k: number of recommendations to explain
+        :param n_users: number of users to generate explanations to. If 0 runs to all users
         """
         self.model_name = "ExplanationAlgorithm"
         self.dataset = dataset
         self.model = model
         self.top_k = top_k
+        self.n_users = n_users
 
         path = self.dataset.path
         if self.dataset.fold_loaded == -1:

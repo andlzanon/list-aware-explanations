@@ -4,20 +4,22 @@
     "Precision@10": 0.23770491803278687,
     "Recall@10": 0.11925884665384252,
     "Algorithm BPR NDCG - 2D@10": 0.3958807450715974,
-    "Algorithm HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
-    "Algorithm HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
-    "Algorithm HCluster&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10 NDCG - 2D@10": 0.001167643038134582,
+    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
+    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=10 NDCG - 2D@10": 0.001167643038134582,
+    "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10 NDCG - 2D@10": 0.0011860796676228219,
     "explanation_algorithms": [
         {
-            "name": "HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10",
+            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10",
             "explanation_metrics": {
                 "attribute_metrics": {
-                    "SEP": 0.5513719704928665,
-                    "LIR": 0.23115912539039898,
+                    "SEP": 0.5713129068829685,
+                    "LIR": 0.24942120472260956,
                     "ETD": 0.9,
-                    "TID": 21,
+                    "TID": 22,
                     "TPD": 22,
-                    "MID": 1.7333333333333334
+                    "MID": 1.7333333333333334,
+                    "Overlap-Attributes": 0.9,
+                    "Overlap-Items": 0.8416666666666667
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
@@ -26,13 +28,38 @@
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.26843984761015754,
-                    "Calinski Harabasz Index": 1.9506654554048455,
-                    "Davies Bouldin Index:": 0.9047819702723944
+                    "Calinski Harabasz Index": 1.950665455404846,
+                    "Davies Bouldin Index:": 0.9047819704768423
                 }
             }
         },
         {
-            "name": "HCluster&method=average&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10",
+            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=10",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.8048033620346452,
+                    "LIR": 0.1649674727393252,
+                    "ETD": 0.5,
+                    "TID": 25,
+                    "TPD": 10,
+                    "MID": 2.0,
+                    "Overlap-Attributes": 0.5,
+                    "Overlap-Items": 0.8333333333333334
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 2.0,
+                    "Std Items Per Cluster": 0.9411152540181135,
+                    "Clusters Entropy": 1.4995766835672895
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.34242545644926775,
+                    "Calinski Harabasz Index": 3.5844648292042685,
+                    "Davies Bouldin Index:": 0.7629029734678499
+                }
+            }
+        },
+        {
+            "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10",
             "explanation_metrics": {
                 "attribute_metrics": {
                     "SEP": 0.6674575349256336,
@@ -40,7 +67,9 @@
                     "ETD": 0.8333333333333334,
                     "TID": 18,
                     "TPD": 19,
-                    "MID": 1.2666666666666668
+                    "MID": 1.2666666666666668,
+                    "Overlap-Attributes": 0.8333333333333334,
+                    "Overlap-Items": 0.9583333333333334
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
@@ -50,30 +79,7 @@
                 "cluster_metrics": {
                     "Silhouette": 0.14593606708703302,
                     "Calinski Harabasz Index": 1.499185296234512,
-                    "Davies Bouldin Index:": 1.1972920155706397
-                }
-            }
-        },
-        {
-            "name": "HCluster&method=ward&criterion=maxclust&metric=euclidean&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=10",
-            "explanation_metrics": {
-                "attribute_metrics": {
-                    "SEP": 0.5560271484974875,
-                    "LIR": 0.3116119349109044,
-                    "ETD": 0.8333333333333334,
-                    "TID": 17,
-                    "TPD": 20,
-                    "MID": 1.3333333333333333
-                },
-                "items_cluster_metrics": {
-                    "Mean Items Per Cluster": 2.0,
-                    "Std Items Per Cluster": 1.5482128178310994,
-                    "Clusters Entropy": 1.3525248628147768
-                },
-                "cluster_metrics": {
-                    "Silhouette": 0.03310141071557063,
-                    "Calinski Harabasz Index": 2.334809680901921,
-                    "Davies Bouldin Index:": 0.8177394776992722
+                    "Davies Bouldin Index:": 1.1972920155706395
                 }
             }
         },

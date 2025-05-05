@@ -7,7 +7,7 @@ from cornac.models import Recommender
 from dataset_experiment.dataset_experiment import DatasetExperiment
 
 def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: DatasetExperiment,
-                     rec_alg: Recommender, top_k: int) -> ExplanationAlgorithm:
+                     rec_alg: Recommender, top_k: int, n_users: int) -> ExplanationAlgorithm:
     """
     Create an Explainer algorithm instance based on the parameters of explainer_params, the name comes from the
     experiment file
@@ -16,6 +16,7 @@ def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: Datas
     :param ds_expr: dataset of the explainer
     :param rec_alg: recommendation algorithm
     :param top_k: top k items to explain
+    :param n_users: number of users to generate explanations to. If 0 runs to all users
     :return: the explanation algorithm object instance
     """
     if explainer_name == "HierarchicalClustering":
@@ -23,10 +24,10 @@ def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: Datas
                                       method=explainer_params["method"], top_n=explainer_params["top_n"],
                                       hitems_per_attr=explainer_params["hitems_per_attr"],
                                       metric=explainer_params["metric"], criterion=explainer_params["criterion"],
-                                      vec_method=explainer_params["vec_method"])
+                                      vec_method=explainer_params["vec_method"], n_users=n_users)
     elif explainer_name == "ExpLOD":
         return ExpLOD(ds_expr, rec_alg, top_k, top_n=explainer_params["top_n"],
-                      hitems_per_attr=explainer_params["hitems_per_attr"])
+                      hitems_per_attr=explainer_params["hitems_per_attr"], n_users=n_users)
     else:
         raise ValueError("Explainer name of the algorithm is not correct.")
 

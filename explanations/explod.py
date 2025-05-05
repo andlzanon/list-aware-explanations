@@ -11,7 +11,7 @@ from explanations.explanation import ExplanationAlgorithm
 
 class ExpLOD(ExplanationAlgorithm):
     def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int,
-                 top_n=1, hitems_per_attr=2):
+                 top_n=1, hitems_per_attr=2, n_users=0):
         """
         :param dataset:
         :param model:
@@ -20,8 +20,9 @@ class ExpLOD(ExplanationAlgorithm):
         :param hitems_per_attr: number of historic items showed per attribute on explanation.
             In an example such as: I recommend you Titanic since you ofter like drama items as X, Y, Z.
             hitems_per_attr is 3, because we are using X, Y and Z profile items to support the attribute
+        :param n_users: number of users to generate explanations to. If 0 runs to all users
         """
-        super().__init__(dataset, model, top_k)
+        super().__init__(dataset, model, top_k, n_users)
         self.top_n = top_n
         self.hitems_per_attr = hitems_per_attr
         self.model_name = (f"ExpLOD&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}"
@@ -208,9 +209,11 @@ class ExpLOD(ExplanationAlgorithm):
 
         all_user_ret = {}
         users = self.dataset.get_users('test')
+        if self.n_users != 0:
+            users = users[:self.n_users]
+
         if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
-        # TODO: Change here
-        for user_id in users[:3]:
+        for user_id in users:
             expl_obj = self.user_explanation(user=user_id, remove_seen=remove_seen,  verbose=verbose)
             all_user_ret[user_id] = expl_obj
 

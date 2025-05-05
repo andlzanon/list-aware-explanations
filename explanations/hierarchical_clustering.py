@@ -11,7 +11,7 @@ from explanations.explanation import ExplanationAlgorithm
 
 class HierarchicalClustering(ExplanationAlgorithm):
     def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int, method: str, criterion: str,
-                 metric: str, n_clusters: int, top_n: int, hitems_per_attr=2, vec_method='binary', random_state=42):
+                 metric: str, n_clusters: int, top_n: int, hitems_per_attr=2, vec_method='binary', random_state=42, n_users=0):
         """
         Hierarchical Clustering explanation algorithm
         :param dataset: dataset used in the recommendation model
@@ -30,8 +30,9 @@ class HierarchicalClustering(ExplanationAlgorithm):
         with zeros and ones, where the 0 represent that the item does not have the feature and 1 that it does, or
         'relevance' to use the Musto graph relevance score
         :param random_state: random state number for reproducible results
+        :param n_users: umber of users to generate explanations to. If 0 runs to all users
         """
-        super().__init__(dataset, model, top_k)
+        super().__init__(dataset, model, top_k, n_users)
         self.method = method
         self.criterion = criterion
         self.metric = metric
@@ -106,11 +107,15 @@ class HierarchicalClustering(ExplanationAlgorithm):
             if self.vec_method == 'binary':
                 vectorize = np.isin(inter, rec_attr).astype(int)
             # create the vector array of a recommended item based on TF-IDF relevance score
-            elif self.vec_method == 'relevance':
+            elif self.vec_method == 'relevance' or self.vec_method == "count":
                 items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                                   for u_item in
                                   self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
-                prop_dict = self.__user_semantic_profile(items_historic)
+
+                if self.vec_method == 'relevance':
+                    prop_dict = self.__user_semantic_profile(items_historic)[0]
+                else:
+                    prop_dict = self.__user_semantic_profile(items_historic)[1]
 
                 l_rec_attr = list(rec_attr)
                 for j in range(0, len(inter)):
@@ -139,7 +144,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 # get arbitrary the top 2 attributes common across all items in the cluster
                 expl_attr_names = cluster_sum[cluster_sum == len(i_cluster)].sort_index()
                 expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:self.top_n]
-            elif self.vec_method == 'relevance':
+            elif self.vec_method == 'relevance' or self.vec_method == "count":
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
                 expl_attr_names = cluster_nonzero.mean().sort_values(ascending=False).index[:self.top_n]
@@ -198,13 +203,20 @@ class HierarchicalClustering(ExplanationAlgorithm):
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
         etd = metrics.etd_metric(unique_attributes, self.top_k, len(self.dataset.prop_set['obj'].unique()))
 
+        total_attributes = sum([len(sublist) for sublist in attributes])
+        overlap_attributes = len(unique_attributes)/total_attributes
+
+        total_items = sum([len(sublist) for sublist in interacted_items])
+        overlap_items = len(unique_items) / total_items
         attr_metrics = {
             "SEP": sep,
             "LIR": lir,
             "ETD": etd,
             "TID": unique_items,
             "TPD": unique_attributes,
-            "MID": mid
+            "MID": mid,
+            "Overlap-Attributes": overlap_attributes,
+            "Overlap-Items": overlap_items
         }
 
         # generate re-ranking based on clustering
@@ -254,7 +266,9 @@ class HierarchicalClustering(ExplanationAlgorithm):
                     "ETD": [],
                     "TID": [],
                     "TPD": [],
-                    "MID": []},
+                    "MID": [],
+                    "Overlap-Attributes": [],
+                    "Overlap-Items": []},
                 "items_cluster_metrics":
                     {"Mean Items Per Cluster": [],
                     "Std Items Per Cluster": [],
@@ -270,8 +284,11 @@ class HierarchicalClustering(ExplanationAlgorithm):
         all_user_ret = {}
         users = self.dataset.get_users('test')
         if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
-        # TODO: Change here
-        for user_id in users[:3]:
+
+        if self.n_users != 0:
+            users = users[:self.n_users]
+
+        for user_id in users:
             expl_obj = self.user_explanation(user=user_id, remove_seen=remove_seen, verbose=verbose,
                                              show_dendrogram=False)
             all_user_ret[user_id] = expl_obj
@@ -292,7 +309,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
         return ret_obj, all_user_ret
 
-    def __user_semantic_profile(self, historic: list) -> dict:
+    def __user_semantic_profile(self, historic: list) -> tuple[dict, dict]:
         """
         Generate the user semantic profile, where all the values of properties (e.g.: George Lucas, action films, etc.)
         are ordered by a score that is calculated as:
@@ -300,7 +317,8 @@ class HierarchicalClustering(ExplanationAlgorithm):
         where npi are the number of edges to a value, i the number of interacted items,
         N the total number of items and dft the number of items with the value
         :param historic: list of the items interacted by a user
-        :return: dictionary with properties' values as keys and scores as values
+        :return: dictionary where pos 0 is properties' values as keys and scores as values and 1 the frequency of
+            attributes on interacted items
         """
 
         # create npi, i and n columns
@@ -327,6 +345,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         # generate the dict
         interacted_props.reset_index(inplace=True)
         interacted_props = interacted_props.set_index(self.dataset.prop_set.columns[-1])
+        top_prop = interacted_props['npi'].to_dict()
         fav_prop = interacted_props['score'].to_dict()
 
-        return fav_prop
+        return fav_prop, top_prop
