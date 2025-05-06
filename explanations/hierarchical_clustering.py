@@ -168,12 +168,17 @@ class HierarchicalClustering(ExplanationAlgorithm):
             attributes.append(expl_attr_names)
 
             # now we have all elements, lets create the sentence:
-            if len(pro_item_names) > 0:
+            if len(pro_item_names) > 0 and len(attributes) > 0:
                 expl = (f"If you are in the mood for {", ".join(expl_attr_names)} items such as "
                         f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
-            else:
+            elif len(pro_item_names) == 0 and len(attributes) > 0:
                 expl = (f"If you are in the mood for {", ".join(expl_attr_names)} items, "
                         f"I recommend {", ".join(rec_item_names)}\n")
+            elif len(pro_item_names) > 0 and len(attributes) == 0:
+                expl = (f"If you are in the mood for items, items such as "
+                        f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
+            else:
+                raise AttributeError("Profile items array and shared attributes array lengths are 0")
 
             if verbose: print(expl)
             with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
@@ -196,18 +201,18 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
         unique_items = list(set([item for sublist in interacted_items for item in sublist]))
         unique_attributes = list(set([item for sublist in attributes for item in sublist]))
+        total_attributes = sum([len(sublist) for sublist in attributes])
+        total_items = sum([len(sublist) for sublist in interacted_items])
+
         mid = np.array([len(sublist) for sublist in interacted_items]).mean()
         lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
                                  train_set=self.dataset.load_fold_asdf()[0],
                                  col_user=self.dataset.user_column, col_item=self.dataset.item_column)
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
-        etd = metrics.etd_metric(unique_attributes, self.top_k, len(self.dataset.prop_set['obj'].unique()))
-
-        total_attributes = sum([len(sublist) for sublist in attributes])
+        etd = metrics.etd_metric(unique_attributes, self.top_k, total_attributes)
         overlap_attributes = len(unique_attributes)/total_attributes
-
-        total_items = sum([len(sublist) for sublist in interacted_items])
         overlap_items = len(unique_items) / total_items
+
         attr_metrics = {
             "SEP": sep,
             "LIR": lir,

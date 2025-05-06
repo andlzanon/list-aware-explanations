@@ -122,7 +122,10 @@ def sep_metric(beta: float, props: list, prop_set: pd.DataFrame, memo_sep: dict)
             # obtain sep value for the property and calculate mean
             local_sep_values.append(p_sep_value)
 
-        sep_values.append(np.array(local_sep_values).mean())
+        if len(local_sep_values) > 0:
+            sep_values.append(np.array(local_sep_values).mean())
+        else:
+            sep_values.append(0)
 
     return np.array(sep_values).mean()
 

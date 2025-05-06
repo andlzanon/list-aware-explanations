@@ -162,17 +162,16 @@ class ExpLOD(ExplanationAlgorithm):
 
         unique_items = list(set([item for sublist in interacted_items for item in sublist]))
         unique_attributes = list(set([item for sublist in attributes for item in sublist]))
+        total_attributes = sum([len(sublist) for sublist in attributes])
+        total_items = sum([len(sublist) for sublist in interacted_items])
+
         mid = np.array([len(sublist) for sublist in interacted_items]).mean()
         lir = metrics.lir_metric(beta=0.3, user=user, items=unique_items,
                                      train_set=self.dataset.load_fold_asdf()[0],
                                      col_user=self.dataset.user_column, col_item=self.dataset.item_column)
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
-        etd = metrics.etd_metric(unique_attributes, self.top_k, len(self.dataset.prop_set['obj'].unique()))
-
-        total_attributes = sum([len(sublist) for sublist in attributes])
+        etd = metrics.etd_metric(unique_attributes, self.top_k, total_attributes)
         overlap_attributes = len(unique_attributes) / total_attributes
-
-        total_items = sum([len(sublist) for sublist in interacted_items])
         overlap_items = len(unique_items) / total_items
 
         expl_metrics = {
