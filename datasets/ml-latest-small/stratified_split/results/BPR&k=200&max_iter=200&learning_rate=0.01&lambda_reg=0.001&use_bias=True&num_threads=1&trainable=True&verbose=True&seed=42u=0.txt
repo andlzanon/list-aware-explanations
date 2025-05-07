@@ -12,14 +12,14 @@
             "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=10&u=0",
             "explanation_metrics": {
                 "attribute_metrics": {
-                    "SEP": 0.5516242929303701,
-                    "LIR": 0.31644684181122246,
+                    "SEP": 0.5516223100498076,
+                    "LIR": 0.3167821854063934,
                     "ETD": 0.7905145719489982,
                     "TID": 1246,
-                    "TPD": 215,
-                    "MID": 1.7655737704918033,
+                    "TPD": 216,
+                    "MID": 1.7665573770491805,
                     "Overlap-Attributes": 0.7905145719489982,
-                    "Overlap-Items": 0.8579761904761903
+                    "Overlap-Items": 0.857803148581837
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
@@ -29,7 +29,7 @@
                 "cluster_metrics": {
                     "Silhouette": 0.2133939140364072,
                     "Calinski Harabasz Index": 1.9312159796391049,
-                    "Davies Bouldin Index:": 0.8687522770297313
+                    "Davies Bouldin Index:": 0.8687522769152356
                 }
             }
         },
@@ -37,14 +37,14 @@
             "name": "HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=5&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=10&u=0",
             "explanation_metrics": {
                 "attribute_metrics": {
-                    "SEP": 0.8644085839283624,
-                    "LIR": 0.3386945928479938,
-                    "ETD": 0.42677595628415305,
-                    "TID": 1725,
-                    "TPD": 62,
-                    "MID": 1.9950819672131148,
-                    "Overlap-Attributes": 0.42677595628415305,
-                    "Overlap-Items": 0.8865300546448087
+                    "SEP": 0.8630465241547688,
+                    "LIR": 0.33540638270283374,
+                    "ETD": 0.42714025500910746,
+                    "TID": 1684,
+                    "TPD": 63,
+                    "MID": 1.9954098360655739,
+                    "Overlap-Attributes": 0.42714025500910746,
+                    "Overlap-Items": 0.8870309653916213
                 },
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 2.0,
@@ -79,7 +79,7 @@
                 "cluster_metrics": {
                     "Silhouette": 0.09659736840181726,
                     "Calinski Harabasz Index": 1.35707007102086,
-                    "Davies Bouldin Index:": 1.0925626706959242
+                    "Davies Bouldin Index:": 1.092562670695924
                 }
             }
         },
@@ -87,14 +87,14 @@
             "name": "ExpLOD&top_n=1&hitems_per_attr=2&top_k=10&u=0",
             "explanation_metrics": {
                 "attribute_metrics": {
-                    "SEP": 0.6134703393174081,
-                    "LIR": 0.6807172507097935,
-                    "ETD": 0.4959016393442623,
-                    "TID": 1636,
+                    "SEP": 0.6134743648020473,
+                    "LIR": 0.6807956812849688,
+                    "ETD": 0.49606557377049176,
+                    "TID": 1634,
                     "TPD": 161,
                     "MID": 1.9914754098360654,
-                    "Overlap-Attributes": 0.4959016393442623,
-                    "Overlap-Items": 0.34048983657311066
+                    "Overlap-Attributes": 0.49606557377049176,
+                    "Overlap-Items": 0.340407869359996
                 }
             }
         }
