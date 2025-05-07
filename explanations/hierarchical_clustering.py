@@ -91,7 +91,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
 
         # get intersection between interacted and recommended attributes
         inter = set(rec_all_attr).intersection(set(pro_all_attr))
-        inter = np.array(list(inter))
+        inter = np.array(sorted(inter))
 
         # create clustering dataset based on intersection
         clustering_df = pd.DataFrame(columns=inter)
@@ -147,7 +147,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
             elif self.vec_method == 'relevance' or self.vec_method == "count":
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
-                expl_attr_names = cluster_nonzero.mean().sort_values(ascending=False).index[:self.top_n]
+                expl_attr_names = cluster_nonzero.mean().sort_values(kind="mergesort", ascending=False).index[:self.top_n]
             else:
                 raise ValueError("Parameter vec_method is misspelled or does not exist.")
 

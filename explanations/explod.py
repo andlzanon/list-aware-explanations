@@ -101,7 +101,7 @@ class ExpLOD(ExplanationAlgorithm):
             rec_props = self.dataset.prop_set.loc[int(r)]
 
             # check properties on both sets
-            intersection = pd.Series(list(set(hist_props['obj']).intersection(set(rec_props['obj']))))
+            intersection = pd.Series(sorted(set(hist_props['obj']).intersection(set(rec_props['obj']))))
 
             # generate dictionary only of attributes on recommended item
             r_sem_dict = {}
@@ -128,7 +128,7 @@ class ExpLOD(ExplanationAlgorithm):
                     user_df[user_df.columns[0]].isin(
                         list(hist_props[hist_props['obj'] == p].index.unique().astype(str)))]
                 hist_ids = list(
-                    user_item.sort_values(by=user_item.columns[-1],
+                    user_item.sort_values(by=user_item.columns[-1], kind="mergesort",
                                           ascending=False)[:self.hitems_per_attr][user_item.columns[0]].astype(int))
                 hist_names = hist_props.loc[hist_ids][prop_cols[0]].unique()
 
