@@ -10,11 +10,13 @@ from explanations.explanation import ExplanationAlgorithm
 
 
 class ExpLOD(ExplanationAlgorithm):
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int,
+    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, expr_file: str, top_k: int,
                  top_n=1, hitems_per_attr=2, n_users=0):
         """
-        :param dataset:
-        :param model:
+        ExpLOD algorithm as in https://dl.acm.org/doi/abs/10.1145/2959100.2959173
+        :param dataset: dataset used in the recommendation model
+        :param model: cornac model used to generate recommendations
+        :param expr_file: name of the experiment file configuration
         :param top_k: top k items to explain
         :param top_n: number of top attributes to generate the explanation
         :param hitems_per_attr: number of historic items showed per attribute on explanation.
@@ -22,13 +24,13 @@ class ExpLOD(ExplanationAlgorithm):
             hitems_per_attr is 3, because we are using X, Y and Z profile items to support the attribute
         :param n_users: number of users to generate explanations to. If 0 runs to all users
         """
-        super().__init__(dataset, model, top_k, n_users)
+        super().__init__(dataset, model, expr_file, top_k, n_users)
         self.top_n = top_n
         self.hitems_per_attr = hitems_per_attr
         self.model_name = (f"ExpLOD&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}"
                            f"&top_k={str(self.top_k)}&u={str(abs(self.n_users))}")
-        self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
-        open(self.expl_file_path, 'w+', encoding='utf-8').close()
+        self.expl_file_path = r"\\?\\" + os.path.abspath(self.expl_file_path + self.model_name + ".txt")
+        open(self.expl_file_path, 'w+').close()
 
     def __user_semantic_profile(self, historic: list) -> dict:
         """

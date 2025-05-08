@@ -140,8 +140,13 @@ class RecommenderSystem:
         metrics_value["rows"] = rows
         metrics_value["columns"] = cols
         if save_results:
-            path = self.get_path("results")
+            path = self.get_path("results") + expr_file[:-5] + "/"
+            try:
+                os.makedirs(path, exist_ok=True)
+            except FileExistsError:
+                pass
             path = path + self.model_name + "u=" + str(n_users) + ".txt"
+
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(metrics_value, f, indent=4)
 

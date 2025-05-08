@@ -1,0 +1,51 @@
+{
+    "recommender": {
+        "name": "BPR",
+        "parameters": {
+            "k": 200,
+            "max_iter": 200,
+            "learning_rate": 0.01,
+            "lambda_reg": 0.001,
+            "seed": 42,
+            "verbose": true
+        }
+    },
+    "explainers": [
+        {
+            "name": "HierarchicalClustering",
+            "parameters": {
+                "n_clusters": 6,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "relevance"
+            }
+        },
+        {
+            "name": "HierarchicalClustering",
+            "parameters": {
+                "n_clusters": 6,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "count"
+            }
+        },
+        {
+            "name": "HierarchicalClustering",
+            "parameters": {
+                "n_clusters": 6,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "binary"
+            }
+        }
+    ]
+}

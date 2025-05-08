@@ -109,7 +109,7 @@ for fold in range(sf, ed):
             expl_name = expl["name"]
             expl_params = expl["parameters"]
 
-            explainer = create_explainer(expl_name, expl_params, ds, rec.model, k, n_users)
+            explainer = create_explainer(expl_name, expl_params, ds, rec.model, args.experiment_file, k, n_users)
             expl_alg_results, _ = explainer.all_users_explanations(remove_seen=True, verbose=True)
             res[explainer.model_name] = expl_alg_results
 

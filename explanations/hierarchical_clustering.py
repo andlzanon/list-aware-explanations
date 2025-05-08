@@ -1,3 +1,5 @@
+import os
+
 import cornac
 import numpy as np
 import pandas as pd
@@ -10,12 +12,14 @@ from explanations.explanation import ExplanationAlgorithm
 
 
 class HierarchicalClustering(ExplanationAlgorithm):
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int, method: str, criterion: str,
-                 metric: str, n_clusters: int, top_n: int, hitems_per_attr=2, vec_method='binary', random_state=42, n_users=0):
+    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, expr_file: str, top_k: int,
+                 method: str, criterion: str, metric: str, n_clusters: int, top_n: int,
+                 hitems_per_attr=2, vec_method='binary', random_state=42, n_users=0):
         """
         Hierarchical Clustering explanation algorithm
         :param dataset: dataset used in the recommendation model
         :param model: cornac model used to generate recommendations
+        :param expr_file: name of the experiment file configuration
         :param top_k: top k items to explain
         :param method: methods are used to compute the distance between two clusters. It will be used in the scipy
             method linkage.
@@ -32,7 +36,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         :param random_state: random state number for reproducible results
         :param n_users: umber of users to generate explanations to. If 0 runs to all users
         """
-        super().__init__(dataset, model, top_k, n_users)
+        super().__init__(dataset, model, expr_file, top_k, n_users)
         self.method = method
         self.criterion = criterion
         self.metric = metric
@@ -46,7 +50,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
                             f"&metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}"
                             f"&hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}"
                             f"&rs={str(self.random_state)}&top_k={str(self.top_k)}&u={str(abs(self.n_users))}")
-        self.expl_file_path = self.expl_file_path + self.model_name + ".txt"
+        self.expl_file_path =  r"\\?\\" + os.path.abspath(self.expl_file_path + self.model_name + ".txt")
         open(self.expl_file_path, 'w+').close()
 
     def user_explanation(self, user: str, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) \

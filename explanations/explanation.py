@@ -1,15 +1,19 @@
+import os
+
 import cornac.models
 
 from dataset_experiment.dataset_experiment import DatasetExperiment
 
 
 class ExplanationAlgorithm:
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, top_k: int, n_users=0):
+    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, expr_file: str,
+                 top_k: int, n_users=0):
         """
         Explanation algorithm class constructor. Every explanation algorithm uses a kg and the train set
         to have access to the users profile items. The model is required to get the recommendations for the explanations
         :param dataset: dataset used in the recommendation model
         :param model: cornac model used to generate recommendations
+        :param expr_file: name of the experiment file configuration
         :param top_k: number of recommendations to explain
         :param n_users: number of users to generate explanations to. If 0 runs to all users
         """
@@ -21,9 +25,14 @@ class ExplanationAlgorithm:
 
         path = self.dataset.path
         if self.dataset.fold_loaded == -1:
-            self.expl_file_path = path + f'''/stratified_split/explanations/'''
+            self.expl_file_path = path + f'''/stratified_split/explanations/{expr_file[:-5]}/'''
         else:
-            self.expl_file_path = path + f'''/folds/{self.dataset.fold_loaded}/explanations/'''
+            self.expl_file_path = path + f'''/folds/{self.dataset.fold_loaded}/explanations/{expr_file[:-5]}/'''
+
+        try:
+            os.makedirs(self.expl_file_path, exist_ok=True)
+        except FileExistsError:
+            pass
 
         self.memo_sep = {}
 
