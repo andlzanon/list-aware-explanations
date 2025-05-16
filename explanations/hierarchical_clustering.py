@@ -172,13 +172,13 @@ class HierarchicalClustering(ExplanationAlgorithm):
             attributes.append(expl_attr_names)
 
             # now we have all elements, lets create the sentence:
-            if len(pro_item_names) > 0 and len(attributes) > 0:
+            if len(pro_item_names) > 0 and len(expl_attr_names) > 0:
                 expl = (f"If you are in the mood for {", ".join(expl_attr_names)} items such as "
                         f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
-            elif len(pro_item_names) == 0 and len(attributes) > 0:
+            elif len(pro_item_names) == 0 and len(expl_attr_names) > 0:
                 expl = (f"If you are in the mood for {", ".join(expl_attr_names)} items, "
                         f"I recommend {", ".join(rec_item_names)}\n")
-            elif len(pro_item_names) > 0 and len(attributes) == 0:
+            elif len(pro_item_names) > 0 and len(expl_attr_names) == 0:
                 expl = (f"If you are in the mood for items, items such as "
                         f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
             else:

@@ -1,6 +1,7 @@
 import cornac
 from explanations.explanation import ExplanationAlgorithm
 from explanations.explod import ExpLOD
+from explanations.explod_rows import ExpLODRows
 from explanations.hierarchical_clustering import HierarchicalClustering
 from cornac.models import Recommender
 
@@ -28,6 +29,9 @@ def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: Datas
                                       vec_method=explainer_params["vec_method"], n_users=n_users)
     elif explainer_name == "ExpLOD":
         return ExpLOD(ds_expr, rec_alg, expr_file, top_k, top_n=explainer_params["top_n"],
+                      hitems_per_attr=explainer_params["hitems_per_attr"], n_users=n_users)
+    elif explainer_name == "ExpLODRows":
+        return ExpLODRows(ds_expr, rec_alg, expr_file, top_k, top_n=explainer_params["top_n"],
                       hitems_per_attr=explainer_params["hitems_per_attr"], n_users=n_users)
     else:
         raise ValueError("Explainer name of the algorithm is not correct.")

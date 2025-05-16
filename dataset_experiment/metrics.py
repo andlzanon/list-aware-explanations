@@ -195,7 +195,7 @@ def clustering_metrics(X: np.array, labels: np.array, verbose=False) -> dict:
 
 #### RANKING METRICS #####
 
-def __fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
+def fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
     """
     Based on a dataset it creates two new columns: x_irank and y_irank that represent the ideal position on a grid
     of an item based on a grid of rows x columns. This is to emulate a screen like Netflix, which is based on a series
@@ -212,7 +212,7 @@ def __fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
     values_copy = values.copy()
 
     # Auto-determine grid size if not specified
-    if n > (rows * cols):
+    if (rows is None and cols is None) or n > (rows * cols):
         # Try to make the grid as square as possible
         cols = np.ceil(np.sqrt(n))
         rows = np.ceil(n / cols)
@@ -270,12 +270,12 @@ def ndcg_2d(predictions: pd.DataFrame, grid_predictions: pd.DataFrame|None, test
         grid_predictions = (predictions.sort_values([col_user, col_rating], ascending=[True, False])
                             .groupby(col_user, as_index=False).head(k)).reset_index(drop=True)
         grid_predictions = grid_predictions.groupby('userId', group_keys=False).apply(
-            lambda group: __fill_ideal_grid_by_manhattan(group, rows=rows, cols=columns))
+            lambda group: fill_ideal_grid_by_manhattan(group, rows=rows, cols=columns))
         grid_predictions = grid_predictions.drop(col_rating, axis=1)
         grid_predictions.columns = [col_user, col_item, "x_rank", "y_rank"]
 
     test_recs_grid = test_recs.groupby('userId', group_keys=False).apply(
-        lambda group: __fill_ideal_grid_by_manhattan(group, rows=rows, cols=columns))
+        lambda group: fill_ideal_grid_by_manhattan(group, rows=rows, cols=columns))
 
     df_hit, _, _ = merge_ranking_true_pred(
         test_recs, predictions, col_user=col_user,
