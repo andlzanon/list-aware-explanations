@@ -3,6 +3,7 @@ import json
 import os
 
 import cornac.models
+import numpy as np
 import pandas as pd
 
 from dataset_experiment.dataset_experiment import DatasetExperiment
@@ -148,7 +149,7 @@ class RecommenderSystem:
             path = path + self.model_name + "u=" + str(n_users) + ".txt"
 
             with open(path, 'w', encoding='utf-8') as f:
-                json.dump(metrics_value, f, indent=4)
+                json.dump(self.to_python_types(metrics_value), f, indent=4)
 
         return metrics_value
 
@@ -203,3 +204,17 @@ class RecommenderSystem:
             path = path + f'''/folds/{self.dataset.fold_loaded}/{last_folder}/'''
 
         return path
+
+    def to_python_types(self, obj: dict):
+        if isinstance(obj, dict):
+            return {k: self.to_python_types(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self.to_python_types(v) for v in obj]
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return obj

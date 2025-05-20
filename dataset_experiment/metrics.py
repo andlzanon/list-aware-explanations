@@ -216,6 +216,8 @@ def fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
         # Try to make the grid as square as possible
         cols = np.ceil(np.sqrt(n))
         rows = np.ceil(n / cols)
+    elif (rows is not None) and (cols is None):
+        cols = np.ceil(n/rows)
 
     positions = []
     # Create list of positions with their Manhattan distance from (0, 0)
@@ -225,7 +227,7 @@ def fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
             positions.append(((i+1, j+1), dist))
 
     # Sort positions by Manhattan distance
-    positions.sort(key=lambda x: x[1])
+    positions.sort(key=lambda x: (x[1], x[0][1], x[0][0]))
     final_posx = [pos[0][0] for pos in positions][:n]
     final_posy = [pos[0][1] for pos in positions][:n]
 

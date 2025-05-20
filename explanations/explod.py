@@ -82,6 +82,7 @@ class ExpLOD(ExplanationAlgorithm):
         user_explanations = {}
         interacted_items = []
         attributes = []
+        misses = 0
 
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                           for u_item in self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
@@ -155,6 +156,9 @@ class ExpLOD(ExplanationAlgorithm):
 
             user_explanations[int(r)] = full_sentence[:-5]
 
+            if len(max_props) == 0:
+                misses = misses + 1
+
             with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
                 f.write("Recommended Item: " + str(r) + ": " + str(rec_name) + "\n")
                 f.write(full_sentence + "\n\n")
@@ -185,7 +189,8 @@ class ExpLOD(ExplanationAlgorithm):
                 "TPD": unique_attributes,
                 "MID": mid,
                 "Overlap-Attributes": overlap_attributes,
-                "Overlap-Items": overlap_items
+                "Overlap-Items": overlap_items,
+                "Path-Misses": misses
             }
         }
 
@@ -213,7 +218,8 @@ class ExpLOD(ExplanationAlgorithm):
                      "TPD": [],
                      "MID": [],
                      "Overlap-Attributes": [],
-                     "Overlap-Items": []},
+                     "Overlap-Items": [],
+                     "Path-Misses": []},
             }
         }
 
@@ -231,12 +237,17 @@ class ExpLOD(ExplanationAlgorithm):
                 for key1, value1 in expl_obj['metrics'][key].items():
                     ret_obj['metrics'][key][key1].append(value1)
 
+        # all metrics are their mean excluding TID, TPD and Misses
+        ret_obj["top_k"] = self.top_k
         for key in ret_obj["metrics"].keys():
             for key1, value_list in ret_obj['metrics'][key].items():
-                if key1 != "TPD" and key1 != "TID":
+                if key1 != "TPD" and key1 != "TID" and not("Misses" in key1):
                     ret_obj['metrics'][key][key1] = np.array(value_list).mean()
                 else:
-                    ret_obj['metrics'][key][key1] = len({item for sublist in value_list for item in sublist})
+                    if "Misses" in key1:
+                        ret_obj['metrics'][key][key1] = np.array(value_list).sum()
+                    else:
+                        ret_obj['metrics'][key][key1] = len({item for sublist in value_list for item in sublist})
 
         return ret_obj, all_user_ret
         

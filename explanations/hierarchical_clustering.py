@@ -70,6 +70,9 @@ class HierarchicalClustering(ExplanationAlgorithm):
         interacted_items = []
         attributes = []
         ranked_clusters = []
+        total_misses = 0
+        path_misses = 0
+        cluster_misses = 0
 
         # generate user recommendations
         ranked_items = list(self.model.recommend(user_id=user, k=self.top_k,
@@ -107,10 +110,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
             rec_attr = self.dataset.prop_set.loc[int(rec_item)][obj_column]
             vectorize = np.zeros(inter.shape)
 
-            # create the vector array of a recommended item based on binary presence of attributes
+            # create the vector array (vectorize) of a recommended item based on binary presence of attributes
             if self.vec_method == 'binary':
                 vectorize = np.isin(inter, rec_attr).astype(int)
-            # create the vector array of a recommended item based on TF-IDF relevance score
+            # create the vector array (vectorize) of a recommended item based on TF-IDF relevance score
             elif self.vec_method == 'relevance' or self.vec_method == "count":
                 items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                                   for u_item in
@@ -147,10 +150,23 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 cluster_sum = cluster_attr.sum(axis=0)
                 # get arbitrary the top 2 attributes common across all items in the cluster
                 expl_attr_names = cluster_sum[cluster_sum == len(i_cluster)].sort_index()
+                # if there is no expl_attr_names where there are common attributes
+                if expl_attr_names.empty:
+                    # if exists (not empty) values higher than 0 and less than total, then clustering found no common attr
+                    if not cluster_sum[(cluster_sum > 0) & (cluster_sum < len(i_cluster))].empty:
+                        cluster_misses = cluster_misses + 1
+                    else:
+                        path_misses = path_misses + 1
                 expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:self.top_n]
             elif self.vec_method == 'relevance' or self.vec_method == "count":
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
+                if cluster_nonzero.empty:
+                    # will enter here if there is a column with one value equal 0 but the sum of all is higher than 0
+                    if cluster_attr.to_numpy().sum() > 0:
+                        cluster_misses = cluster_misses + 1
+                    else:
+                        path_misses = path_misses + 1
                 expl_attr_names = cluster_nonzero.mean().sort_values(kind="mergesort", ascending=False).index[:self.top_n]
             else:
                 raise ValueError("Parameter vec_method is misspelled or does not exist.")
@@ -181,6 +197,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
             elif len(pro_item_names) > 0 and len(expl_attr_names) == 0:
                 expl = (f"If you are in the mood for items, items such as "
                         f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
+                total_misses = total_misses + 1
             else:
                 raise AttributeError("Profile items array and shared attributes array lengths are 0")
 
@@ -225,7 +242,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
             "TPD": unique_attributes,
             "MID": mid,
             "Overlap-Attributes": overlap_attributes,
-            "Overlap-Items": overlap_items
+            "Overlap-Items": overlap_items,
+            "Total-Misses": total_misses,
+            "Cluster-Misses": cluster_misses,
+            "Path-Misses": path_misses
         }
 
         # generate re-ranking based on clustering
@@ -277,7 +297,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
                     "TPD": [],
                     "MID": [],
                     "Overlap-Attributes": [],
-                    "Overlap-Items": []},
+                    "Overlap-Items": [],
+                    "Total-Misses": [],
+                    "Cluster-Misses": [],
+                    "Path-Misses": []},
                 "items_cluster_metrics":
                     {"Mean Items Per Cluster": [],
                     "Std Items Per Cluster": [],
@@ -308,13 +331,17 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 for key1, value1 in expl_obj['metrics'][key].items():
                     ret_obj['metrics'][key][key1].append(value1)
 
+        # all metrics are their mean excluding TID, TPD and Misses
         ret_obj["top_k"] = self.top_k
         for key in ret_obj["metrics"].keys():
             for key1, value_list in ret_obj['metrics'][key].items():
-                if key1 != "TPD" and key1 != "TID":
+                if key1 != "TPD" and key1 != "TID" and not("Misses" in key1):
                     ret_obj['metrics'][key][key1] = np.array(value_list).mean()
                 else:
-                    ret_obj['metrics'][key][key1] = len({item for sublist in value_list for item in sublist})
+                    if "Misses" in key1:
+                        ret_obj['metrics'][key][key1] = np.array(value_list).sum()
+                    else:
+                        ret_obj['metrics'][key][key1] = len({item for sublist in value_list for item in sublist})
 
         return ret_obj, all_user_ret
 
