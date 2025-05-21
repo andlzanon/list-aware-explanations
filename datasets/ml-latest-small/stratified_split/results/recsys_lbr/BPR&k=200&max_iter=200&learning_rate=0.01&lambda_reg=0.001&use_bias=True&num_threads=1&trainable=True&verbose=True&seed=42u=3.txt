@@ -29,9 +29,9 @@
                     "Clusters Entropy": 1.6094379124341005
                 },
                 "cluster_metrics": {
-                    "Silhouette": -0.036554214804401304,
+                    "Silhouette": -0.03655421480440132,
                     "Calinski Harabasz Index": 1.4765510652079576,
-                    "Davies Bouldin Index:": 3.033054752945771
+                    "Davies Bouldin Index:": 3.0330547529457696
                 }
             }
         },

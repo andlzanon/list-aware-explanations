@@ -26,6 +26,7 @@ class ExpLODRows(ExplanationAlgorithm):
         :param n_users: number of users to generate explanations to. If 0 runs to all users
         :param alpha: weight to the number of links of attributes on interacted items
         :param beta: weight on number of links of attributes to recommended items
+        :param random_state: random state number for reproducible results
         :param n_clusters: Number of clusters
         """
         super().__init__(dataset, model, expr_file, top_k, n_users)
@@ -128,8 +129,9 @@ class ExpLODRows(ExplanationAlgorithm):
         if verbose: print(f'''--- Explanations User Id {user} ---''')
 
         all_items = list(set(items_historic).union(set(recommendations)))
-        all_props = self.dataset.prop_set.loc[self.dataset.prop_set.index.isin(all_items)].copy()['obj']
-        all_props = all_props.drop_duplicates().sample(frac=1, random_state=self.random_state).reset_index(drop=True)
+        all_props = (self.dataset.prop_set.loc[
+            self.dataset.prop_set.index.isin(all_items)].copy()['obj']
+                     .drop_duplicates().sort_values().reset_index(drop=True))
         clustering_df = pd.DataFrame(columns=all_props)
 
         for row in range(min_value, max_value+1):
@@ -139,6 +141,7 @@ class ExpLODRows(ExplanationAlgorithm):
             props_sorted = sorted(props.items(), key=lambda item: item[1], reverse=True)
             max_props = [k for k, _ in props_sorted[:self.top_n]]
 
+            # create the embedding with the ExpLOD value function for every recommendation on the row
             for rec in rec_row:
                 vectorize = np.zeros(all_props.shape)
                 rec_props = self.dataset.prop_set.loc[int(rec)]['obj'].tolist()
@@ -151,6 +154,7 @@ class ExpLODRows(ExplanationAlgorithm):
                 clustering_df.loc[len(clustering_df)] = vectorize
                 clusters.append(row)
 
+            # get explanation attributes
             expl_attr_names = []
             for pi in range(0, len(max_props)):
                 p = max_props[pi]
