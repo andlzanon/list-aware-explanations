@@ -23,13 +23,13 @@
             "parameters": {
                 "top_n": 2,
                 "hitems_per_attr": 2,
-                "n_clusters": 37
+                "n_clusters": 6
             }
         },
         {
             "name": "HierarchicalClustering",
             "parameters": {
-                "n_clusters": 37,
+                "n_clusters": 6,
                 "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
@@ -41,7 +41,7 @@
         {
             "name": "HierarchicalClustering",
             "parameters": {
-                "n_clusters": 37,
+                "n_clusters": 6,
                 "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
@@ -53,7 +53,7 @@
         {
             "name": "HierarchicalClustering",
             "parameters": {
-                "n_clusters": 37,
+                "n_clusters": 6,
                 "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,

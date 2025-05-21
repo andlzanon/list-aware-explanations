@@ -212,7 +212,8 @@ def fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
     values_copy = values.copy()
 
     # Auto-determine grid size if not specified
-    if (rows is None and cols is None) or n > (rows * cols):
+    if ((rows is None and cols is None) or
+            (rows is not None and cols is not None and n > (rows * cols))):
         # Try to make the grid as square as possible
         cols = np.ceil(np.sqrt(n))
         rows = np.ceil(n / cols)

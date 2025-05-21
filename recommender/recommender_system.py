@@ -128,7 +128,7 @@ class RecommenderSystem:
                 metrics_value[f'''Algorithm {key} NDCG - 2D@{k}'''] = metrics.ndcg_2d(predictions=predictions,
                                                         grid_predictions=grid_predictions, test_recs=test_df,
                                                         k=k, alg_name=key, col_rating=self.dataset.rating_column,
-                                                        col_user='userId', col_item='movieId', alpha=1, beta=1,
+                                                        col_user=self.dataset.user_column, col_item=self.dataset.item_column, alpha=1, beta=1,
                                                         gama=1, rows=rows, columns=cols, step_x=1, step_y=1,
                                                         verbose=verbose)
 
@@ -140,13 +140,15 @@ class RecommenderSystem:
         metrics_value["experiment_file"] = expr_file
         metrics_value["rows"] = rows
         metrics_value["columns"] = cols
+
         if save_results:
             path = self.get_path("results") + expr_file[:-5] + "/"
             try:
                 os.makedirs(path, exist_ok=True)
             except FileExistsError:
                 pass
-            path = path + self.model_name + "u=" + str(n_users) + ".txt"
+
+            path = r"\\?\\" + os.path.abspath(path + self.model_name + "u=" + str(n_users) + ".txt")
 
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(self.to_python_types(metrics_value), f, indent=4)
@@ -166,16 +168,22 @@ class RecommenderSystem:
         metrics_dict = {}
 
         for k in k_list:
-            eval_map = map(test_recs, predictions, col_user='userId',
-                           col_item='movieId',
+            eval_map = map(test_recs, predictions,
+                           col_user=self.dataset.user_column,
+                           col_item=self.dataset.item_column,
                            col_prediction=self.dataset.rating_column, k=k)
-            eval_ndcg = ndcg_at_k(test_recs, predictions, col_user='userId',
-                                  col_item='movieId',
+            eval_ndcg = ndcg_at_k(test_recs, predictions,
+                                  col_user=self.dataset.user_column,
+                                  col_item=self.dataset.item_column,
                                   col_prediction=self.dataset.rating_column, k=k)
-            eval_precision = precision_at_k(test_recs, predictions, col_user='userId',
-                                            col_item='movieId', col_prediction=self.dataset.rating_column, k=k)
-            eval_recall = recall_at_k(test_recs, predictions, col_user='userId',
-                                      col_item='movieId', col_prediction=self.dataset.rating_column, k=k)
+            eval_precision = precision_at_k(test_recs, predictions,
+                                            col_user=self.dataset.user_column,
+                                            col_item=self.dataset.item_column,
+                                            col_prediction=self.dataset.rating_column, k=k)
+            eval_recall = recall_at_k(test_recs, predictions,
+                                      col_user=self.dataset.user_column,
+                                      col_item=self.dataset.item_column,
+                                      col_prediction=self.dataset.rating_column, k=k)
 
             metrics_dict[f'''MAP@{k}'''] = eval_map
             metrics_dict[f'''NDCG@{k}'''] = eval_ndcg

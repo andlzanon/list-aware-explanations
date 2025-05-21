@@ -31,8 +31,14 @@ def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: Datas
         return ExpLOD(ds_expr, rec_alg, expr_file, top_k, top_n=explainer_params["top_n"],
                       hitems_per_attr=explainer_params["hitems_per_attr"], n_users=n_users)
     elif explainer_name == "ExpLODRows":
+        try:
+            n_clusters = explainer_params["n_clusters"]
+        except KeyError:
+            n_clusters = None
+
         return ExpLODRows(ds_expr, rec_alg, expr_file, top_k, top_n=explainer_params["top_n"],
-                      hitems_per_attr=explainer_params["hitems_per_attr"], n_users=n_users)
+                        n_clusters=n_clusters, hitems_per_attr=explainer_params["hitems_per_attr"],
+                        n_users=n_users)
     else:
         raise ValueError("Explainer name of the algorithm is not correct.")
 

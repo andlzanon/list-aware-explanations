@@ -5,6 +5,7 @@
     "Recall@30": 0.23420879081737014,
     "Algorithm BPR NDCG - 2D@30": 0.30602681995604425,
     "Algorithm ExpLODRows&top_n=2&hitems_per_attr=2&top_k=30&alpha=0.5&beta=0.5&rs=42&n_clusters=None&u=3 NDCG - 2D@30": 0.001032845118654794,
+    "Algorithm ExpLODRows&top_n=2&hitems_per_attr=2&top_k=30&alpha=0.5&beta=0.5&rs=42&n_clusters=6&u=3 NDCG - 2D@30": 0.0010324593225752422,
     "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=6&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=30&u=3 NDCG - 2D@30": 0.0010064768931729977,
     "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=6&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=30&u=3 NDCG - 2D@30": 0.0010417212132056701,
     "Algorithm HCluster&method=weighted&criterion=maxclust&metric=cosine&n_clusters=6&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=30&u=3 NDCG - 2D@30": 0.0009833933106642408,
@@ -32,6 +33,32 @@
                     "Silhouette": -0.03655421480440132,
                     "Calinski Harabasz Index": 1.4765510652079576,
                     "Davies Bouldin Index:": 3.0330547529457696
+                }
+            }
+        },
+        {
+            "name": "ExpLODRows&top_n=2&hitems_per_attr=2&top_k=30&alpha=0.5&beta=0.5&rs=42&n_clusters=6&u=3",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.43005294691484547,
+                    "LIR": 0.25980530249950484,
+                    "ETD": 0.6666666666666666,
+                    "TID": 11,
+                    "TPD": 21,
+                    "MID": 0.8888888888888888,
+                    "Overlap-Attributes": 0.6666666666666666,
+                    "Overlap-Items": 0.7638888888888888,
+                    "Path-Misses": 0
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 5.0,
+                    "Std Items Per Cluster": 0.0,
+                    "Clusters Entropy": 1.7917594692280547
+                },
+                "cluster_metrics": {
+                    "Silhouette": -0.046534661280301017,
+                    "Calinski Harabasz Index": 1.4139889859842663,
+                    "Davies Bouldin Index:": 2.8425207402306643
                 }
             }
         },
@@ -120,7 +147,7 @@
             }
         }
     ],
-    "experiment_file": "recsys_lbr.json",
+    "experiment_file": "recsys_lbr_small.json",
     "rows": 3,
     "columns": 2
 }
