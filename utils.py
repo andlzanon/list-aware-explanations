@@ -2,7 +2,7 @@ import cornac
 from explanations.explanation import ExplanationAlgorithm
 from explanations.explod import ExpLOD
 from explanations.explod_rows import ExpLODRows
-from explanations.hierarchical_clustering import HierarchicalClustering
+from explanations.clustering import Clustering
 from cornac.models import Recommender
 
 from dataset_experiment.dataset_experiment import DatasetExperiment
@@ -21,12 +21,20 @@ def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: Datas
     :param n_users: number of users to generate explanations to. If 0 runs to all users
     :return: the explanation algorithm object instance
     """
-    if explainer_name == "HierarchicalClustering":
-        return HierarchicalClustering(ds_expr, rec_alg, expr_file, top_k, n_clusters=explainer_params["n_clusters"],
-                                      method=explainer_params["method"], top_n=explainer_params["top_n"],
-                                      hitems_per_attr=explainer_params["hitems_per_attr"],
-                                      metric=explainer_params["metric"], criterion=explainer_params["criterion"],
-                                      vec_method=explainer_params["vec_method"], n_users=n_users)
+    if explainer_name == "Clustering":
+        try:
+            method = explainer_params["method"]
+            criterion = explainer_params["criterion"]
+        except KeyError:
+            method = None
+            criterion = None
+
+        return Clustering(ds_expr, explainer_params["alg"], rec_alg, expr_file, top_k, n_clusters=explainer_params["n_clusters"],
+                          method=method, top_n=explainer_params["top_n"],
+                          hitems_per_attr=explainer_params["hitems_per_attr"],
+                          metric=explainer_params["metric"], criterion=criterion,
+                          vec_method=explainer_params["vec_method"], n_users=n_users)
+
     elif explainer_name == "ExpLOD":
         return ExpLOD(ds_expr, rec_alg, expr_file, top_k, top_n=explainer_params["top_n"],
                       hitems_per_attr=explainer_params["hitems_per_attr"], n_users=n_users)

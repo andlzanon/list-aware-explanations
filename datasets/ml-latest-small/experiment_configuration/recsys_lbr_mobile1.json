@@ -1,0 +1,30 @@
+{
+    "recommender": {
+        "name": "BPR",
+        "parameters": {
+            "k": 200,
+            "max_iter": 200,
+            "learning_rate": 0.01,
+            "lambda_reg": 0.001,
+            "seed": 42,
+            "verbose": true
+        }
+    },
+    "explainers": [
+        {
+         "name": "ExpLODRows",
+            "parameters": {
+                "top_n": 2,
+                "hitems_per_attr": 2
+            }
+        },
+        {
+         "name": "ExpLODRows",
+            "parameters": {
+                "top_n": 2,
+                "hitems_per_attr": 2,
+                "n_clusters": 15
+            }
+        }
+    ]
+}

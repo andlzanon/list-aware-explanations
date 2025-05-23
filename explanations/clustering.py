@@ -1,19 +1,23 @@
+import math
 import os
 
 import cornac
+import hdbscan
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
-from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from scipy.cluster.hierarchy import linkage, fcluster
+from scipy.spatial.distance import squareform, pdist
+from sklearn.cluster import SpectralClustering, BisectingKMeans
+from sklearn.preprocessing import Normalizer
 
 from dataset_experiment import metrics
 from dataset_experiment.dataset_experiment import DatasetExperiment
 from explanations.explanation import ExplanationAlgorithm
 
 
-class HierarchicalClustering(ExplanationAlgorithm):
-    def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, expr_file: str, top_k: int,
-                 method: str, criterion: str, metric: str, n_clusters: int, top_n: int,
+class Clustering(ExplanationAlgorithm):
+    def __init__(self, dataset: DatasetExperiment, alg: str, model: cornac.models.Recommender, expr_file: str,
+                 top_k: int, method: str, criterion: str, metric: str, n_clusters: int, top_n: int,
                  hitems_per_attr=2, vec_method='binary', random_state=42, n_users=0):
         """
         Hierarchical Clustering explanation algorithm
@@ -37,6 +41,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         :param n_users: umber of users to generate explanations to. If 0 runs to all users
         """
         super().__init__(dataset, model, expr_file, top_k, n_users)
+        self.alg = alg
         self.method = method
         self.criterion = criterion
         self.metric = metric
@@ -46,14 +51,14 @@ class HierarchicalClustering(ExplanationAlgorithm):
         self.vec_method = vec_method
         self.random_state = random_state
         np.random.seed(self.random_state)
-        self.model_name = (f"HCluster&method={str(self.method)}&criterion={str(self.criterion)}"
+        self.model_name = (f"Cluster&alg={str(self.alg)}&method={str(self.method)}&criterion={str(self.criterion)}"
                             f"&metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}"
                             f"&hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}"
                             f"&rs={str(self.random_state)}&top_k={str(self.top_k)}&u={str(abs(self.n_users))}")
         self.expl_file_path =  r"\\?\\" + os.path.abspath(self.expl_file_path + self.model_name + ".txt")
         open(self.expl_file_path, 'w+').close()
 
-    def user_explanation(self, user: str, remove_seen=True, verbose=True, show_dendrogram=False, **kwargs) \
+    def user_explanation(self, user: str, remove_seen=True, verbose=True, **kwargs) \
             -> dict:
         """
         Generate explanation based on hierarchical clustering of items based on the simple presence of those
@@ -61,7 +66,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
         :param user: user id
         :param remove_seen: True if model should exclude seen items, False otherwise
         :param verbose: True to print explanations
-        :param show_dendrogram: True to print the generated dendrogram
         :param kwargs: additional arguments
         :return:
         """
@@ -70,7 +74,7 @@ class HierarchicalClustering(ExplanationAlgorithm):
         interacted_items = []
         attributes = []
         ranked_clusters = []
-        total_misses = 0
+        rem_items = []
         path_misses = 0
         cluster_misses = 0
 
@@ -100,6 +104,15 @@ class HierarchicalClustering(ExplanationAlgorithm):
         inter = set(rec_all_attr).intersection(set(pro_all_attr))
         inter = np.array(sorted(inter))
 
+        items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
+                          for u_item in
+                          self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
+
+        if self.vec_method == 'relevance':
+            prop_dict = self.__user_semantic_profile(items_historic)[0]
+        else:
+            prop_dict = self.__user_semantic_profile(items_historic)[1]
+
         # create clustering dataset based on intersection
         clustering_df = pd.DataFrame(columns=inter)
         with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
@@ -115,34 +128,45 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 vectorize = np.isin(inter, rec_attr).astype(int)
             # create the vector array (vectorize) of a recommended item based on TF-IDF relevance score
             elif self.vec_method == 'relevance' or self.vec_method == "count":
-                items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
-                                  for u_item in
-                                  self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
-
-                if self.vec_method == 'relevance':
-                    prop_dict = self.__user_semantic_profile(items_historic)[0]
-                else:
-                    prop_dict = self.__user_semantic_profile(items_historic)[1]
-
                 l_rec_attr = list(rec_attr)
-                for j in range(0, len(inter)):
-                    attr = inter[j]
-                    attr_value = 0
-                    if attr in l_rec_attr:
-                        attr_value = prop_dict[attr]
-                    vectorize[j] = attr_value
+                vectorize = np.array([prop_dict[attr] if attr in l_rec_attr else 0 for attr in inter])
 
-            clustering_df.loc[len(clustering_df)] = vectorize
+            if sum(vectorize) > 0:
+                clustering_df.loc[len(clustering_df)] = vectorize
+            else:
+                rem_items.append(rec_item)
+                path_misses = path_misses + 1
+
+        for j in range(0, len(rem_items)):
+            ranked_items.remove(rem_items[j])
 
         clustering_data = clustering_df.to_numpy()
 
         # run hierarchical clustering
-        linkage_matrix = linkage(clustering_data, method=self.method, metric=self.metric)
-        clusters = fcluster(linkage_matrix, t=self.n_clusters, criterion=self.criterion)
-        if show_dendrogram: print(clusters)
-        for i in range(0, self.n_clusters):
+        if self.alg == "agglomerative":
+            linkage_matrix = linkage(clustering_data, method=self.method, metric=self.metric)
+            clusters = fcluster(linkage_matrix, t=self.n_clusters, criterion=self.criterion)
+        elif self.alg == "HDBSCAN" or self.alg == "spectral":
+            dist_matrix = squareform(pdist(clustering_data, metric=self.metric))
+            if self.alg == "HDBSCAN":
+                hdbscan_alg = hdbscan.HDBSCAN(min_cluster_size=self.n_clusters, metric='precomputed')
+                clusters = hdbscan_alg.fit_predict(dist_matrix)
+            else:
+                similarity_matrix = 1 - dist_matrix
+                sc = SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed', n_neighbors=self.top_n,
+                                        random_state=self.random_state)
+                clusters = sc.fit_predict(similarity_matrix)
+        elif self.alg == "BKMeans":
+            normalizer = Normalizer(norm='l2')
+            X_normalized = normalizer.fit_transform(clustering_data)
+            bkmeans = BisectingKMeans(n_clusters=self.n_clusters, random_state=self.random_state)
+            clusters = bkmeans.fit_predict(X_normalized)
+        else:
+            raise ValueError("alg parameter should be rather 'aglomerative' or 'HDBSCAN'")
+
+        for i in range(min(clusters), max(clusters)+1):
             # get items on cluster, then the attributes of the items on the cluster
-            i_cluster = [j for j in range(0, len(clusters)) if clusters[j] == i+1]
+            i_cluster = [j for j in range(0, len(clusters)) if clusters[j] == i]
             cluster_attr = clustering_df.iloc[i_cluster]
             # generate explanations based on clusters
             if self.vec_method == 'binary':
@@ -152,21 +176,13 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 expl_attr_names = cluster_sum[cluster_sum == len(i_cluster)].sort_index()
                 # if there is no expl_attr_names where there are common attributes
                 if expl_attr_names.empty:
-                    # if exists (not empty) values higher than 0 and less than total, then clustering found no common attr
-                    if not cluster_sum[(cluster_sum > 0) & (cluster_sum < len(i_cluster))].empty:
-                        cluster_misses = cluster_misses + 1
-                    else:
-                        path_misses = path_misses + 1
+                    cluster_misses = cluster_misses + 1
                 expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:self.top_n]
             elif self.vec_method == 'relevance' or self.vec_method == "count":
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
                 if cluster_nonzero.empty:
-                    # will enter here if there is a column with one value equal 0 but the sum of all is higher than 0
-                    if cluster_attr.to_numpy().sum() > 0:
-                        cluster_misses = cluster_misses + 1
-                    else:
-                        path_misses = path_misses + 1
+                    cluster_misses = cluster_misses + 1
                 expl_attr_names = cluster_nonzero.mean().sort_values(kind="mergesort", ascending=False).index[:self.top_n]
             else:
                 raise ValueError("Parameter vec_method is misspelled or does not exist.")
@@ -197,7 +213,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
             elif len(pro_item_names) > 0 and len(expl_attr_names) == 0:
                 expl = (f"If you are in the mood for items, items such as "
                         f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
-                total_misses = total_misses + 1
             else:
                 raise AttributeError("Profile items array and shared attributes array lengths are 0")
 
@@ -206,16 +221,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
                 f.write(expl)
             for rec in rec_item_ids:
                 user_explanations[rec] = expl
-
-        if show_dendrogram:
-            plt.figure(figsize=(16, 8))
-            dendrogram(linkage_matrix)
-            plt.title("Dendrogram")
-            plt.xlabel("Samples")
-            plt.ylabel("Distance")
-            plt.xticks(fontsize=6, rotation=90)
-            plt.legend()
-            plt.show()
 
         clu_metrics = metrics.clustering_metrics(clustering_data, clusters, verbose=False)
         item_cluster_metrics = metrics.items_per_cluster(clusters.tolist())
@@ -232,7 +237,10 @@ class HierarchicalClustering(ExplanationAlgorithm):
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
         etd = metrics.etd_metric(unique_attributes, self.top_k, total_attributes)
         overlap_attributes = len(unique_attributes)/total_attributes
-        overlap_items = len(unique_items) / total_items
+        try:
+            overlap_items = len(unique_items) / total_items
+        except ZeroDivisionError:
+            overlap_items = math.nan
 
         attr_metrics = {
             "SEP": sep,
@@ -243,7 +251,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
             "MID": mid,
             "Overlap-Attributes": overlap_attributes,
             "Overlap-Items": overlap_items,
-            "Total-Misses": total_misses,
             "Cluster-Misses": cluster_misses,
             "Path-Misses": path_misses
         }
@@ -298,7 +305,6 @@ class HierarchicalClustering(ExplanationAlgorithm):
                     "MID": [],
                     "Overlap-Attributes": [],
                     "Overlap-Items": [],
-                    "Total-Misses": [],
                     "Cluster-Misses": [],
                     "Path-Misses": []},
                 "items_cluster_metrics":
@@ -321,15 +327,17 @@ class HierarchicalClustering(ExplanationAlgorithm):
             users = users[:self.n_users]
 
         for user_id in users:
-            expl_obj = self.user_explanation(user=user_id, remove_seen=remove_seen, verbose=verbose,
-                                             show_dendrogram=False)
+            expl_obj = self.user_explanation(user=user_id, remove_seen=remove_seen, verbose=verbose)
             all_user_ret[user_id] = expl_obj
             ret_obj["grid_items"] = pd.concat([ret_obj["grid_items"].copy(),
                                                expl_obj["grid_items"]], ignore_index=True)
 
             for key in ret_obj["metrics"].keys():
                 for key1, value1 in expl_obj['metrics'][key].items():
-                    ret_obj['metrics'][key][key1].append(value1)
+                    if not isinstance(value1, list) and not math.isnan(value1):
+                        ret_obj['metrics'][key][key1].append(value1)
+                    else:
+                        ret_obj['metrics'][key][key1].append(value1)
 
         # all metrics are their mean excluding TID, TPD and Misses
         ret_obj["top_k"] = self.top_k

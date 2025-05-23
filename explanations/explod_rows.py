@@ -1,3 +1,4 @@
+import math
 import os
 
 import cornac
@@ -214,7 +215,7 @@ class ExpLODRows(ExplanationAlgorithm):
             overlap_items = len(unique_items) / total_items
         except ZeroDivisionError:
             # it will be ignored in the metric
-            overlap_items = -1
+            overlap_items = math.nan
 
         clustering_data = clustering_df.to_numpy()
         clu_metrics = metrics.clustering_metrics(clustering_data, clusters, verbose=False)
@@ -295,7 +296,9 @@ class ExpLODRows(ExplanationAlgorithm):
 
             for key in ret_obj["metrics"].keys():
                 for key1, value1 in expl_obj['metrics'][key].items():
-                    if value1 != -1:
+                    if not isinstance(value1, list) and not math.isnan(value1):
+                        ret_obj['metrics'][key][key1].append(value1)
+                    else:
                         ret_obj['metrics'][key][key1].append(value1)
 
         # all metrics are their mean excluding TID, TPD and Misses

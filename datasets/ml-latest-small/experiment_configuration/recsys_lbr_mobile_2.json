@@ -12,24 +12,10 @@
     },
     "explainers": [
         {
-         "name": "ExpLODRows",
+            "name": "Clustering",
             "parameters": {
-                "top_n": 2,
-                "hitems_per_attr": 2
-            }
-        },
-        {
-         "name": "ExpLODRows",
-            "parameters": {
-                "top_n": 2,
-                "hitems_per_attr": 2,
-                "n_clusters": 6
-            }
-        },
-        {
-            "name": "HierarchicalClustering",
-            "parameters": {
-                "n_clusters": 6,
+                "alg": "agglomerative",
+                "n_clusters": 15,
                 "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
@@ -39,9 +25,10 @@
             }
         },
         {
-            "name": "HierarchicalClustering",
+            "name": "Clustering",
             "parameters": {
-                "n_clusters": 6,
+                "alg": "agglomerative",
+                "n_clusters": 15,
                 "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
@@ -51,9 +38,10 @@
             }
         },
         {
-            "name": "HierarchicalClustering",
+            "name": "Clustering",
             "parameters": {
-                "n_clusters": 6,
+                "alg": "agglomerative",
+                "n_clusters": 15,
                 "method": "weighted",
                 "top_n": 2,
                 "hitems_per_attr":2,
