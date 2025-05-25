@@ -52,7 +52,7 @@
         },{
             "name": "Clustering",
             "parameters": {
-                "alg": "BKMeans",
+            "alg": "BKMeans",
                 "n_clusters": 15,
                 "top_n": 2,
                 "hitems_per_attr":2,
@@ -79,6 +79,14 @@
                 "hitems_per_attr":2,
                 "metric": "cosine",
                 "vec_method": "relevance"
+            }
+        },
+        {
+            "name": "ExpLODRows",
+            "parameters": {
+                "n_clusters": 15,
+                "top_n": 2,
+                "hitems_per_attr":2
             }
         },
         {

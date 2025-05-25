@@ -86,12 +86,13 @@ set them, use the following command line parameters:
 
 An example of a command-line argument is:
 
-    python main.py --dataset=ml100k --split=0 --k_list=10 --rows=3 --columns=2 --rec_model_folder=BPR --experiment_file=experiment1.json --n_users=3
+    python main.py --dataset=ml100k --split=0 --k_list=90 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=experiment1.json --n_users=3
 
 To run the results for the mobile configuration of the RecSys LBR run:
     
-    python main.py --dataset=ml100k --split=0 --k_list=90 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
-    python main.py --dataset=ml100k --split=0 --k_list=90 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k_list=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k_list=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k_list=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
 
 ## Project Organization
 

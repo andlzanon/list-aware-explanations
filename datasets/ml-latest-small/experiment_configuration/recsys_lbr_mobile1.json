@@ -23,7 +23,7 @@
             "parameters": {
                 "top_n": 2,
                 "hitems_per_attr": 2,
-                "n_clusters": 15
+                "n_clusters": 35
             }
         }
     ]

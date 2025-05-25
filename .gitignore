@@ -172,6 +172,7 @@ notebooks/exploration/*
 **/outputs/*
 **/model/*
 datasets/**/explanations/*
+!datasets/**/explanations/experiment1/
 
 /knowledge-graphs/*
 
