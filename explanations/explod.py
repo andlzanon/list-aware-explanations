@@ -1,3 +1,4 @@
+import math
 import os
 
 import cornac.models
@@ -176,9 +177,21 @@ class ExpLOD(ExplanationAlgorithm):
                                      train_set=self.dataset.load_fold_asdf()[0],
                                      col_user=self.dataset.user_column, col_item=self.dataset.item_column)
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
-        etd = metrics.etd_metric(unique_attributes, self.top_k, total_attributes)
-        overlap_attributes = len(unique_attributes) / total_attributes
-        overlap_items = len(unique_items) / total_items
+
+        try:
+            etd = metrics.etd_metric(unique_attributes, self.top_k, total_attributes)
+        except ZeroDivisionError:
+            etd = math.nan
+
+        try:
+            overlap_attributes = len(unique_attributes) / total_attributes
+        except ZeroDivisionError:
+            overlap_attributes = math.nan
+
+        try:
+            overlap_items = len(unique_items) / total_items
+        except ZeroDivisionError:
+            overlap_items = math.nan
 
         expl_metrics = {
             "attribute_metrics": {
@@ -235,7 +248,11 @@ class ExpLOD(ExplanationAlgorithm):
 
             for key in ret_obj["metrics"].keys():
                 for key1, value1 in expl_obj['metrics'][key].items():
-                    ret_obj['metrics'][key][key1].append(value1)
+                    if not isinstance(value1, list):
+                        if not math.isnan(value1):
+                            ret_obj['metrics'][key][key1].append(value1)
+                    else:
+                        ret_obj['metrics'][key][key1].append(value1)
 
         # all metrics are their mean excluding TID, TPD and Misses
         ret_obj["top_k"] = self.top_k

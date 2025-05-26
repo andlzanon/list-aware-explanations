@@ -1,0 +1,66 @@
+{
+    "MAP@350": 0.14466311291156903,
+    "NDCG@350": 0.4009442809501072,
+    "Precision@350": 0.052786885245901645,
+    "Recall@350": 0.6712104693265732,
+    "Algorithm BPR NDCG - 2D@350": 0.4365193460536058,
+    "Algorithm ExpLODRows&top_n=2&hitems_per_attr=2&top_k=350&alpha=0.5&beta=0.5&rs=42&n_clusters=None&u=0 NDCG - 2D@350": 0.4365193460536058,
+    "Algorithm ExpLODRows&top_n=2&hitems_per_attr=2&top_k=350&alpha=0.5&beta=0.5&rs=42&n_clusters=35&u=0 NDCG - 2D@350": 0.4305018568765564,
+    "explanation_algorithms": [
+        {
+            "name": "ExpLODRows&top_n=2&hitems_per_attr=2&top_k=350&alpha=0.5&beta=0.5&rs=42&n_clusters=None&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.5535451799745046,
+                    "LIR": 0.3126614641826722,
+                    "ETD": 0.4342968075927524,
+                    "TID": 1227,
+                    "TPD": 585,
+                    "MID": 1.3977566867989644,
+                    "Overlap-Attributes": 0.4342968075927524,
+                    "Overlap-Items": 0.5507037640312498,
+                    "Path-Misses": 0
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 18.421052631578952,
+                    "Std Items Per Cluster": 1.1385951396202074,
+                    "Clusters Entropy": 2.942444722586714
+                },
+                "cluster_metrics": {
+                    "Silhouette": -0.058325547221943747,
+                    "Calinski Harabasz Index": 1.9689033204173931,
+                    "Davies Bouldin Index:": 5.416137762290253
+                }
+            }
+        },
+        {
+            "name": "ExpLODRows&top_n=2&hitems_per_attr=2&top_k=350&alpha=0.5&beta=0.5&rs=42&n_clusters=35&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.47470817643531404,
+                    "LIR": 0.31593239072519486,
+                    "ETD": 0.5246604215456675,
+                    "TID": 1342,
+                    "TPD": 1446,
+                    "MID": 0.9680093676814988,
+                    "Overlap-Attributes": 0.5246604215456675,
+                    "Overlap-Items": 0.5412815022929792,
+                    "Path-Misses": 0
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 10.0,
+                    "Std Items Per Cluster": 0.0,
+                    "Clusters Entropy": 3.5553480614894144
+                },
+                "cluster_metrics": {
+                    "Silhouette": -0.0777654353290122,
+                    "Calinski Harabasz Index": 1.8298237807500914,
+                    "Davies Bouldin Index:": 4.095779456584936
+                }
+            }
+        }
+    ],
+    "experiment_file": "recsys_lbr_mobile1.json",
+    "rows": 3,
+    "columns": 3
+}
