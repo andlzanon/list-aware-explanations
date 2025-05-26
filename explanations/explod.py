@@ -238,10 +238,11 @@ class ExpLOD(ExplanationAlgorithm):
 
         all_user_ret = {}
         users = self.dataset.get_users('test')
+        if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
+
         if self.n_users != 0:
             users = users[:self.n_users]
 
-        if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
         for user_id in users:
             expl_obj = self.user_explanation(user=user_id, remove_seen=remove_seen,  verbose=verbose)
             all_user_ret[user_id] = expl_obj

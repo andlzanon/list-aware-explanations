@@ -209,8 +209,17 @@ class ExpLODRows(ExplanationAlgorithm):
                                  train_set=self.dataset.load_fold_asdf()[0],
                                  col_user=self.dataset.user_column, col_item=self.dataset.item_column)
         sep = metrics.sep_metric(beta=0.3, props=attributes, prop_set=self.dataset.prop_set, memo_sep=self.memo_sep)
-        etd = metrics.etd_metric(unique_attributes, self.top_k, total_attributes)
-        overlap_attributes = len(unique_attributes) / total_attributes
+
+        try:
+            etd = metrics.etd_metric(unique_attributes, self.top_k, total_attributes)
+        except ZeroDivisionError:
+            etd = math.nan
+
+        try:
+            overlap_attributes = len(unique_attributes) / total_attributes
+        except ZeroDivisionError:
+            overlap_attributes = math.nan
+
         try:
             overlap_items = len(unique_items) / total_items
         except ZeroDivisionError:
@@ -296,8 +305,9 @@ class ExpLODRows(ExplanationAlgorithm):
 
             for key in ret_obj["metrics"].keys():
                 for key1, value1 in expl_obj['metrics'][key].items():
-                    if not isinstance(value1, list) and not math.isnan(value1):
-                        ret_obj['metrics'][key][key1].append(value1)
+                    if not isinstance(value1, list):
+                        if not math.isnan(value1):
+                            ret_obj['metrics'][key][key1].append(value1)
                     else:
                         ret_obj['metrics'][key][key1].append(value1)
 
