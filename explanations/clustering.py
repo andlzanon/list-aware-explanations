@@ -8,6 +8,7 @@ import pandas as pd
 from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import squareform, pdist
 from sklearn.cluster import SpectralClustering, BisectingKMeans
+from sklearn.metrics.pairwise import cosine_similarity, cosine_distances
 from sklearn.preprocessing import Normalizer
 
 from dataset_experiment import metrics
@@ -18,10 +19,12 @@ from explanations.explanation import ExplanationAlgorithm
 class Clustering(ExplanationAlgorithm):
     def __init__(self, dataset: DatasetExperiment, alg: str, model: cornac.models.Recommender, expr_file: str,
                  top_k: int, method: str, criterion: str, metric: str, n_clusters: int, top_n: int,
-                 hitems_per_attr=2, vec_method='binary', random_state=42, n_users=0):
+                 hitems_per_attr=2, vec_method='binary', random_state=42, n_users=0, alpha=None, beta=None):
         """
         Hierarchical Clustering explanation algorithm
         :param dataset: dataset used in the recommendation model
+        :param alg: name of the clustering algorithm to be used.
+            Either 'agglomerative', 'HDBSCAN', 'spectral' or 'BKMeans'
         :param model: cornac model used to generate recommendations
         :param expr_file: name of the experiment file configuration
         :param top_k: top k items to explain
@@ -39,6 +42,8 @@ class Clustering(ExplanationAlgorithm):
         'relevance' to use the Musto graph relevance score
         :param random_state: random state number for reproducible results
         :param n_users: umber of users to generate explanations to. If 0 runs to all users
+        :param alpha: weight to the number of links of attributes on interacted items
+        :param beta: weight on number of links of attributes to recommended items
         """
         super().__init__(dataset, model, expr_file, top_k, n_users)
         self.alg = alg
@@ -49,12 +54,15 @@ class Clustering(ExplanationAlgorithm):
         self.top_n = top_n
         self.hitems_per_attr = hitems_per_attr
         self.vec_method = vec_method
+        self.alpha = alpha
+        self.beta = beta
         self.random_state = random_state
         np.random.seed(self.random_state)
         self.model_name = (f"Cluster&alg={str(self.alg)}&method={str(self.method)}&criterion={str(self.criterion)}"
                             f"&metric={str(self.metric)}&n_clusters={str(self.n_clusters)}&top_n={str(self.top_n)}"
                             f"&hitems_per_attr={str(self.hitems_per_attr)}&vec_method={str(self.vec_method)}"
-                            f"&rs={str(self.random_state)}&top_k={str(self.top_k)}&u={str(abs(self.n_users))}")
+                            f"&rs={str(self.random_state)}&top_k={str(self.top_k)}&a={str(self.alpha)}"
+                           f"&b={str(self.beta)}&u={str(abs(self.n_users))}")
         self.expl_file_path =  r"\\?\\" + os.path.abspath(self.expl_file_path + self.model_name + ".txt")
         open(self.expl_file_path, 'w+').close()
 
@@ -83,34 +91,25 @@ class Clustering(ExplanationAlgorithm):
                                                  train_set=self.dataset.train,
                                                  remove_seen=remove_seen))
 
-        #  get train dataset and set user as index
-        train_df = self.dataset.load_fold_asdf()[0]
-        train_df = train_df.set_index(self.dataset.user_column)
+        # get user historic items
+        items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
+                          for u_item in
+                          self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
 
-        # create a set of all profile attributes
-        pro_all_attr = set()
-        pro_items = train_df.loc[user][self.dataset.item_column]
-
-        # for evey user profile item get its properties
-        for pro_item in pro_items:
-            i_attr = self.dataset.prop_set.loc[int(pro_item)][self.dataset.prop_set.columns[-1]]
-            pro_all_attr = pro_all_attr.union(set(list(i_attr)))
-
-        # get all profile and recommended attributes from kg
-        pro_all_attr = np.array(list(pro_all_attr))
+        # create a set of all profile attributes and get all profile and recommended attributes from kg
+        pro_all_attr = self.dataset.prop_set.loc[items_historic][obj_column]
         rec_all_attr = self.dataset.prop_set.loc[list(map(int, ranked_items))][obj_column]
 
         # get intersection between interacted and recommended attributes
         inter = set(rec_all_attr).intersection(set(pro_all_attr))
         inter = np.array(sorted(inter))
 
-        items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
-                          for u_item in
-                          self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
-
+        prop_dict = {}
         if self.vec_method == 'relevance':
             prop_dict = self.__user_semantic_profile(items_historic)[0]
-        else:
+        elif self.vec_method == 'explod':
+            prop_dict = self.__user_semantic_profile_explod(items_historic, list(map(int, ranked_items)))
+        elif self.vec_method == 'count':
             prop_dict = self.__user_semantic_profile(items_historic)[1]
 
         # create clustering dataset based on intersection
@@ -118,6 +117,7 @@ class Clustering(ExplanationAlgorithm):
         with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
             f.write(f'''--- Explanations User Id {user} ---\n''')
         if verbose: print(f'''--- Explanations User Id {user} ---''')
+
         for rec_item in ranked_items:
             # initialize vector array of recommended item with all 0 and get recommended attributes
             rec_attr = self.dataset.prop_set.loc[int(rec_item)][obj_column]
@@ -127,7 +127,7 @@ class Clustering(ExplanationAlgorithm):
             if self.vec_method == 'binary':
                 vectorize = np.isin(inter, rec_attr).astype(int)
             # create the vector array (vectorize) of a recommended item based on TF-IDF relevance score
-            elif self.vec_method == 'relevance' or self.vec_method == "count":
+            elif self.vec_method in ['relevance', 'count', 'explod']:
                 l_rec_attr = list(rec_attr)
                 vectorize = np.array([prop_dict[attr] if attr in l_rec_attr else 0 for attr in inter])
 
@@ -146,16 +146,15 @@ class Clustering(ExplanationAlgorithm):
         if self.alg == "agglomerative":
             linkage_matrix = linkage(clustering_data, method=self.method, metric=self.metric)
             clusters = fcluster(linkage_matrix, t=self.n_clusters, criterion=self.criterion)
-        elif self.alg == "HDBSCAN" or self.alg == "spectral":
-            dist_matrix = squareform(pdist(clustering_data, metric=self.metric))
-            if self.alg == "HDBSCAN":
-                hdbscan_alg = hdbscan.HDBSCAN(min_cluster_size=self.n_clusters, metric='precomputed')
-                clusters = hdbscan_alg.fit_predict(dist_matrix)
-            else:
-                similarity_matrix = 1 - dist_matrix
-                sc = SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed', n_neighbors=self.top_n,
+        elif self.alg == "HDBSCAN":
+            distance_matrix = cosine_distances(clustering_data)
+            dbscan_alg = hdbscan.HDBSCAN(min_cluster_size=self.n_clusters, metric='precomputed')
+            clusters = dbscan_alg.fit_predict(distance_matrix)
+        elif self.alg == "spectral":
+            similarity_matrix = cosine_similarity(clustering_data)
+            sc = SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed', n_neighbors=self.top_n,
                                         random_state=self.random_state)
-                clusters = sc.fit_predict(similarity_matrix)
+            clusters = sc.fit_predict(similarity_matrix)
         elif self.alg == "BKMeans":
             normalizer = Normalizer(norm='l2')
             X_normalized = normalizer.fit_transform(clustering_data)
@@ -164,7 +163,9 @@ class Clustering(ExplanationAlgorithm):
         else:
             raise ValueError("alg parameter should be rather 'aglomerative' or 'HDBSCAN'")
 
+        n_clusters = 0
         for i in range(min(clusters), max(clusters)+1):
+            n_clusters = n_clusters + 1
             # get items on cluster, then the attributes of the items on the cluster
             i_cluster = [j for j in range(0, len(clusters)) if clusters[j] == i]
             cluster_attr = clustering_df.iloc[i_cluster]
@@ -178,7 +179,7 @@ class Clustering(ExplanationAlgorithm):
                 if expl_attr_names.empty:
                     cluster_misses = cluster_misses + 1
                 expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:self.top_n]
-            elif self.vec_method == 'relevance' or self.vec_method == "count":
+            elif self.vec_method in ['relevance', 'count', 'explod']:
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
                 if cluster_nonzero.empty:
@@ -192,7 +193,7 @@ class Clustering(ExplanationAlgorithm):
             rec_item_names = self.dataset.prop_set.loc[rec_item_ids]['title'].unique()
 
             # get profile item names that have the explanation attributes
-            pro_df = self.dataset.prop_set.loc[list(pro_items.astype(int))]
+            pro_df = self.dataset.prop_set.loc[items_historic]
             pro_item_ids = pro_df.groupby(pro_df.index)["obj"].apply(set)
             pro_item_ids = pro_item_ids.apply(lambda attrs: set(attrs).issuperset(set(expl_attr_names)))
             pro_item_ids = pro_item_ids[pro_item_ids == True].index.astype(int)
@@ -250,6 +251,8 @@ class Clustering(ExplanationAlgorithm):
             overlap_items = len(unique_items) / total_items
         except ZeroDivisionError:
             overlap_items = math.nan
+
+        cluster_misses = cluster_misses/n_clusters
 
         attr_metrics = {
             "SEP": sep,
@@ -353,10 +356,10 @@ class Clustering(ExplanationAlgorithm):
         ret_obj["top_k"] = self.top_k
         for key in ret_obj["metrics"].keys():
             for key1, value_list in ret_obj['metrics'][key].items():
-                if key1 != "TPD" and key1 != "TID" and not("Misses" in key1):
+                if key1 != "TPD" and key1 != "TID" and key1 != "Path-Misses":
                     ret_obj['metrics'][key][key1] = np.array(value_list).mean()
                 else:
-                    if "Misses" in key1:
+                    if key1 == "Path-Misses":
                         ret_obj['metrics'][key][key1] = np.array(value_list).sum()
                     else:
                         ret_obj['metrics'][key][key1] = len({item for sublist in value_list for item in sublist})
@@ -403,3 +406,53 @@ class Clustering(ExplanationAlgorithm):
         fav_prop = interacted_props['score'].to_dict()
 
         return fav_prop, top_prop
+
+    def __user_semantic_profile_explod(self, historic: list, recommended: list) -> dict:
+        """
+        Generate the user semantic profile, where all the values of properties (e.g.: George Lucas, action films, etc.)
+        are ordered by a score that is calculated as:
+            score = (npi/i + npr/r) * log(N/dft)
+        where npi are the number of edges to a value, i the number of interacted items,
+        N the total number of items and dft the number of items with the value
+        :param historic: list of the items interacted by a user
+        :param recommended: list of the items recommended to the user
+        :return: dictionary with properties' values as keys and scores as values
+        """
+        # create npi, i and n columns
+        interacted_props = self.dataset.prop_set.loc[self.dataset.prop_set.index.isin(historic)].copy()
+        interacted_props['npi'] = interacted_props.groupby(self.dataset.prop_set.columns[-1])[
+            self.dataset.prop_set.columns[-1]].transform('count')
+        interacted_props['i'] = len(historic)
+
+        recommended_props = self.dataset.prop_set.loc[self.dataset.prop_set.index.isin(recommended)].copy()
+        recommended_props['npr'] = recommended_props.groupby(self.dataset.prop_set.columns[-1])[
+            self.dataset.prop_set.columns[-1]].transform('count')
+        recommended_props['r'] = len(recommended)
+
+        merged = interacted_props.merge(recommended_props, on='obj', how='inner')
+        merged['n'] = len(self.dataset.prop_set.index.unique())
+
+        # get items per property on full dbpedia/wikidata by dropping the duplicates with same item id and prop value
+        # therefore, a value that repeats in the same item is ignored
+        items_per_obj = self.dataset.prop_set.reset_index().drop_duplicates(
+            subset=[self.dataset.prop_set.columns[0], self.dataset.prop_set.columns[-1]]).set_index(
+            self.dataset.prop_set.columns[-1])
+        df_dict = items_per_obj.index.value_counts().to_dict()
+
+        # generate the dft column based on items per property and score column base on all new created columns
+        merged['dft'] = merged.apply(lambda x: df_dict[x[self.dataset.prop_set.columns[-1]]], axis=1)
+        merged['idfc'] = np.log(merged['n'] / merged['dft'])
+
+        merged['ncip'] = merged['npi'] / merged['i']
+        merged['ncir'] = merged['npr'] / merged['r']
+
+        merged['score'] = (((self.alpha * merged['ncip']) + (self.beta * merged['ncir']))
+                                     * merged['idfc'])
+
+        # generate the dict
+        merged.reset_index(inplace=True)
+        merged = merged.set_index(self.dataset.prop_set.columns[-1])
+        fav_prop = merged['score'].to_dict()
+
+        return fav_prop
+

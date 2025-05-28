@@ -67,7 +67,7 @@ set them, use the following command line parameters:
 - `end_fold`: End fold to run the experiments if split is 1
 
 
-- `k_list`: Top K items to generate explanations to evaluate on offline metrics. Separate numbers with space. E.g.: 1 3 5 10
+- `k`: Top K items to generate explanations to evaluate on offline metrics.
 
 
 - `n_users`: User to generate only explanations to. Recommendations will be generated to all users
@@ -86,13 +86,13 @@ set them, use the following command line parameters:
 
 An example of a command-line argument is:
 
-    python main.py --dataset=ml100k --split=0 --k_list=90 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=experiment1.json --n_users=3
+    python main.py --dataset=ml100k --split=0 --k=90 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=experiment1.json --n_users=3
 
 To run the results for the mobile configuration of the RecSys LBR run:
     
-    python main.py --dataset=ml100k --split=0 --k_list=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
-    python main.py --dataset=ml100k --split=0 --k_list=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
-    python main.py --dataset=ml100k --split=0 --k_list=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
 
 ## Project Organization
 

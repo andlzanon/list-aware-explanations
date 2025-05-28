@@ -15,7 +15,8 @@
          "name": "ExpLODRows",
             "parameters": {
                 "top_n": 2,
-                "hitems_per_attr": 2
+                "hitems_per_attr": 2,
+                "all_props_on_items": false
             }
         },
         {
@@ -23,8 +24,18 @@
             "parameters": {
                 "top_n": 2,
                 "hitems_per_attr": 2,
-                "n_clusters": 35
+                "n_clusters": 35,
+                "all_props_on_items": false
             }
+        },
+        {
+           "name": "ExpLODRows",
+              "parameters": {
+                  "top_n": 2,
+                  "hitems_per_attr": 2,
+                  "n_clusters": 35,
+                  "all_props_on_items": true
+              }
         }
     ]
 }

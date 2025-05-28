@@ -27,11 +27,10 @@ parser.add_argument("--end_fold",
                     default=0,
                     help="End fold to run the experiments if split is 1")
 
-parser.add_argument("--k_list",
-                    type=str,
+parser.add_argument("--k",
+                    type=int,
                     default="10",
-                    help="Top K items to generate explanations to evaluate on offline metrics. Separate numbers"
-                         "with space. E.g.: 1 3 5 10")
+                    help="Top K items to generate explanations to evaluate on offline metrics. E.g.: 1 3 5 10")
 
 parser.add_argument("--n_users",
                     type=int,
@@ -89,7 +88,7 @@ if args.rec_model_folder == "None":
     args.rec_model_folder = None
 
 # get the k list from command line argument
-k_list = [int(x) for x in args.k_list.split(" ")]
+k = int(args.k)
 n_users = args.n_users
 
 # for every fold
@@ -104,16 +103,15 @@ for fold in range(sf, ed):
     rec.fit_model(save=True)
 
     # for every k create an explainer based on the experiment configuration file, generate explanation and get results
-    for k in k_list:
-        for expl in expr["explainers"]:
-            expl_name = expl["name"]
-            expl_params = expl["parameters"]
+    for expl in expr["explainers"]:
+        expl_name = expl["name"]
+        expl_params = expl["parameters"]
 
-            explainer = create_explainer(expl_name, expl_params, ds, rec.model, args.experiment_file, k, n_users)
-            expl_alg_results, _ = explainer.all_users_explanations(remove_seen=True, verbose=True)
-            res[explainer.model_name] = expl_alg_results
+        explainer = create_explainer(expl_name, expl_params, ds, rec.model, args.experiment_file, k, n_users)
+        expl_alg_results, _ = explainer.all_users_explanations(remove_seen=True, verbose=True)
+        res[explainer.model_name] = expl_alg_results
 
     # run offline experiments
-    expr_out = rec.run_experiment(k_list, res, args.experiment_file, n_users=n_users,
+    expr_out = rec.run_experiment(k, res, args.experiment_file, n_users=n_users,
                        rows=args.rows, cols=args.columns, verbose=False, save_results=True)
     print(expr_out)

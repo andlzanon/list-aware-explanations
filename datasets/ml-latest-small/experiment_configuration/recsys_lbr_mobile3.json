@@ -19,7 +19,9 @@
               "top_n": 2,
               "hitems_per_attr":2,
               "metric": "cosine",
-              "vec_method": "relevance"
+              "vec_method": "explod",
+              "alpha": 0.5,
+              "beta": 0.5
             }
         },
         {
@@ -30,7 +32,9 @@
               "top_n": 2,
               "hitems_per_attr":2,
               "metric": "cosine",
-              "vec_method": "relevance"
+              "vec_method": "explod",
+              "alpha": 0.5,
+              "beta": 0.5
             }
         },
         {
@@ -41,7 +45,9 @@
               "top_n": 2,
               "hitems_per_attr": 2,
               "metric": "cosine",
-              "vec_method": "relevance"
+              "vec_method": "explod",
+              "alpha": 0.5,
+              "beta": 0.5
           }
         }
     ]

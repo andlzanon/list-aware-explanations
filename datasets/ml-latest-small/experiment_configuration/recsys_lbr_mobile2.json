@@ -21,6 +21,21 @@
                 "hitems_per_attr":2,
                 "metric": "cosine",
                 "criterion": "maxclust",
+                "vec_method": "explod",
+                "alpha": 0.5,
+                "beta": 0.5
+            }
+        },
+        {
+            "name": "Clustering",
+            "parameters": {
+                "alg": "agglomerative",
+                "n_clusters": 35,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
                 "vec_method": "relevance"
             }
         },

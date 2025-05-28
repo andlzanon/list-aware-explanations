@@ -13,7 +13,8 @@ from explanations.explanation import ExplanationAlgorithm
 
 class ExpLODRows(ExplanationAlgorithm):
     def __init__(self, dataset: DatasetExperiment, model: cornac.models.Recommender, expr_file: str, top_k: int,
-                 top_n=1, hitems_per_attr=2, n_users=0, alpha=0.5, beta=0.5, random_state=42, n_clusters=None):
+                 top_n=1, hitems_per_attr=2, n_users=0, alpha=0.5, beta=0.5, random_state=42, n_clusters=None,
+                 all_props_on_items=False):
         """
         ExpLOD algorithm as in https://dl.acm.org/doi/abs/10.1145/2959100.2959173
         :param dataset: dataset used in the recommendation model
@@ -29,6 +30,7 @@ class ExpLODRows(ExplanationAlgorithm):
         :param beta: weight on number of links of attributes to recommended items
         :param random_state: random state number for reproducible results
         :param n_clusters: Number of clusters
+        :param: all_props_on_items: If true will consider only props that appear in all items
         """
         super().__init__(dataset, model, expr_file, top_k, n_users)
         self.top_n = top_n
@@ -36,11 +38,12 @@ class ExpLODRows(ExplanationAlgorithm):
         self.alpha = alpha
         self.beta = beta
         self.n_clusters = n_clusters
+        self.all_props_on_items = all_props_on_items
         self.random_state = random_state
         np.random.seed(self.random_state)
         self.model_name = (f"ExpLODRows&top_n={str(self.top_n)}&hitems_per_attr={str(self.hitems_per_attr)}"
                            f"&top_k={str(self.top_k)}&alpha={str(self.alpha)}&beta={str(self.beta)}"
-                           f"&rs={str(self.random_state)}"
+                           f"&rs={str(self.random_state)}&all_props={str(self.all_props_on_items)}"
                            f"&n_clusters={str(self.n_clusters)}&u={str(abs(self.n_users))}")
         self.expl_file_path = r"\\?\\" + os.path.abspath(self.expl_file_path + self.model_name + ".txt")
         open(self.expl_file_path, 'w+').close()
@@ -106,8 +109,10 @@ class ExpLODRows(ExplanationAlgorithm):
         interacted_items = []
         attributes = []
         clusters = []
+        rem_items = []
         rerank_df = pd.DataFrame()
-        misses = 0
+        path_misses = 0
+        cluster_misses = 0
 
         item_col = self.dataset.item_column
 
@@ -120,7 +125,7 @@ class ExpLODRows(ExplanationAlgorithm):
         ranked_items_2d = fill_ideal_grid_by_manhattan(ranked_items, rows=self.n_clusters, cols=None)
 
         max_value = ranked_items_2d['x_irank'].max()
-        min_value = ranked_items_2d['y_irank'].min()
+        min_value = ranked_items_2d['x_irank'].min()
 
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                           for u_item in self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
@@ -129,37 +134,79 @@ class ExpLODRows(ExplanationAlgorithm):
             f.write(f'''--- Explanations User Id {user} ---\n''')
         if verbose: print(f'''--- Explanations User Id {user} ---''')
 
-        all_items = list(set(items_historic).union(set(recommendations)))
-        all_props = (self.dataset.prop_set.loc[
-            self.dataset.prop_set.index.isin(all_items)].copy()['obj']
-                     .drop_duplicates().sort_values().reset_index(drop=True))
-        clustering_df = pd.DataFrame(columns=all_props)
+        #  get train dataset and set user as index
+        obj_column = self.dataset.prop_set.columns[-1]
 
+        # create a set of all profile attributes and get all profile and recommended attributes from kg
+        pro_all_attr = self.dataset.prop_set.loc[items_historic][obj_column]
+        rec_all_attr = self.dataset.prop_set.loc[list(map(int, recommendations))][obj_column]
+
+        # get intersection between interacted and recommended attributes
+        inter = set(rec_all_attr).intersection(set(pro_all_attr))
+        inter = np.array(sorted(inter))
+
+        # initialize clustering df and number of clusters
+        clustering_df = pd.DataFrame(columns=inter)
+        n_clusters = 0
         for row in range(min_value, max_value+1):
+            n_clusters = n_clusters + 1
             rec_row = ranked_items_2d[ranked_items_2d["x_irank"] == row][item_col].astype(int).tolist()
 
+            # get scored properties
             props = self.__user_semantic_profile(items_historic, rec_row)
-            props_sorted = sorted(props.items(), key=lambda item: item[1], reverse=True)
-            max_props = [k for k, _ in props_sorted[:self.top_n]]
 
             # create the embedding with the ExpLOD value function for every recommendation on the row
-            for rec in rec_row:
-                vectorize = np.zeros(all_props.shape)
-                rec_props = self.dataset.prop_set.loc[int(rec)]['obj'].tolist()
-                for i in range(0, len(all_props)):
-                    prop_name = all_props.iloc[i]
-                    attr_value = 0
-                    if prop_name in rec_props:
-                        attr_value = props[prop_name]
-                    vectorize[i] = attr_value
-                clustering_df.loc[len(clustering_df)] = vectorize
-                clusters.append(row)
+            for rec_item in rec_row:
+                rec_attr = self.dataset.prop_set.loc[int(rec_item)]['obj']
+                l_rec_attr = list(rec_attr)
+                vectorize = np.array([props[attr] if attr in l_rec_attr else 0 for attr in inter])
+
+                # if there are common attributes between interacted and recommended item add to clustering
+                # if there are not add on path miss and remove of row if it is required that all items share all obj
+                if sum(vectorize) > 0:
+                    clustering_df.loc[len(clustering_df)] = vectorize
+                    clusters.append(row)
+                else:
+                    path_misses = path_misses + 1
+                    if self.all_props_on_items:
+                        rem_items.append(rec_item)
+
+            # if we are considering only items that will have all explanations,
+            # then remove items not connected to hist
+            if self.all_props_on_items:
+                for j in range(0, len(rem_items)):
+                    rec_row.remove(rem_items[j])
+
+            # if we props do not need to be in all items only get the first two
+            props_sorted = sorted(props.items(), key=lambda item: item[1], reverse=True)
+            if not self.all_props_on_items:
+                props_sorted = props_sorted[:self.top_n]
 
             # get explanation attributes
+            rec_items_props = self.dataset.prop_set.loc[rec_row]
             expl_attr_names = []
-            for pi in range(0, len(max_props)):
-                p = max_props[pi]
-                expl_attr_names.append(p)
+            for pi in range(0, len(props_sorted)):
+                p = props_sorted[pi][0]
+                if self.all_props_on_items:
+                    items_with_obj = rec_items_props[rec_items_props["obj"] == p].index.unique().tolist()
+                    if set(items_with_obj) == set(rec_row):
+                        expl_attr_names.append(p)
+                else:
+                    expl_attr_names.append(p)
+
+            # check if all items have at least one attribute
+            if len(expl_attr_names) > 0:
+                # group by item and collect all their 'obj' values into sets
+                item_obj_sets = rec_items_props.groupby(rec_items_props.index)["obj"].apply(set)
+
+                # filter items where the set of objs contains all of expl_attr_names
+                items_with_all_props = item_obj_sets[
+                    item_obj_sets.apply(lambda x: set(expl_attr_names).issubset(x))].index.tolist()
+
+                if set(items_with_all_props) != set(rec_row):
+                    cluster_misses = cluster_misses + 1
+            else:
+                cluster_misses = cluster_misses + 1
 
             # get profile item names that have the explanation attributes
             pro_df = self.dataset.prop_set.loc[items_historic]
@@ -189,7 +236,6 @@ class ExpLODRows(ExplanationAlgorithm):
             elif len(pro_item_names) > 0 and len(expl_attr_names) == 0:
                 expl = (f"If you are in the mood for items, items such as "
                         f"{", ".join(list(pro_item_names))}, I recommend {", ".join(rec_item_names)}\n")
-                misses = misses + 1
             else:
                 raise AttributeError("Profile items array and shared attributes array lengths are 0")
 
@@ -229,6 +275,7 @@ class ExpLODRows(ExplanationAlgorithm):
         clustering_data = clustering_df.to_numpy()
         clu_metrics = metrics.clustering_metrics(clustering_data, clusters, verbose=False)
         item_cluster_metrics = metrics.items_per_cluster(ranked_items_2d["x_irank"].astype(int).tolist())
+        cluster_misses = cluster_misses/n_clusters
 
         attr_metrics = {
             "SEP": sep,
@@ -239,7 +286,8 @@ class ExpLODRows(ExplanationAlgorithm):
             "MID": mid,
             "Overlap-Attributes": overlap_attributes,
             "Overlap-Items": overlap_items,
-            "Path-Misses": misses
+            "Path-Misses": path_misses,
+            "Cluster-Misses": cluster_misses
         }
 
         expl_metrics = {
@@ -276,7 +324,8 @@ class ExpLODRows(ExplanationAlgorithm):
                     "MID": [],
                     "Overlap-Attributes": [],
                     "Overlap-Items": [],
-                    "Path-Misses": []},
+                    "Path-Misses": [],
+                    "Cluster-Misses": []},
                 "items_cluster_metrics":
                     {"Mean Items Per Cluster": [],
                     "Std Items Per Cluster": [],
@@ -315,10 +364,10 @@ class ExpLODRows(ExplanationAlgorithm):
         ret_obj["top_k"] = self.top_k
         for key in ret_obj["metrics"].keys():
             for key1, value_list in ret_obj['metrics'][key].items():
-                if key1 != "TPD" and key1 != "TID" and not("Misses" in key1):
+                if key1 != "TPD" and key1 != "TID" and key1 != "Path-Misses":
                     ret_obj['metrics'][key][key1] = np.array(value_list).mean()
                 else:
-                    if "Misses" in key1:
+                    if key1 == "Path-Misses":
                         ret_obj['metrics'][key][key1] = np.array(value_list).sum()
                     else:
                         ret_obj['metrics'][key][key1] = len({item for sublist in value_list for item in sublist})
