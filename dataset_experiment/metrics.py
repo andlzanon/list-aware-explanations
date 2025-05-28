@@ -149,11 +149,11 @@ def items_per_cluster(cluster_list: list) -> dict:
     :param cluster_list: list with cluster number for each element on the position e.g.: [1,2,2,3,4]
     :return: mean and std of the quantity of items per cluster, entropy and the clusters by themselves
     """
-    n_clusters = max(cluster_list)
+    unique_labels = sorted(set(cluster_list))
     items_on_cluster = []
-    for i in range(0, n_clusters):
-        # get items on cluster, then the attributes of the items on the cluster
-        i_cluster = [j for j in range(0, len(cluster_list)) if cluster_list[j] == i + 1]
+
+    for label in unique_labels:
+        i_cluster = [j for j in range(len(cluster_list)) if cluster_list[j] == label]
         items_on_cluster.append(i_cluster)
 
     cluster_len = np.array([len(c) for c in items_on_cluster])
@@ -161,7 +161,8 @@ def items_per_cluster(cluster_list: list) -> dict:
     out = {
         "Mean Items Per Cluster":  cluster_len.mean(),
         "Std Items Per Cluster": cluster_len.std(),
-        "Clusters Entropy": entropy(cluster_len)
+        "Clusters Entropy": entropy(cluster_len),
+        "Number of Clusters": len(unique_labels)
     }
     return out
 

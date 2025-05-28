@@ -329,7 +329,8 @@ class ExpLODRows(ExplanationAlgorithm):
                 "items_cluster_metrics":
                     {"Mean Items Per Cluster": [],
                     "Std Items Per Cluster": [],
-                    "Clusters Entropy": []},
+                    "Clusters Entropy": [],
+                    "Number of Clusters": []},
                 "cluster_metrics":{
                     "Silhouette": [],
                     "Calinski Harabasz Index": [],

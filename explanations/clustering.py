@@ -6,7 +6,6 @@ import hdbscan
 import numpy as np
 import pandas as pd
 from scipy.cluster.hierarchy import linkage, fcluster
-from scipy.spatial.distance import squareform, pdist
 from sklearn.cluster import SpectralClustering, BisectingKMeans
 from sklearn.metrics.pairwise import cosine_similarity, cosine_distances
 from sklearn.preprocessing import Normalizer
@@ -322,7 +321,8 @@ class Clustering(ExplanationAlgorithm):
                 "items_cluster_metrics":
                     {"Mean Items Per Cluster": [],
                     "Std Items Per Cluster": [],
-                    "Clusters Entropy": []},
+                    "Clusters Entropy": [],
+                    "Number of Clusters": []},
                 "cluster_metrics":{
                     "Silhouette": [],
                     "Calinski Harabasz Index": [],

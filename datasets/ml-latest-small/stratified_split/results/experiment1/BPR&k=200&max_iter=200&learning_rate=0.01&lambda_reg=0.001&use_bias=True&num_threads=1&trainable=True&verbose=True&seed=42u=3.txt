@@ -33,7 +33,8 @@
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 6.0,
                     "Std Items Per Cluster": 6.4242957451517,
-                    "Clusters Entropy": 2.275370046995588
+                    "Clusters Entropy": 2.275370046995588,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.20997810042741835,
@@ -60,7 +61,8 @@
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 6.0,
                     "Std Items Per Cluster": 6.260457237032889,
-                    "Clusters Entropy": 2.2582442421272053
+                    "Clusters Entropy": 2.2582442421272053,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.2545789415176454,
@@ -87,7 +89,8 @@
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 6.0,
                     "Std Items Per Cluster": 6.104930286554777,
-                    "Clusters Entropy": 2.238496453913816
+                    "Clusters Entropy": 2.238496453913816,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.2872372578154566,
@@ -114,7 +117,8 @@
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 6.0,
                     "Std Items Per Cluster": 7.220048102920269,
-                    "Clusters Entropy": 2.1877772285011052
+                    "Clusters Entropy": 2.1877772285011052,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.08710934964073432,
@@ -139,9 +143,10 @@
                     "Path-Misses": 0
                 },
                 "items_cluster_metrics": {
-                    "Mean Items Per Cluster": 5.8809523809523805,
-                    "Std Items Per Cluster": 3.0100504543047744,
-                    "Clusters Entropy": 2.494306890382982
+                    "Mean Items Per Cluster": 6.0,
+                    "Std Items Per Cluster": 2.993814795975007,
+                    "Clusters Entropy": 2.569766166702736,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.11242551322604709,
@@ -166,9 +171,10 @@
                     "Path-Misses": 0
                 },
                 "items_cluster_metrics": {
-                    "Mean Items Per Cluster": 10.200000000000001,
-                    "Std Items Per Cluster": 10.99383577190816,
-                    "Clusters Entropy": 1.1868485507352915
+                    "Mean Items Per Cluster": 12.321428571428571,
+                    "Std Items Per Cluster": 12.629779980161862,
+                    "Clusters Entropy": 1.5263989019848863,
+                    "Number of Clusters": 7.333333333333333
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.09316950770237421,
@@ -193,9 +199,10 @@
                     "Path-Misses": 0
                 },
                 "items_cluster_metrics": {
-                    "Mean Items Per Cluster": 5.714285714285715,
-                    "Std Items Per Cluster": 4.632505350804171,
-                    "Clusters Entropy": 2.347210765611488
+                    "Mean Items Per Cluster": 6.0,
+                    "Std Items Per Cluster": 4.721242453320664,
+                    "Clusters Entropy": 2.4261167857603168,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": 0.16440415386215826,
@@ -222,7 +229,8 @@
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 6.0,
                     "Std Items Per Cluster": 0.0,
-                    "Clusters Entropy": 2.70805020110221
+                    "Clusters Entropy": 2.70805020110221,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": -0.05509589112980217,
@@ -249,7 +257,8 @@
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 10.0,
                     "Std Items Per Cluster": 0.0,
-                    "Clusters Entropy": 2.1972245773362196
+                    "Clusters Entropy": 2.1972245773362196,
+                    "Number of Clusters": 9.0
                 },
                 "cluster_metrics": {
                     "Silhouette": -0.04698844933153846,
@@ -276,7 +285,8 @@
                 "items_cluster_metrics": {
                     "Mean Items Per Cluster": 6.0,
                     "Std Items Per Cluster": 0.0,
-                    "Clusters Entropy": 2.70805020110221
+                    "Clusters Entropy": 2.70805020110221,
+                    "Number of Clusters": 15.0
                 },
                 "cluster_metrics": {
                     "Silhouette": -0.05509589112980217,
