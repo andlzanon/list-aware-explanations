@@ -171,6 +171,8 @@ cython_debug/
 notebooks/exploration/*
 **/outputs/*
 **/model/*
+!**/model/BPR
+
 datasets/**/explanations/*
 !datasets/**/explanations/experiment1/
 !datasets/**/explanations/experiment2/
