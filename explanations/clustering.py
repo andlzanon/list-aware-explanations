@@ -152,8 +152,7 @@ class Clustering(ExplanationAlgorithm):
             clusters = dbscan_alg.fit_predict(distance_matrix)
         elif self.alg == "spectral":
             similarity_matrix = cosine_similarity(clustering_data)
-            sc = SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed', n_neighbors=self.top_n,
-                                        random_state=self.random_state)
+            sc = SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed', random_state=self.random_state)
             clusters = sc.fit_predict(similarity_matrix)
         elif self.alg == "BKMeans":
             normalizer = Normalizer(norm='l2')
