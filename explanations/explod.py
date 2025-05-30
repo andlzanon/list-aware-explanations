@@ -85,6 +85,9 @@ class ExpLOD(ExplanationAlgorithm):
         attributes = []
         misses = 0
 
+        name_col = self.dataset.prop_set.columns[0]
+        obj_col = self.dataset.prop_set.columns[-1]
+
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                           for u_item in self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
         ranked_items = list(self.model.recommend(user_id=user, k=self.top_k,
@@ -105,7 +108,7 @@ class ExpLOD(ExplanationAlgorithm):
             rec_props = self.dataset.prop_set.loc[int(r)]
 
             # check properties on both sets
-            intersection = pd.Series(sorted(set(hist_props['obj']).intersection(set(rec_props['obj']))))
+            intersection = pd.Series(sorted(set(hist_props[obj_col]).intersection(set(rec_props[obj_col]))))
 
             # generate dictionary only of attributes on recommended item
             r_sem_dict = {}
@@ -120,7 +123,7 @@ class ExpLOD(ExplanationAlgorithm):
             train_c = train_c.set_index(train_set.columns[0])
             user_df = train_c.loc[str(user)]
             try:
-                rec_name = self.dataset.prop_set.loc[int(r)]['title'].unique()[0]
+                rec_name = self.dataset.prop_set.loc[int(r)][name_col].unique()[0]
             except AttributeError:
                 rec_name = self.dataset.prop_set.loc[int(r)][prop_cols[0]]
             full_sentence = "I recommend you " + "\"" + str(rec_name) + "\" since you often like "
@@ -130,7 +133,7 @@ class ExpLOD(ExplanationAlgorithm):
                 path_sentence = "\"" + p + "\" items as "
                 user_item = user_df[
                     user_df[user_df.columns[0]].isin(
-                        list(hist_props[hist_props['obj'] == p].index.unique().astype(str)))]
+                        list(hist_props[hist_props[obj_col] == p].index.unique().astype(str)))]
                 hist_ids = list(
                     user_item.sort_values(by=user_item.columns[-1], kind="mergesort",
                                           ascending=False)[:self.hitems_per_attr][user_item.columns[0]].astype(int))

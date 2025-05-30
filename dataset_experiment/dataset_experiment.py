@@ -63,9 +63,9 @@ class DatasetExperiment:
             validation_df = pd.read_csv(path + '''validation.csv''', dtype='object')
             test_df = pd.read_csv(path + '''test.csv''', dtype='object')
 
-            train_df["rating"] = train_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
-            validation_df["rating"] = validation_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
-            test_df["rating"] = test_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
+            train_df[self.rating_column] = train_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
+            validation_df[self.rating_column] = validation_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
+            test_df[self.rating_column] = test_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
 
         else:
             path = self.path + f'''/stratified_split/'''
@@ -73,8 +73,8 @@ class DatasetExperiment:
             test_df = pd.read_csv(path + '''test.csv''', dtype='object')
             validation_df = pd.DataFrame()
 
-            train_df["rating"] = train_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
-            test_df["rating"] = test_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
+            train_df[self.rating_column] = train_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
+            test_df[self.rating_column] = test_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
 
         return train_df, validation_df, test_df
 

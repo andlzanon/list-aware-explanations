@@ -1,0 +1,48 @@
+--- Explanations User Id 2 ---
+If you are in the mood for Parlophone, United Kingdom items such as Talk Talk, Kylie Minogue, I recommend The Beatles, David Bowie, Coldplay, U2, Pet Shop Boys, Beyoncé
+If you are in the mood for Parlophone, Grammy Award for Best Pop Duo/Group Performance items, I recommend Radiohead, Lady Gaga, The Cure, Pink Floyd, Queen, Shakira
+If you are in the mood for MTV Video Music Award for Best New Artist, alternative rock items, I recommend Muse, Mick Jackson, The Killers, Nirvana, Pink, Paramore
+If you are in the mood for American Music Award for Favorite Pop/Rock Band/Duo/Group, electronic rock items, I recommend Placebo, A-ha, Red Hot Chili Peppers, Christina Aguilera, Franz Ferdinand, Linkin Park
+If you are in the mood for 1977-01-01T00:00:00Z, art pop items, I recommend Britney Spears, Katy Perry, The Smiths, Björk, Green Day, The Human League
+If you are in the mood for Epic Records, United Kingdom items such as Sade, Fleetwood Mac, I recommend Rihanna, Oasis, Kings of Leon, Black Eyed Peas, Thirty Seconds to Mars, Tears for Fears
+If you are in the mood for Q Awards, BRIT Awards items, I recommend Avril Lavigne, Arctic Monkeys, The Strokes, Amy Winehouse, list of Nine Inch Nails band members, Jennifer Lopez
+If you are in the mood for Favorite Pop/Rock Album, Grammy Award for Best Music Film items, I recommend Joy Division, Lily Allen, Miley Cyrus, Florence + the Machine, Alanis Morissette, R.E.M.
+If you are in the mood for Geffen Records, synth-pop items such as Kylie Minogue, I recommend Kesha, Sigur Rós, Guns N’ Roses, Nelly Furtado, MGMT, Erasure
+If you are in the mood for Grammy Award for Best New Artist, Epic Records items such as Sade, I recommend Metallica, Foo Fighters, Evanescence, Mariah Carey, The Smashing Pumpkins, Pearl Jam
+If you are in the mood for United Kingdom, 1978-01-01T00:00:00Z items such as Prefab Sprout, Marc Almond, I recommend Massive Attack, Orchestral Manoeuvres in the Dark, The Pussycat Dolls, Marilyn Manson, Gorillaz, Goldfrapp
+If you are in the mood for United Kingdom, Atlantic Records items, I recommend Led Zeppelin, Dave Gahan, Kelly Clarkson, Yeah Yeah Yeahs, Maroon 5, The Rolling Stones
+If you are in the mood for United Kingdom, English items such as Katie Melua, Kylie Minogue, I recommend Interpol, Eminem, Rammstein, Morrissey, System of a Down, Leona Lewis
+If you are in the mood for Grammy Award for Album of the Year, United Kingdom items such as Fleetwood Mac, I recommend The Doors, Keane, The Kooks, Taylor Swift, list of Iron Maiden band members, The White Stripes
+If you are in the mood for United Kingdom, new wave items such as Duran Duran, Spandau Ballet, I recommend Eurythmics, ABBA, Yazoo, Snow Patrol, The Who, Blur
+--- Explanations User Id 3 ---
+If you are in the mood for English, United Kingdom items such as Burial, Lukid, I recommend The Beatles, Radiohead, Madonna, Paramore, Nirvana, Christina Aguilera
+If you are in the mood for English, 2005-01-01T00:00:00Z items, I recommend Lady Gaga, Coldplay, Rihanna, Beyoncé, Shakira, Kings of Leon
+If you are in the mood for English, musician items such as Burial, Lukid, I recommend Muse, Britney Spears, The Killers, Pink, Green Day, Miley Cyrus
+If you are in the mood for experimental music, United Kingdom items, I recommend Katy Perry, Placebo, Arctic Monkeys, Pink Floyd, Thirty Seconds to Mars, Björk
+If you are in the mood for Shortlist Music Prize, FatCat Records items, I recommend Avril Lavigne, Depeche Mode, Red Hot Chili Peppers, Kylie Minogue, Metallica, Sigur Rós
+If you are in the mood for United Kingdom, English items such as Burial, Lukid, I recommend Kesha, Mick Jackson, Oasis, Queen, Foo Fighters, Amy Winehouse
+If you are in the mood for ambient music, electronic rock items such as Matryoshka, I recommend Linkin Park, Lily Allen, Eminem, David Bowie, Daft Punk, Blink-182
+If you are in the mood for Shortlist Music Prize, English items such as Burial, I recommend Black Eyed Peas, The Strokes, Franz Ferdinand, System of a Down, Taylor Swift, Marilyn Manson
+If you are in the mood for United Kingdom, English items such as Lukid, Burial, I recommend The Cure, Evanescence, Jennifer Lopez, Guns N’ Roses, Joy Division, The Smashing Pumpkins
+If you are in the mood for 2004-01-01T00:00:00Z, 2001-01-01T00:00:00Z items, I recommend U2, Kelly Clarkson, Florence + the Machine, My Chemical Romance, 3OH!3, The Kooks
+If you are in the mood for experimental music, English items, I recommend The Smiths, Mariah Carey, Maroon 5, Yeah Yeah Yeahs, Alicia Keys, Kanye West
+If you are in the mood for musician, Canada items, I recommend The Pussycat Dolls, list of Nine Inch Nails band members, Nelly Furtado, Alanis Morissette, Ashley Tisdale, Massive Attack
+If you are in the mood for Shortlist Music Prize, 2001-01-01T00:00:00Z items such as Burial, I recommend Led Zeppelin, Interpol, Pearl Jam, Fall Out Boy, Keane, The White Stripes
+If you are in the mood for 2005-01-01T00:00:00Z, United Kingdom items, I recommend MGMT, Gorillaz, Portishead, Rammstein, Nickelback, Adele
+If you are in the mood for 1994-01-01T00:00:00Z, musician items such as Max Richter, I recommend Leona Lewis, list of Iron Maiden band members, The Doors, Hilary Duff, Snow Patrol, Arcade Fire
+--- Explanations User Id 4 ---
+If you are in the mood for Grammy Award for Best New Artist, MTV Video Music Award – Breakthrough Video items, I recommend The Beatles, Madonna, Placebo, Pink Floyd, Red Hot Chili Peppers, Christina Aguilera
+If you are in the mood for English, Sony Music items such as George Michael, I recommend Lady Gaga, Britney Spears, The Killers, Mick Jackson, Shakira, Kings of Leon
+If you are in the mood for alternative rock, pop rock items such as OneRepublic, Dolores O'Riordan, I recommend Depeche Mode, Katy Perry, Nirvana, Linkin Park, Oasis, David Bowie
+If you are in the mood for alternative rock, English items such as Dolores O'Riordan, The Cranberries, I recommend Rihanna, Paramore, Pink, Green Day, Thirty Seconds to Mars, Björk
+If you are in the mood for alternative rock, Los Angeles items, I recommend Avril Lavigne, Kesha, Metallica, U2, Foo Fighters, list of Iron Maiden band members
+If you are in the mood for Favorite Soul/R&B Album, Grammy Award for Best New Artist items, I recommend Beyoncé, Arctic Monkeys, Black Eyed Peas, Evanescence, Led Zeppelin, The Pussycat Dolls
+If you are in the mood for pop rock, United Kingdom items such as George Michael, James Blunt, I recommend Queen, The Cure, Miley Cyrus, Franz Ferdinand, Amy Winehouse, list of Nine Inch Nails band members
+If you are in the mood for MTV Video Music Award for Best Editing, English items, I recommend Kylie Minogue, The Strokes, Eminem, Daft Punk, Rammstein, Alanis Morissette
+If you are in the mood for Grammy Award for Best New Artist, English items such as Elton John, James Blunt, I recommend Lily Allen, Guns N’ Roses, Kelly Clarkson, Mariah Carey, Taylor Swift, The Kooks
+If you are in the mood for Grammy Award for Best New Artist, 1994-01-01T00:00:00Z items, I recommend System of a Down, Jennifer Lopez, Marilyn Manson, Maroon 5, MGMT, Yeah Yeah Yeahs
+If you are in the mood for Grammy Award for Best New Artist, alternative rock items such as Keane, Garbage, I recommend The Smiths, Florence + the Machine, Pearl Jam, A-ha, Gorillaz, Alicia Keys
+If you are in the mood for alternative rock, pop rock items such as Coldplay, OneRepublic, I recommend Sigur Rós, Joy Division, The Smashing Pumpkins, 3OH!3, Ashley Tisdale, Fall Out Boy
+If you are in the mood for alternative rock, MTV Video Music Award for Best Cinematography items, I recommend The Doors, My Chemical Romance, Interpol, Portishead, The Rolling Stones, Snow Patrol
+If you are in the mood for 1996-01-01T00:00:00Z, alternative rock items such as Coldplay, OneRepublic, I recommend Nelly Furtado, Leona Lewis, Massive Attack, Queens of the Stone Age, Panic! At The Disco, Bob Dylan
+If you are in the mood for alternative rock, English items such as Dolores O'Riordan, The Cranberries, I recommend Nickelback, Blink-182, Hilary Duff, Gwen Stefani, The White Stripes, Adele

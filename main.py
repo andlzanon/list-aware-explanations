@@ -1,5 +1,7 @@
 import argparse
 import json
+
+from dataset_experiment.lastfm import LastFM
 from utils import create_explainer, create_recommender
 from dataset_experiment.movielens100k import MovieLens100K
 from recommender.recommender_system import RecommenderSystem
@@ -72,7 +74,12 @@ else:
 ds_folder = ""
 if args.dataset == "ml100k":
     ds = MovieLens100K(gen_dataset=True)
-    ds_folder = "ml-latest-small"
+elif args.dataset == "lastfm":
+    ds = LastFM(gen_dataset=True)
+else:
+    raise ValueError("Dataset name is not correct. Options are 'ml100k' or 'lastfm'")
+
+ds_folder = ds.path.split("/")[-1]
 
 # load file of experiment configuration
 file_path =  f'''./datasets/{ds_folder}/experiment_configuration/''' + args.experiment_file

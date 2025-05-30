@@ -239,7 +239,7 @@ def fill_ideal_grid_by_manhattan(values, rows=None, cols=None):
     return values_copy
 
 def ndcg_2d(predictions: pd.DataFrame, grid_predictions: pd.DataFrame|None, test_recs: pd.DataFrame,
-               k: int, alg_name: str, col_rating: str, col_user='userId', col_item='movieId',
+               k: int, alg_name: str, col_rating: str, col_user: str, col_item: str,
                alpha=1, beta=1, gama=1, lambd=1, rows=3, columns=2, step_x=1, step_y=1, verbose=True):
     """
     Implementation of the 2D-NDCG According to the paper:
@@ -273,12 +273,12 @@ def ndcg_2d(predictions: pd.DataFrame, grid_predictions: pd.DataFrame|None, test
     if grid_predictions is None:
         grid_predictions = (predictions.sort_values([col_user, col_rating], ascending=[True, False])
                             .groupby(col_user, as_index=False).head(k)).reset_index(drop=True)
-        grid_predictions = grid_predictions.groupby('userId', group_keys=False).apply(
+        grid_predictions = grid_predictions.groupby(col_user, group_keys=False).apply(
             lambda group: fill_ideal_grid_by_manhattan(group, rows=rows, cols=columns))
         grid_predictions = grid_predictions.drop(col_rating, axis=1)
         grid_predictions.columns = [col_user, col_item, "x_rank", "y_rank"]
 
-    test_recs_grid = test_recs.groupby('userId', group_keys=False).apply(
+    test_recs_grid = test_recs.groupby(col_user, group_keys=False).apply(
         lambda group: fill_ideal_grid_by_manhattan(group, rows=rows, cols=columns))
 
     df_hit, _, _ = merge_ranking_true_pred(

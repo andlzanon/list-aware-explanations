@@ -70,7 +70,7 @@ class ExpLODRows(ExplanationAlgorithm):
             self.dataset.prop_set.columns[-1]].transform('count')
         recommended_props['r'] = len(recommended)
 
-        merged = interacted_props.merge(recommended_props, on='obj', how='inner')
+        merged = interacted_props.merge(recommended_props, on=self.dataset.prop_set.columns[-1], how='inner')
         merged['n'] = len(self.dataset.prop_set.index.unique())
 
         # get items per property on full dbpedia/wikidata by dropping the duplicates with same item id and prop value
@@ -109,12 +109,13 @@ class ExpLODRows(ExplanationAlgorithm):
         interacted_items = []
         attributes = []
         clusters = []
-        rem_items = []
         rerank_df = pd.DataFrame()
         path_misses = 0
         cluster_misses = 0
 
         item_col = self.dataset.item_column
+        name_col = self.dataset.prop_set.columns[0]
+        obj_col = self.dataset.prop_set.columns[-1]
 
         # generate user recommendations, this time as tuples
         recommendations = list(self.model.recommend(user_id=user, k=self.top_k,
@@ -128,18 +129,15 @@ class ExpLODRows(ExplanationAlgorithm):
         min_value = ranked_items_2d['x_irank'].min()
 
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
-                          for u_item in self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
+                          for u_item in self.dataset.train.user_data[self.dataset.train.uid_map[user]][0]]
 
         with open(self.expl_file_path, 'a+', encoding='utf-8') as f:
             f.write(f'''--- Explanations User Id {user} ---\n''')
         if verbose: print(f'''--- Explanations User Id {user} ---''')
 
-        #  get train dataset and set user as index
-        obj_column = self.dataset.prop_set.columns[-1]
-
         # create a set of all profile attributes and get all profile and recommended attributes from kg
-        pro_all_attr = self.dataset.prop_set.loc[items_historic][obj_column]
-        rec_all_attr = self.dataset.prop_set.loc[list(map(int, recommendations))][obj_column]
+        pro_all_attr = self.dataset.prop_set.loc[items_historic][obj_col]
+        rec_all_attr = self.dataset.prop_set.loc[list(map(int, recommendations))][obj_col]
 
         # get intersection between interacted and recommended attributes
         inter = set(rec_all_attr).intersection(set(pro_all_attr))
@@ -149,6 +147,7 @@ class ExpLODRows(ExplanationAlgorithm):
         clustering_df = pd.DataFrame(columns=inter)
         n_clusters = 0
         for row in range(min_value, max_value+1):
+            rem_items = []
             n_clusters = n_clusters + 1
             rec_row = ranked_items_2d[ranked_items_2d["x_irank"] == row][item_col].astype(int).tolist()
 
@@ -157,7 +156,7 @@ class ExpLODRows(ExplanationAlgorithm):
 
             # create the embedding with the ExpLOD value function for every recommendation on the row
             for rec_item in rec_row:
-                rec_attr = self.dataset.prop_set.loc[int(rec_item)]['obj']
+                rec_attr = self.dataset.prop_set.loc[int(rec_item)][obj_col]
                 l_rec_attr = list(rec_attr)
                 vectorize = np.array([props[attr] if attr in l_rec_attr else 0 for attr in inter])
 
@@ -188,7 +187,7 @@ class ExpLODRows(ExplanationAlgorithm):
             for pi in range(0, len(props_sorted)):
                 p = props_sorted[pi][0]
                 if self.all_props_on_items:
-                    items_with_obj = rec_items_props[rec_items_props["obj"] == p].index.unique().tolist()
+                    items_with_obj = rec_items_props[rec_items_props[obj_col] == p].index.unique().tolist()
                     if set(items_with_obj) == set(rec_row):
                         expl_attr_names.append(p)
                 else:
@@ -197,7 +196,7 @@ class ExpLODRows(ExplanationAlgorithm):
             # check if all items have at least one attribute
             if len(expl_attr_names) > 0:
                 # group by item and collect all their 'obj' values into sets
-                item_obj_sets = rec_items_props.groupby(rec_items_props.index)["obj"].apply(set)
+                item_obj_sets = rec_items_props.groupby(rec_items_props.index)[obj_col].apply(set)
 
                 # filter items where the set of objs contains all of expl_attr_names
                 items_with_all_props = item_obj_sets[
@@ -210,13 +209,13 @@ class ExpLODRows(ExplanationAlgorithm):
 
             # get profile item names that have the explanation attributes
             pro_df = self.dataset.prop_set.loc[items_historic]
-            pro_item_ids = pro_df.groupby(pro_df.index)["obj"].apply(set)
+            pro_item_ids = pro_df.groupby(pro_df.index)[obj_col].apply(set)
             pro_item_ids = pro_item_ids.apply(lambda attrs: set(attrs).issuperset(set(expl_attr_names)))
             pro_item_ids = pro_item_ids[pro_item_ids == True].index.astype(int)
             pro_item_ids = np.random.choice(pro_item_ids,
                                                 size=pro_item_ids.shape[0], replace=False)[:self.hitems_per_attr]
-            pro_item_names = self.dataset.prop_set.loc[pro_item_ids]['title'].unique().tolist()
-            rec_item_names = self.dataset.prop_set.loc[rec_row]['title'].unique()
+            pro_item_names = self.dataset.prop_set.loc[pro_item_ids][name_col].unique().tolist()
+            rec_item_names = self.dataset.prop_set.loc[rec_row][name_col].unique()
 
             interacted_items.append(pro_item_ids)
             attributes.append(expl_attr_names)

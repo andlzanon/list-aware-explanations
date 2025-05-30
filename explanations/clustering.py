@@ -77,13 +77,14 @@ class Clustering(ExplanationAlgorithm):
         :return:
         """
         user_explanations = {}
-        obj_column = self.dataset.prop_set.columns[-1]
         interacted_items = []
         attributes = []
         ranked_clusters = []
         rem_items = []
         path_misses = 0
         cluster_misses = 0
+        name_col = self.dataset.prop_set.columns[0]
+        obj_col = self.dataset.prop_set.columns[-1]
 
         # generate user recommendations
         ranked_items = list(self.model.recommend(user_id=user, k=self.top_k,
@@ -93,11 +94,11 @@ class Clustering(ExplanationAlgorithm):
         # get user historic items
         items_historic = [next((int(k) for k, v in self.dataset.train.iid_map.items() if v == u_item), None)
                           for u_item in
-                          self.dataset.train.chrono_user_data[self.dataset.train.uid_map[user]][0]]
+                          self.dataset.train.user_data[self.dataset.train.uid_map[user]][0]]
 
         # create a set of all profile attributes and get all profile and recommended attributes from kg
-        pro_all_attr = self.dataset.prop_set.loc[items_historic][obj_column]
-        rec_all_attr = self.dataset.prop_set.loc[list(map(int, ranked_items))][obj_column]
+        pro_all_attr = self.dataset.prop_set.loc[items_historic][obj_col]
+        rec_all_attr = self.dataset.prop_set.loc[list(map(int, ranked_items))][obj_col]
 
         # get intersection between interacted and recommended attributes
         inter = set(rec_all_attr).intersection(set(pro_all_attr))
@@ -119,7 +120,7 @@ class Clustering(ExplanationAlgorithm):
 
         for rec_item in ranked_items:
             # initialize vector array of recommended item with all 0 and get recommended attributes
-            rec_attr = self.dataset.prop_set.loc[int(rec_item)][obj_column]
+            rec_attr = self.dataset.prop_set.loc[int(rec_item)][obj_col]
             vectorize = np.zeros(inter.shape)
 
             # create the vector array (vectorize) of a recommended item based on binary presence of attributes
@@ -189,16 +190,16 @@ class Clustering(ExplanationAlgorithm):
 
             # get recommended item names
             rec_item_ids = np.array(ranked_items)[i_cluster].astype(int)
-            rec_item_names = self.dataset.prop_set.loc[rec_item_ids]['title'].unique()
+            rec_item_names = self.dataset.prop_set.loc[rec_item_ids][name_col].unique()
 
             # get profile item names that have the explanation attributes
             pro_df = self.dataset.prop_set.loc[items_historic]
-            pro_item_ids = pro_df.groupby(pro_df.index)["obj"].apply(set)
+            pro_item_ids = pro_df.groupby(pro_df.index)[obj_col].apply(set)
             pro_item_ids = pro_item_ids.apply(lambda attrs: set(attrs).issuperset(set(expl_attr_names)))
             pro_item_ids = pro_item_ids[pro_item_ids == True].index.astype(int)
             pro_item_ids = np.random.choice(pro_item_ids,
                                               size=pro_item_ids.shape[0], replace=False)[:self.hitems_per_attr]
-            pro_item_names = self.dataset.prop_set.loc[pro_item_ids]['title'].unique().tolist()
+            pro_item_names = self.dataset.prop_set.loc[pro_item_ids][name_col].unique().tolist()
 
             interacted_items.append(pro_item_ids)
             attributes.append(expl_attr_names)
@@ -429,7 +430,7 @@ class Clustering(ExplanationAlgorithm):
             self.dataset.prop_set.columns[-1]].transform('count')
         recommended_props['r'] = len(recommended)
 
-        merged = interacted_props.merge(recommended_props, on='obj', how='inner')
+        merged = interacted_props.merge(recommended_props, on=self.dataset.prop_set.columns[-1], how='inner')
         merged['n'] = len(self.dataset.prop_set.index.unique())
 
         # get items per property on full dbpedia/wikidata by dropping the duplicates with same item id and prop value
