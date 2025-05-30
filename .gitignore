@@ -173,7 +173,7 @@ notebooks/exploration/*
 **/model/*
 datasets/**/explanations/*
 !datasets/**/explanations/experiment1/
-
+!datasets/**/explanations/experiment2/
 
 # PyPI configuration file
 .pypirc
