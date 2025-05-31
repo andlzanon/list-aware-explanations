@@ -94,6 +94,12 @@ To run the results for the mobile configuration of the RecSys LBR run:
     python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
     python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
 
+To run for the lastfm dataset run:
+    
+    python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
+    python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
+    python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
+
 ## Project Organization
 
 :file_folder: datasets: file with MovieLens 100k dataset. It has three main folds:
