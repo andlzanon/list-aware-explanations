@@ -176,6 +176,7 @@ notebooks/exploration/*
 datasets/**/explanations/*
 !datasets/**/explanations/experiment1/
 !datasets/**/explanations/experiment2/
+!datasets/**/explanations/recsys_lbr_mobile2/
 
 # PyPI configuration file
 .pypirc
