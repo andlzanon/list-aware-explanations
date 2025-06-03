@@ -52,6 +52,8 @@ developed in the [explanations](explanations) folder. Similarly, to define the p
 also match the respective implementation parameter names from Cornac and [explanations](explanations) folder, 
 respectively. 
 
+### Arguments Documentation
+
 After a JSON experiment file is created, it is required to specify the dataset and files used to run the experiment. To 
 set them, use the following command line parameters:
 
@@ -88,17 +90,31 @@ An example of a command-line argument is:
 
     python main.py --dataset=ml100k --split=0 --k=90 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=experiment1.json --n_users=3
 
+### RecSys LBR Experiments Commands 
+
 To run the experiments for the mobile configuration of the RecSys LBR for the MovieLens 100k dataset run:
     
     python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
     python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
     python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
 
+To run the experiments for the PC configuration of the RecSys LBR for the MovieLens 100k dataset run:
+    
+    python main.py --dataset=ml100k --split=0 --k=500 --rows=3 --columns=6 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc1.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k=500 --rows=3 --columns=6 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc2.json --n_users=0
+    python main.py --dataset=ml100k --split=0 --k=500 --rows=3 --columns=6 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc3.json --n_users=0
+
 To run the experiments for the mobile configuration of the RecSys LBR run for the LastFM dataset run:
     
     python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
     python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
     python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
+
+To run the experiments for the PC configuration of the RecSys LBR run for the LastFM dataset run:
+    
+    python main.py --dataset=lastfm --split=0 --k=250 --rows=2 --columns=5 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc1.json --n_users=0
+    python main.py --dataset=lastfm --split=0 --k=250 --rows=2 --columns=5 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc2.json --n_users=0
+    python main.py --dataset=lastfm --split=0 --k=250 --rows=2 --columns=5 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc3.json --n_users=0
 
 ## Project Organization
 

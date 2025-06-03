@@ -1,0 +1,99 @@
+{
+    "MAP@500": 0.14806548392826452,
+    "NDCG@500": 0.422308287966152,
+    "Precision@500": 0.04179016393442623,
+    "Recall@500": 0.7365546096762753,
+    "Algorithm BPR NDCG - 2D@500": 0.4654715564762723,
+    "Algorithm ExpLODRows&top_n=2&hitems_per_attr=2&top_k=500&alpha=0.5&beta=0.5&rs=42&all_props=False&n_clusters=None&u=0 NDCG - 2D@500": 0.4654715564762723,
+    "Algorithm ExpLODRows&top_n=2&hitems_per_attr=2&top_k=500&alpha=0.5&beta=0.5&rs=42&all_props=False&n_clusters=40&u=0 NDCG - 2D@500": 0.46105775493359946,
+    "Algorithm ExpLODRows&top_n=2&hitems_per_attr=2&top_k=500&alpha=0.5&beta=0.5&rs=42&all_props=True&n_clusters=40&u=0 NDCG - 2D@500": 0.46105775493359946,
+    "explanation_algorithms": [
+        {
+            "name": "ExpLODRows&top_n=2&hitems_per_attr=2&top_k=500&alpha=0.5&beta=0.5&rs=42&all_props=False&n_clusters=None&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.5851605119175224,
+                    "LIR": 0.3134566389954277,
+                    "ETD": 0.35424739195231,
+                    "TID": 1429,
+                    "TPD": 507,
+                    "MID": 1.5347988077496275,
+                    "Overlap-Attributes": 0.35424739195231,
+                    "Overlap-Items": 0.5002937585466452,
+                    "Path-Misses": 39,
+                    "Cluster-Misses": 1.0
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 22.727272727272723,
+                    "Std Items Per Cluster": 0.7496555682941201,
+                    "Clusters Entropy": 3.090481052425807,
+                    "Number of Clusters": 22.0
+                },
+                "cluster_metrics": {
+                    "Silhouette": -0.06057751060479668,
+                    "Calinski Harabasz Index": 2.016358234736631,
+                    "Davies Bouldin Index:": 6.0417751814418335
+                }
+            }
+        },
+        {
+            "name": "ExpLODRows&top_n=2&hitems_per_attr=2&top_k=500&alpha=0.5&beta=0.5&rs=42&all_props=False&n_clusters=40&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.508046577502635,
+                    "LIR": 0.3154894334754985,
+                    "ETD": 0.45614754098360655,
+                    "TID": 1554,
+                    "TPD": 1397,
+                    "MID": 1.093934426229508,
+                    "Overlap-Attributes": 0.45614754098360655,
+                    "Overlap-Items": 0.48294937158153994,
+                    "Path-Misses": 39,
+                    "Cluster-Misses": 1.0
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 12.5,
+                    "Std Items Per Cluster": 1.322875655532295,
+                    "Clusters Entropy": 3.682657537244029,
+                    "Number of Clusters": 40.0
+                },
+                "cluster_metrics": {
+                    "Silhouette": -0.079137283276462,
+                    "Calinski Harabasz Index": 1.8731243343906696,
+                    "Davies Bouldin Index:": 4.615330145817057
+                }
+            }
+        },
+        {
+            "name": "ExpLODRows&top_n=2&hitems_per_attr=2&top_k=500&alpha=0.5&beta=0.5&rs=42&all_props=True&n_clusters=40&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.4100819672131147,
+                    "LIR": 0.3451379808514416,
+                    "ETD": 0.09336494513056916,
+                    "TID": 4576,
+                    "TPD": 2,
+                    "MID": 2.0,
+                    "Overlap-Attributes": 0.09336494513056916,
+                    "Overlap-Items": 0.5517213114754098,
+                    "Path-Misses": 39,
+                    "Cluster-Misses": 0.5899180327868853
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 12.5,
+                    "Std Items Per Cluster": 1.322875655532295,
+                    "Clusters Entropy": 3.682657537244029,
+                    "Number of Clusters": 40.0
+                },
+                "cluster_metrics": {
+                    "Silhouette": -0.079137283276462,
+                    "Calinski Harabasz Index": 1.8731243343906696,
+                    "Davies Bouldin Index:": 4.615330145817057
+                }
+            }
+        }
+    ],
+    "experiment_file": "recsys_lbr_pc1.json",
+    "rows": 3,
+    "columns": 6
+}

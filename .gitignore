@@ -172,6 +172,7 @@ notebooks/exploration/*
 **/outputs/*
 **/model/*
 !**/model/BPR
+*debug*
 
 # PyPI configuration file
 .pypirc
