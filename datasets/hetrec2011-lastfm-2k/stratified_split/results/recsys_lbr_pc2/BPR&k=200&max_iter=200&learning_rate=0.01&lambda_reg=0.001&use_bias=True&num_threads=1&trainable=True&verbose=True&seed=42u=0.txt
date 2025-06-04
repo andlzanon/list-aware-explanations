@@ -1,0 +1,128 @@
+{
+    "MAP@250": 0.10048404285218601,
+    "NDCG@250": 0.28610212325276296,
+    "Precision@250": 0.01828936170212766,
+    "Recall@250": 0.5018712006079027,
+    "Algorithm BPR NDCG - 2D@250": 0.33024274062999237,
+    "Algorithm Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=explod&rs=42&top_k=250&a=0.5&b=0.5&u=0 NDCG - 2D@250": 0.3116131501348232,
+    "Algorithm Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=250&a=None&b=None&u=0 NDCG - 2D@250": 0.3102810190765633,
+    "Algorithm Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=250&a=None&b=None&u=0 NDCG - 2D@250": 0.3030162993251758,
+    "Algorithm Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=250&a=None&b=None&u=0 NDCG - 2D@250": 0.3149866941819755,
+    "explanation_algorithms": [
+        {
+            "name": "Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=explod&rs=42&top_k=250&a=0.5&b=0.5&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.5628860626328345,
+                    "LIR": 0.0,
+                    "ETD": 0.7479903356793218,
+                    "TID": 6592,
+                    "TPD": 358,
+                    "MID": 1.426659574468085,
+                    "Overlap-Attributes": 0.7479903356793218,
+                    "Overlap-Items": 0.5802270852043406,
+                    "Cluster-Misses": 0.026382978723404255,
+                    "Path-Misses": 2705
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 9.94244680851064,
+                    "Std Items Per Cluster": 16.175377400691477,
+                    "Clusters Entropy": 2.375031742340722,
+                    "Number of Clusters": 25.0
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.2596494413185551,
+                    "Calinski Harabasz Index": 8.42312746641268,
+                    "Davies Bouldin Index:": 1.3546241438313051
+                }
+            }
+        },
+        {
+            "name": "Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=relevance&rs=42&top_k=250&a=None&b=None&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.47539386019486773,
+                    "LIR": 0.0,
+                    "ETD": 0.8514506304705145,
+                    "TID": 7102,
+                    "TPD": 555,
+                    "MID": 1.462148936170213,
+                    "Overlap-Attributes": 0.8514506304705145,
+                    "Overlap-Items": 0.5987907211536849,
+                    "Cluster-Misses": 0.05378723404255319,
+                    "Path-Misses": 2705
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 9.94244680851064,
+                    "Std Items Per Cluster": 16.79125841578033,
+                    "Clusters Entropy": 2.3637437843347846,
+                    "Number of Clusters": 25.0
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.31853125342884925,
+                    "Calinski Harabasz Index": 9.187667552486618,
+                    "Davies Bouldin Index:": 1.3331032494152324
+                }
+            }
+        },
+        {
+            "name": "Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=count&rs=42&top_k=250&a=None&b=None&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.5761931892146333,
+                    "LIR": 0.0,
+                    "ETD": 0.7353543082744943,
+                    "TID": 6567,
+                    "TPD": 352,
+                    "MID": 1.279826241134752,
+                    "Overlap-Attributes": 0.7353543082744943,
+                    "Overlap-Items": 0.6094075850770759,
+                    "Cluster-Misses": 0.005663120567375887,
+                    "Path-Misses": 2705
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 9.943283687943264,
+                    "Std Items Per Cluster": 21.888981713034973,
+                    "Clusters Entropy": 2.014068366264156,
+                    "Number of Clusters": 24.99787234042553
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.4879038192780307,
+                    "Calinski Harabasz Index": 18.313907846851848,
+                    "Davies Bouldin Index:": 0.9764725756909846
+                }
+            }
+        },
+        {
+            "name": "Cluster&alg=agglomerative&method=weighted&criterion=maxclust&metric=cosine&n_clusters=25&top_n=2&hitems_per_attr=2&vec_method=binary&rs=42&top_k=250&a=None&b=None&u=0",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.4501480039634925,
+                    "LIR": 0.0,
+                    "ETD": 0.802823727656099,
+                    "TID": 7034,
+                    "TPD": 574,
+                    "MID": 1.3702898936170214,
+                    "Overlap-Attributes": 0.802823727656099,
+                    "Overlap-Items": 0.6180201250232333,
+                    "Cluster-Misses": 0.1287890070921986,
+                    "Path-Misses": 2675
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 9.943594858156029,
+                    "Std Items Per Cluster": 15.244165088944255,
+                    "Clusters Entropy": 2.4770217419690113,
+                    "Number of Clusters": 24.998404255319148
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.11137647719084899,
+                    "Calinski Harabasz Index": 4.604564724905784,
+                    "Davies Bouldin Index:": 1.9778324476891116
+                }
+            }
+        }
+    ],
+    "experiment_file": "recsys_lbr_pc2.json",
+    "rows": 2,
+    "columns": 5
+}
