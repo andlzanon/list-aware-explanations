@@ -1,0 +1,48 @@
+--- Explanations User Id 2 ---
+If you are in the mood for United Kingdom items such as Dido, Spandau Ballet, I recommend The Beatles, Radiohead, David Bowie, Muse, Coldplay, Placebo, Mick Jackson, The Cure, Pink Floyd, Pet Shop Boys, Queen, Oasis, The Smiths, Joy Division, Arctic Monkeys, Franz Ferdinand, Lily Allen, Amy Winehouse, The Human League, Massive Attack, Florence + the Machine, Tears for Fears, Led Zeppelin, Orchestral Manoeuvres in the Dark, Dave Gahan, Erasure, Eurythmics, Keane, Gorillaz, The Kooks, Morrissey, Goldfrapp, Yazoo, The Rolling Stones, Snow Patrol, Leona Lewis, The Who, Blur
+If you are in the mood for pop music, pop rock items such as Simply Red, Dido, I recommend Linkin Park, ABBA
+If you are in the mood for pop music, English items such as Kylie Minogue, Marc Almond, I recommend Lady Gaga, Britney Spears, Rihanna, Beyoncé, Christina Aguilera, Pink, Shakira, Miley Cyrus, Nelly Furtado, Alanis Morissette, Jennifer Lopez, Mariah Carey, Taylor Swift
+If you are in the mood for pop music, voice items such as Kylie Minogue, Madonna, I recommend Katy Perry
+If you are in the mood for English, United States of America items such as Madonna, I recommend Nirvana, Metallica, Eminem, Pearl Jam
+If you are in the mood for English, singer items such as Madonna, Nik Kershaw, I recommend Avril Lavigne, Björk, Kesha, Kelly Clarkson, Marilyn Manson
+If you are in the mood for new wave, English items such as Nik Kershaw, Marc Almond, I recommend A-ha
+If you are in the mood for United States of America, rock music items such as Fleetwood Mac, Air, I recommend Red Hot Chili Peppers, The Strokes, Green Day, Foo Fighters
+If you are in the mood for United States of America items such as Cock Robin, Madonna, I recommend The Killers, Kings of Leon, Paramore, Thirty Seconds to Mars, Guns N’ Roses, list of Nine Inch Nails band members, Interpol, The Pussycat Dolls, R.E.M., The Doors, The Smashing Pumpkins, Yeah Yeah Yeahs, Maroon 5, The White Stripes
+If you are in the mood for United States of America, 1995-01-01T00:00:00Z items such as Thievery Corporation, I recommend Black Eyed Peas, Evanescence, System of a Down
+If you are in the mood for United States of America, Columbia Records items such as Cock Robin, Fleetwood Mac, I recommend MGMT
+If you are in the mood for Columbia Records, alternative rock items such as Depeche Mode, I recommend U2
+If you are in the mood for EMI items such as Depeche Mode, ABC, I recommend list of Iron Maiden band members
+If you are in the mood for Geffen Records items such as Kylie Minogue, I recommend Sigur Rós
+If you are in the mood for Germany items such as Camouflage, Ministry of Sound, I recommend Rammstein
+--- Explanations User Id 3 ---
+If you are in the mood for 2004-01-01T00:00:00Z, United States of America items, I recommend Paramore, 3OH!3
+If you are in the mood for Shortlist Music Prize, United States of America items, I recommend Kings of Leon, Interpol, Yeah Yeah Yeahs
+If you are in the mood for 1994-01-01T00:00:00Z, United States of America items, I recommend Foo Fighters, System of a Down, Maroon 5
+If you are in the mood for United States of America items such as Celer, I recommend The Killers, Linkin Park, Red Hot Chili Peppers, Black Eyed Peas, Thirty Seconds to Mars, Evanescence, The Pussycat Dolls, Guns N’ Roses, Blink-182, list of Nine Inch Nails band members, My Chemical Romance, The Smashing Pumpkins, Fall Out Boy, The White Stripes
+If you are in the mood for 1999-01-01T00:00:00Z, United States of America items, I recommend The Strokes
+If you are in the mood for musician items such as Max Richter, Burial, I recommend Britney Spears, Christina Aguilera, Pink Floyd, Green Day, Miley Cyrus, Kelly Clarkson, Led Zeppelin, Nelly Furtado, Alanis Morissette, Alicia Keys, The Doors, Massive Attack, Hilary Duff, Adele
+If you are in the mood for male, English items such as Lukid, Burial, I recommend Mick Jackson, Eminem, David Bowie, Marilyn Manson, Kanye West
+If you are in the mood for United Kingdom items such as Lukid, Burial, I recommend The Beatles, Radiohead, Muse, Coldplay, Madonna, Placebo, Depeche Mode, Arctic Monkeys, Lily Allen, Oasis, Kylie Minogue, The Cure, Queen, Franz Ferdinand, The Smiths, Amy Winehouse, Florence + the Machine, Joy Division, Leona Lewis, Gorillaz, The Kooks, Portishead, Keane, Snow Patrol
+If you are in the mood for 2005-01-01T00:00:00Z items such as Richard Skelton, Celer, I recommend Lady Gaga, Rihanna, Kesha, MGMT
+If you are in the mood for English items such as Lukid, Burial, I recommend Avril Lavigne, Beyoncé, Nirvana, Pink, Shakira, Metallica, Jennifer Lopez, Daft Punk, Mariah Carey, Taylor Swift, Pearl Jam, Ashley Tisdale
+If you are in the mood for English, experimental music items, I recommend Björk
+If you are in the mood for 2001-01-01T00:00:00Z, United States of America items, I recommend Katy Perry
+If you are in the mood for Canada items such as Aidan Baker, I recommend Nickelback, Arcade Fire
+If you are in the mood for 1994-01-01T00:00:00Z, FatCat Records items such as Max Richter, I recommend Sigur Rós
+If you are in the mood for 1994-01-01T00:00:00Z, Berlin items such as Max Richter, I recommend Rammstein
+--- Explanations User Id 4 ---
+If you are in the mood for 1994-01-01T00:00:00Z items such as Mew, Muse, I recommend Sigur Rós, Rammstein
+If you are in the mood for United States of America items such as OneRepublic, VAST, I recommend Black Eyed Peas, Evanescence, System of a Down, Guns N’ Roses, The Pussycat Dolls, list of Nine Inch Nails band members, The Doors, MGMT, 3OH!3
+If you are in the mood for United States of America, rock music items such as Air, Tommy Lee, I recommend The Strokes
+If you are in the mood for United Kingdom items such as Duran Duran, George Michael, I recommend Madonna, Pink Floyd, Mick Jackson, Kylie Minogue, Lily Allen, Amy Winehouse, Leona Lewis, Adele
+If you are in the mood for United Kingdom items such as George Michael, Coldplay, I recommend Franz Ferdinand, Florence + the Machine, Joy Division, Massive Attack
+If you are in the mood for United Kingdom, rock music items such as Elton John, Muse, I recommend The Beatles, Queen, Led Zeppelin, The Rolling Stones
+If you are in the mood for alternative rock, English items such as Dolores O'Riordan, The Cranberries, I recommend Avril Lavigne, David Bowie, Björk, Alanis Morissette, A-ha
+If you are in the mood for alternative rock, United States of America items such as OneRepublic, VAST, I recommend The Killers, Paramore, Nirvana, Red Hot Chili Peppers, Linkin Park, Green Day, Kings of Leon, Thirty Seconds to Mars, Foo Fighters, Maroon 5, My Chemical Romance, The Smashing Pumpkins, Interpol, Yeah Yeah Yeahs, Blink-182, Queens of the Stone Age, Fall Out Boy, Panic! At The Disco, The White Stripes
+If you are in the mood for alternative rock items such as Stereophonics, Radiohead, I recommend Depeche Mode, Placebo, Arctic Monkeys, Oasis, The Cure, U2, The Smiths, The Kooks, Nickelback, Gorillaz, Portishead, Snow Patrol
+If you are in the mood for English, United States of America items such as Tommy Lee, I recommend Beyoncé, Metallica, Marilyn Manson, Bob Dylan
+If you are in the mood for English, United States of America items such as Tommy Lee, I recommend Lady Gaga, Britney Spears, Christina Aguilera, Eminem, Mariah Carey, Pearl Jam, Ashley Tisdale, Alicia Keys
+If you are in the mood for pop rock, voice items such as Dolores O'Riordan, George Michael, I recommend Katy Perry, Kesha, Pink, Shakira, Miley Cyrus, Kelly Clarkson, Taylor Swift, Hilary Duff, Gwen Stefani
+If you are in the mood for English, pop music items such as Enrique Iglesias, George Michael, I recommend Rihanna, Jennifer Lopez, Nelly Furtado
+If you are in the mood for English, Columbia Records items such as George Michael, I recommend Daft Punk
+If you are in the mood for EMI items such as Roxette, I recommend list of Iron Maiden band members

@@ -1,0 +1,134 @@
+{
+    "recommender": {
+        "name": "BPR",
+        "parameters": {
+            "k": 200,
+            "max_iter": 200,
+            "learning_rate": 0.01,
+            "lambda_reg": 0.001,
+            "seed": 42,
+            "verbose": true
+        }
+    },
+    "explainers": [
+        {
+            "name": "Clustering",
+            "parameters": {
+                "alg": "agglomerative",
+                "n_clusters": 15,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "explod",
+                "alpha": 0.5,
+                "beta": 0.5
+            }
+        },
+        {
+            "name": "Clustering",
+            "parameters": {
+                "alg": "agglomerative",
+                "n_clusters": 15,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "relevance"
+            }
+        },
+        {
+            "name": "Clustering",
+            "parameters": {
+                "alg": "agglomerative",
+                "n_clusters": 15,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "count"
+            }
+        },
+        {
+            "name": "Clustering",
+            "parameters": {
+                "alg": "agglomerative",
+                "n_clusters": 15,
+                "method": "weighted",
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "criterion": "maxclust",
+                "vec_method": "binary"
+            }
+        },
+        {
+            "name": "Clustering",
+            "parameters": {
+            "alg": "BKMeans",
+                "n_clusters": 15,
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "vec_method": "explod",
+                "alpha": 0.5,
+                "beta": 0.5
+            }
+        },
+        {
+            "name": "Clustering",
+            "parameters": {
+                "alg": "HDBSCAN",
+                "n_clusters": 2,
+                "top_n": 2,
+                "hitems_per_attr": 2,
+                "metric": "cosine",
+                "vec_method": "explod",
+                "alpha": 0.5,
+                "beta": 0.5
+            }
+        },
+        {
+            "name": "Clustering",
+            "parameters": {
+                "alg": "spectral",
+                "n_clusters": 15,
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "metric": "cosine",
+                "vec_method": "explod",
+                "alpha": 0.5,
+                "beta": 0.5
+            }
+        },
+        {
+            "name": "ExpLODRows",
+            "parameters": {
+                "n_clusters": 15,
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "all_props_on_items": false
+            }
+        },
+        {
+            "name": "ExpLODRows",
+            "parameters": {
+                "top_n": 2,
+                "hitems_per_attr":2,
+                "all_props_on_items": false
+            }
+        },
+        {
+           "name": "ExpLODRows",
+              "parameters": {
+                  "top_n": 2,
+                  "hitems_per_attr": 2,
+                  "n_clusters": 15,
+                  "all_props_on_items": true
+              }
+        }
+    ]
+}

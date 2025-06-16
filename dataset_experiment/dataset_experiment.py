@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from cornac.data import Reader, Dataset
 
@@ -64,9 +63,9 @@ class DatasetExperiment:
             validation_df = pd.read_csv(path + '''validation.csv''', dtype='object')
             test_df = pd.read_csv(path + '''test.csv''', dtype='object')
 
-            train_df["rating"] = train_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
-            validation_df["rating"] = validation_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
-            test_df["rating"] = test_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
+            train_df[self.rating_column] = train_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
+            validation_df[self.rating_column] = validation_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
+            test_df[self.rating_column] = test_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
 
         else:
             path = self.path + f'''/stratified_split/'''
@@ -74,8 +73,8 @@ class DatasetExperiment:
             test_df = pd.read_csv(path + '''test.csv''', dtype='object')
             validation_df = pd.DataFrame()
 
-            train_df["rating"] = train_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
-            test_df["rating"] = test_df['rating'].apply(lambda x: 1 if float(x) > 0 else 0)
+            train_df[self.rating_column] = train_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
+            test_df[self.rating_column] = test_df[self.rating_column].apply(lambda x: 1 if float(x) > 0 else 0)
 
         return train_df, validation_df, test_df
 
@@ -127,13 +126,23 @@ class DatasetExperiment:
 
         return self.train, self.validation, self.test
 
-    def get_users(self):
+    def get_users(self, dset: str):
         """
         Function that returns all train users as list
+        :param dset: 'train' to return training users, 'val' for validation and any 'test' for test users
         :return: train users ids
         """
-        users = list(self.train.iid_map.keys())
+        users = list()
+        if dset == 'train':
+            users = list(self.train.uid_map.keys())
+        elif dset == 'val':
+            users = list(self.validation.uid_map.keys())
+        elif dset == 'test':
+            users = list(self.test.uid_map.keys())
+
+        assert len(users) > 0, "dset should be either train, val or test"
         users = sorted(users, key=int)
+
         return users
 
     def load_all_folds(self) -> list:

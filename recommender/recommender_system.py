@@ -1,10 +1,14 @@
 import inspect
+import json
 import os
 
 import cornac.models
+import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from dataset_experiment.dataset_experiment import DatasetExperiment
+from dataset_experiment import metrics
 from recommenders.evaluation.python_evaluation import map, ndcg_at_k, precision_at_k, recall_at_k
 from recommenders.models.cornac.cornac_utils import predict_ranking
 
@@ -32,6 +36,8 @@ class RecommenderSystem:
         self.model_name = name_params[:-1]
         self.dataset = dataset
         self.remove_seen = remove_seen
+        if load_path == "None":
+            load_path = None
         self.load_path = load_path
         self.model = model
 
@@ -75,13 +81,20 @@ class RecommenderSystem:
                                     train_set=self.dataset.train,
                                     remove_seen=self.remove_seen)
 
-    def run_experiment(self, k_list: list, save_results=True) -> dict:
+    def run_experiment(self, k: int, expl_results: dict, expr_file: str, n_users=0, rows=3, cols=2, save_results=False,
+                       verbose=True) -> dict:
         """
         Run experiment where the recommender system will score all items to all users and extract results.
         This function can also save the score of items for all user, item tuples and the metrics in the file
         system if the flag save_results is set to True.
-        :param k_list: list of top k to evaluate
+        :param k: top k to evaluate
+        :param expl_results: dictionary with explanation results from the explanation algorithms
+        :param expr_file: name of the file with the algorithms parameters passed on command line arguments
+        :param n_users: number of users to generate explanations to. If 0 runs to all users
+        :param rows: number of rows on grid to evaluate ndcg-2d
+        :param cols: number of columns on grid to evaluate ndcg-2d
         :param save_results: True if results should be saved in the datasets folder as file, False otherwise
+        :param verbose: True to display results on the console
         :return: metrics as dictionary and saved files on file system
         """
         print("Generating Predictions...")
@@ -95,62 +108,104 @@ class RecommenderSystem:
             path = path + self.model_name + ".csv"
             predictions.to_csv(path, header=True, index=False, mode="w+")
 
-        print("Generating Metrics...")
-        metrics = self.__evaluate(predictions=predictions, test_recs=test_df,
-                                  k_list=k_list, save_results=save_results)
-        return metrics
+        print("Generating Ranking Metrics...")
+        metrics_value = self.__evaluate(predictions=predictions, test_recs=test_df, k=k)
 
-    def __evaluate(self, predictions: pd.DataFrame, test_recs: pd.DataFrame,
-                   k_list: list, verbose=True, save_results=True) -> dict:
+        metrics_value[f'''Algorithm {self.model.name} NDCG - 2D@{k}'''] = \
+                (metrics.ndcg_2d(predictions=predictions, grid_predictions=None, test_recs=test_df,
+                                k=k, alg_name=self.model.name, col_rating=self.dataset.rating_column,
+                                col_user=self.dataset.user_column, col_item=self.dataset.item_column,
+                                alpha=1, beta=1, gama=1, rows=rows, columns=cols, step_x=1,
+                                step_y=1, verbose=verbose))
+        print(f'''NDCG - 2D@{k}: {metrics_value[f'''Algorithm {self.model.name} NDCG - 2D@{k}''']}''')
+
+        for key in tqdm(expl_results.keys(), desc="Generating Explanation Metrics..."):
+            try:
+                grid_predictions = expl_results[key]["grid_items"]
+            except KeyError:
+                print(f'''Error model {key} does not outputted the grid predictions''')
+                continue
+
+            metrics_value[f'''Algorithm {key} NDCG - 2D@{k}'''] = metrics.ndcg_2d(predictions=predictions,
+                                                        grid_predictions=grid_predictions, test_recs=test_df,
+                                                        k=k, alg_name=key, col_rating=self.dataset.rating_column,
+                                                        col_user=self.dataset.user_column, col_item=self.dataset.item_column, alpha=1, beta=1,
+                                                        gama=1, rows=rows, columns=cols, step_x=1, step_y=1,
+                                                        verbose=verbose)
+
+        explanation_algorithms = []
+        for key, value in expl_results.items():
+            explanation_algorithms.append({"name": key, "explanation_metrics": value["metrics"]})
+        metrics_value["explanation_algorithms"] = explanation_algorithms
+
+        metrics_value["experiment_file"] = expr_file
+        metrics_value["rows"] = rows
+        metrics_value["columns"] = cols
+
+        if save_results:
+            path = self.get_path("results") + expr_file[:-5] + "/"
+            try:
+                os.makedirs(path, exist_ok=True)
+            except FileExistsError:
+                pass
+
+            path = r"\\?\\" + os.path.abspath(path + self.model_name + "u=" + str(n_users) + ".txt")
+
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(self.to_python_types(metrics_value), f, indent=4)
+
+        return metrics_value
+
+    def __evaluate(self, predictions: pd.DataFrame, test_recs: pd.DataFrame, k: int) -> dict:
         """
         Function that evaluate the predictions generated by the recommender system on top k items
         :param predictions: dataframe containing scores for all possible (user item) tuples, therefore, it has
         three columns: user, item and predicted rating
         :param test_recs: testing set as pandas dataframe
-        :param k_list: list of top k recommendations to extract metrics
-        :param verbose: True to print the results on console, False otherwise
-        :param save_results: True to save the results on file system, false otherwise
+        :param k: top k recommendations
         :return: metrics as dictionary
         """
         metrics_dict = {}
 
-        for k in k_list:
-            eval_map = map(test_recs, predictions, col_user='userId',
-                           col_item='movieId',
-                           col_prediction=self.dataset.rating_column, k=k)
-            eval_ndcg = ndcg_at_k(test_recs, predictions, col_user='userId',
-                                  col_item='movieId',
-                                  col_prediction=self.dataset.rating_column, k=k)
-            eval_precision = precision_at_k(test_recs, predictions, col_user='userId',
-                                            col_item='movieId', col_prediction=self.dataset.rating_column, k=k)
-            eval_recall = recall_at_k(test_recs, predictions, col_user='userId',
-                                      col_item='movieId', col_prediction=self.dataset.rating_column, k=k)
+        eval_map = map(test_recs, predictions,
+                        col_user=self.dataset.user_column,
+                        col_item=self.dataset.item_column,
+                        col_prediction=self.dataset.rating_column,
+                        col_rating=self.dataset.rating_column, k=k)
+        print(f'''MAP@{k}: {eval_map}''')
 
-            metrics_dict[f'''MAP@{k}'''] = eval_map
-            metrics_dict[f'''NDCG@{k}'''] = eval_ndcg
-            metrics_dict[f'''Precision@{k}'''] = eval_precision
-            metrics_dict[f'''Recall@{k}'''] = eval_recall
+        eval_ndcg = ndcg_at_k(test_recs, predictions,
+                                col_user=self.dataset.user_column,
+                                col_item=self.dataset.item_column,
+                                col_prediction=self.dataset.rating_column,
+                                col_rating=self.dataset.rating_column, k=k)
+        print(f'''NDCG@{k}: {eval_ndcg}''')
 
-            if verbose:
-                print(f'''--- Metrics ---''')
-                print(f'''MAP@{k}: {eval_map}''')
-                print(f'''NDCG@{k}: {eval_ndcg}''')
-                print(f'''Precision@{k}: {eval_precision}''')
-                print(f'''Recall@{k}: {eval_recall}''')
+        eval_precision = precision_at_k(test_recs, predictions,
+                                            col_user=self.dataset.user_column,
+                                            col_item=self.dataset.item_column,
+                                            col_prediction=self.dataset.rating_column,
+                                            col_rating=self.dataset.rating_column, k=k)
+        print(f'''Precision@{k}: {eval_precision}''')
 
-        if save_results:
-            path = self.get_path("results")
-            path = path + self.model_name + ".txt"
-            with open(path, 'w') as f:
-                for key, value in metrics_dict.items():
-                    f.write(f'''{key}:{value}\n''')
+        eval_recall = recall_at_k(test_recs, predictions,
+                                      col_user=self.dataset.user_column,
+                                      col_item=self.dataset.item_column,
+                                      col_prediction=self.dataset.rating_column,
+                                      col_rating=self.dataset.rating_column, k=k)
+        print(f'''Recall@{k}: {eval_recall}''')
+
+        metrics_dict[f'''MAP@{k}'''] = eval_map
+        metrics_dict[f'''NDCG@{k}'''] = eval_ndcg
+        metrics_dict[f'''Precision@{k}'''] = eval_precision
+        metrics_dict[f'''Recall@{k}'''] = eval_recall
 
         return metrics_dict
 
     def get_path(self, last_folder: str) -> str:
         """
         Get path to save a file or folder
-        :param last_folder: it will be outputs or model or results to save the file in the appropriate folder
+        :param last_folder: it will be 'outputs' or 'model' or 'results' to save the file in the appropriate folder
         :return: path in the file system as str
         """
         path = self.dataset.path
@@ -160,3 +215,17 @@ class RecommenderSystem:
             path = path + f'''/folds/{self.dataset.fold_loaded}/{last_folder}/'''
 
         return path
+
+    def to_python_types(self, obj: dict):
+        if isinstance(obj, dict):
+            return {k: self.to_python_types(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self.to_python_types(v) for v in obj]
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return obj
