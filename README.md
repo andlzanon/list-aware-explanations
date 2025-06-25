@@ -1,6 +1,6 @@
 # List Aware Explanations
 
-## Description
+## 📌 Description
 The main objective of this project is to generate list
 aware explanations for recommendations. Consequently, an explanation algorithm 
 consider that items are on a list and that explanations may not be only for
@@ -16,7 +16,7 @@ where each explanation is a row category in the home page os streaming services 
 recommendations are clustered considering a similar content. The idea is also to adapt and choose an optimal number of 
 clusters to optimize user experience. 
 
-## Reproduction
+## 📋 Reproduction
 ### Environment 
 To install the libraries used in this project, use the command: 
     
@@ -36,7 +36,7 @@ are not required and already installed. The version of ```recommenders``` used i
 
 We used [Anaconda](https://www.anaconda.com/) to run the experiments. The version of Python used was the [3.12.3](https://www.python.org/downloads/release/python-3123/).
 
-## Command Line Arguments
+## 🧪 Command Line Arguments
 
 Explanations are generated as post-hoc (or agnostic) to the recommender system. As a result, we have to define:
 
@@ -57,7 +57,7 @@ respectively.
 After a JSON experiment file is created, it is required to specify the dataset and files used to run the experiment. To 
 set them, use the following command line parameters:
 
-- `dataset`: Data set. Either 'ml100k' for the movielens 100k dataset or 'lastfm' for the lastfm dataset
+- `dataset`: Data set. Either 'ml100k' for the MovieLens dataset or 'lastfm' for the lastfm dataset
 
 
 - `split`: Split of the dataset. If 0, then use train/test split set to 80/20, if 1 use K-Fold with train, validation and test sets.
@@ -90,35 +90,9 @@ An example of a command-line argument is:
 
     python main.py --dataset=ml100k --split=0 --k=90 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=experiment1.json --n_users=3
 
-### RecSys LBR Experiments Commands 
+## 📝 Project Organization
 
-To run the experiments for the mobile configuration of the RecSys LBR for the MovieLens 100k dataset run:
-    
-    python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
-    python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
-    python main.py --dataset=ml100k --split=0 --k=350 --rows=3 --columns=3 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
-
-To run the experiments for the PC configuration of the RecSys LBR for the MovieLens 100k dataset run:
-    
-    python main.py --dataset=ml100k --split=0 --k=500 --rows=3 --columns=6 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc1.json --n_users=0
-    python main.py --dataset=ml100k --split=0 --k=500 --rows=3 --columns=6 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc2.json --n_users=0
-    python main.py --dataset=ml100k --split=0 --k=500 --rows=3 --columns=6 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc3.json --n_users=0
-
-To run the experiments for the mobile configuration of the RecSys LBR run for the LastFM dataset run:
-    
-    python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile1.json --n_users=0
-    python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile2.json --n_users=0
-    python main.py --dataset=lastfm --split=0 --k=300 --rows=2 --columns=2 --rec_model_folder=BPR --experiment_file=recsys_lbr_mobile3.json --n_users=0
-
-To run the experiments for the PC configuration of the RecSys LBR run for the LastFM dataset run:
-    
-    python main.py --dataset=lastfm --split=0 --k=250 --rows=2 --columns=5 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc1.json --n_users=0
-    python main.py --dataset=lastfm --split=0 --k=250 --rows=2 --columns=5 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc2.json --n_users=0
-    python main.py --dataset=lastfm --split=0 --k=250 --rows=2 --columns=5 --rec_model_folder=BPR --experiment_file=recsys_lbr_pc3.json --n_users=0
-
-## Project Organization
-
-:file_folder: datasets: file with MovieLens 100k dataset. It has three main folds:
+:file_folder: datasets: file with MovieLens dataset. It has three main folds:
 (i)  the cross validation folds, (ii) simple stratified split train/test split and the
 (iii) the experiment_configuration folder. Each fold on the cross validation of (i) and
 (ii) are subdivided into three other folders:
@@ -148,3 +122,11 @@ purposes
 :page_facing_up: main.py: main source code to run command line arguments experiments
 
 :page_facing_up: requirements.txt: list of library requirements to run the code
+
+## ✨ Papers Experiments Reproduction and Results
+
+This section is devoted to direct any readers to reproduce or check the results of papers resulting from this source
+code repository. If you use any of the results or code from this project please cite any of the projects below:
+
+- [RecSys LBR](RecSysLBR.md)
+
