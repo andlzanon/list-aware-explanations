@@ -107,7 +107,7 @@ experiment configuration passed in the command line argument `experiment_file`
 Folder (iii) represents the explanation and recommendation algorithms 
 that will be used to form the pipeline to generate recommendations associated with explanations. It is a JSON file and
 should have two main components: a `recommender` and a set of `explainers`, as described in the 
-[Project Organization](#Project-Organization) section. 
+[Command Line Arguments](#-command-line-arguments) section. 
 
 :file_folder: knowledge-graphs: files of metadata generated from the Wikidata for items and datasets
 

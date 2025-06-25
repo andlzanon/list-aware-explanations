@@ -49,9 +49,9 @@ To run the experiments for the PC configuration of the RecSys LBR run for the La
 
 ### RecSys LBR Results
 
-As in Section [RecSys LBR Experiments Commands](#RecSys-LBR-Experiments-Commands)
-we executed 3 commands for each dataset to obtain explanations and result metrics reported. Here are the shortcut to 
-the generated carousels with descriptive title explanations and resulted metric for each command of the previous section. 
+As in the previous section we executed 3 commands for each dataset to obtain explanations and result metrics reported. 
+Here are the shortcut to the generated carousels with descriptive title explanations and resulted metric for each 
+command of the previous section. 
 
 #### MovieLens
 - Explanations
