@@ -36,6 +36,33 @@ are not required and already installed. The version of ```recommenders``` used i
 
 We used [Anaconda](https://www.anaconda.com/) to run the experiments. The version of Python used was the [3.12.3](https://www.python.org/downloads/release/python-3123/).
 
+### Datasets and Knowledge Graphs
+
+In this code we are using the datasets:
+- [MovieLens Latest](https://grouplens.org/datasets/movielens/)
+- [LastFM-2k](https://grouplens.org/datasets/hetrec-2011/)
+
+Despite the fact that MovieLens Latest is not for research, we are sharing it here so other researchers can reproduce
+our results. We used it because it has the imdbId tag that really helps to extract the Knowledge Graph from 
+[Wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page).
+We are sharing also the resulting datasets files for the 
+[MovieLens](datasets/ml-latest-small/ratings_processed.csv) and 
+[LastFM-2K](datasets/hetrec2011-lastfm-2k/ratings_processed.csv) after our preprocessing.
+The only preprocessing step was to remove item interactions that are not on the respective Knowledge Graphs.
+They are generated based on their respective class
+in the folder [dataset_experiment](dataset_experiment).
+
+To check the statistics of the datasets, check this [notebook](notebooks/dataset_info.ipynb).
+
+The Knowledge Graphs available are:
+- [Movie Domain for MovieLens Latest](knowledge-graphs/props_wikidata_movielens_small.csv)
+- [Artist Domain for the LastFM dataset](knowledge-graphs/props_artists_id.csv)
+
+We used the code in this [GitHub Project]() to get Knowledge Graphs for 
+[MovieLens](https://github.com/andlzanon/lod-personalized-recommender/blob/main/preprocessing/movielens_small_utils.py) 
+and for the 
+[LastFM](https://github.com/andlzanon/lod-personalized-recommender/blob/main/preprocessing/lastfm_utils.py).
+
 ## 🧪 Command Line Arguments
 
 Explanations are generated as post-hoc (or agnostic) to the recommender system. As a result, we have to define:
@@ -123,7 +150,7 @@ purposes
 
 :page_facing_up: requirements.txt: list of library requirements to run the code
 
-## ✨ Papers Experiments Reproduction and Results
+## ✨ Reproduction of Paper Results
 
 This section is devoted to direct any readers to reproduce or check the results of papers resulting from this source
 code repository. If you use any of the results or code from this project please cite any of the projects below:
