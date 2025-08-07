@@ -155,5 +155,5 @@ purposes
 This section is devoted to direct any readers to reproduce or check the results of papers resulting from this source
 code repository. If you use any of the results or code from this project please cite any of the projects below:
 
-- [RecSys LBR](RecSysLBR.md)
+- [RecSys Beyond Workshop](RecSysBeyond.md)
 

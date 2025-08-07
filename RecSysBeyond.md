@@ -1,4 +1,4 @@
-# RecSys LBR
+# RecSys BEYOND '25 Workshop 
 
 This paper propose to cluster items based on their metadata to automatically generate carousels and corresponding 
 descriptive titles. Each carousel represents a cluster of items sharing similar metadata, which is then used to create 
@@ -8,7 +8,7 @@ the carousel’s descriptive title.
 
 If you use any of the results or code from these experiments please cite us:
 
-Paper submitted to the LBR of RecSys '25 in Prague. 
+Paper submitted to the Beyond Workshop of RecSys '25 in Prague. 
 
 ## 💻 RecSys LBR Experiments Commands 
 
@@ -47,7 +47,7 @@ To run the experiments for the PC configuration of the RecSys LBR run for the La
 
 ## 📊 Results 
 
-### RecSys LBR Results
+### RecSys Workshop Beyond '25 Results
 
 As in the previous section we executed 3 commands for each dataset to obtain explanations and result metrics reported. 
 Here are the shortcut to the generated carousels with descriptive title explanations and resulted metric for each 
