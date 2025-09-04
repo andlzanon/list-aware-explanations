@@ -99,7 +99,7 @@ set them, use the following command line parameters:
 - `k`: Top K items to generate explanations to evaluate on offline metrics.
 
 
-- `n_users`: User to generate only explanations to. Recommendations will be generated to all users
+- `n_users`: User to generate only explanations to. If 0 recommendations will be generated to all users
 
 
 - `rows`: Rows on the grid to generate the NDCG-2D.
@@ -155,5 +155,5 @@ purposes
 This section is devoted to direct any readers to reproduce or check the results of papers resulting from this source
 code repository. If you use any of the results or code from this project please cite any of the projects below:
 
-- [RecSys Beyond Workshop](RecSysBeyond.md)
+- [AICS Conference](AICS.md)
 
