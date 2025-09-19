@@ -1,4 +1,6 @@
 import cornac
+
+from explanations.embedding import EmbeddingClustering
 from explanations.explanation import ExplanationAlgorithm
 from explanations.explod import ExpLOD
 from explanations.explod_rows import ExpLODRows
@@ -42,6 +44,16 @@ def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: Datas
                           metric=explainer_params["metric"], criterion=criterion,
                           vec_method=explainer_params["vec_method"], n_users=n_users,
                           alpha=alpha, beta=beta)
+
+    elif explainer_name == "Embedding":
+        return EmbeddingClustering(ds_expr, explainer_params["alg"], rec_alg, expr_file, top_k,
+                                   n_clusters=explainer_params["n_clusters"],
+                                   emb_model_path=explainer_params["emb_model_path"],
+                                   emb_model_name=explainer_params["emb_model_name"],
+                                   top_n=explainer_params["top_n"],
+                                   hitems_per_attr=explainer_params["hitems_per_attr"],
+                                   n_users=n_users,
+                                   embedding_model_params=explainer_params["embedding_model_params"])
 
     elif explainer_name == "ExpLOD":
         return ExpLOD(ds_expr, rec_alg, expr_file, top_k, top_n=explainer_params["top_n"],
