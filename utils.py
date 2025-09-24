@@ -49,7 +49,7 @@ def create_explainer(explainer_name: str, explainer_params: dict, ds_expr: Datas
         return EmbeddingClustering(ds_expr, explainer_params["alg"], rec_alg, expr_file, top_k,
                                    n_clusters=explainer_params["n_clusters"],
                                    emb_model_path=explainer_params["emb_model_path"],
-                                   emb_model_name=explainer_params["emb_model_name"],
+                                   kg_emb_model_name=explainer_params["kg_emb_model_name"],
                                    top_n=explainer_params["top_n"],
                                    hitems_per_attr=explainer_params["hitems_per_attr"],
                                    n_users=n_users,
