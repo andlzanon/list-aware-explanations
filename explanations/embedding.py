@@ -244,7 +244,6 @@ class EmbeddingClustering(ExplanationAlgorithm):
 
             # create the vector array (vectorize) of a recommended item based on binary presence of attributes
             # for explanations
-            # TODO: check path misses and cluster misses
             vectorize = np.isin(inter, rec_attr).astype(int)
             if sum(vectorize) > 0:
                 co_ocur_df.loc[len(co_ocur_df)] = vectorize
@@ -270,6 +269,9 @@ class EmbeddingClustering(ExplanationAlgorithm):
             vi = vi_num/vi_den
             clustering_df.loc[len(clustering_df)] = vi
 
+        for j in range(0, len(rem_items)):
+            ranked_items.remove(rem_items[j])
+
         # run clustering
         clustering_data = clustering_df.to_numpy()
         linkage_matrix = linkage(clustering_data, method="weighted", metric="cosine")
@@ -290,9 +292,8 @@ class EmbeddingClustering(ExplanationAlgorithm):
             # if there is no expl_attr_names where there are common attributes
             if n_attr == 0:
                 cluster_misses = cluster_misses + 1
-                continue
-
-            if n_attr == 1:
+                expl_attr_names = []
+            elif n_attr == 1:
                 expl_attr_names = [expl_attr_names[0]]
             else:
                 attribute_data = pd.DataFrame(columns=range(self.kg_embed_params["embedding_dim"]))

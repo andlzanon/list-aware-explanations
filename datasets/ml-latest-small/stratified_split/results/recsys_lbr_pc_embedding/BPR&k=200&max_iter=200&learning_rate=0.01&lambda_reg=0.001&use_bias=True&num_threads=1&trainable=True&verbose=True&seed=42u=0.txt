@@ -1,0 +1,41 @@
+{
+    "MAP@500": 0.14806548392826452,
+    "NDCG@500": 0.422308287966152,
+    "Precision@500": 0.04179016393442623,
+    "Recall@500": 0.7365546096762753,
+    "Algorithm BPR NDCG - 2D@500": 0.4654715564762723,
+    "Algorithm Embed&alg=agglomerative&method=Rotate&n_clusters=35&top_n=2&hitems_per_attr=2&rs=42&top_k=500&lw=0.5&gw=0.5&u=0&normalize=True NDCG - 2D@500": 0.4291205559072418,
+    "explanation_algorithms": [
+        {
+            "name": "Embed&alg=agglomerative&method=Rotate&n_clusters=35&top_n=2&hitems_per_attr=2&rs=42&top_k=500&lw=0.5&gw=0.5&u=0&normalize=True",
+            "explanation_metrics": {
+                "attribute_metrics": {
+                    "SEP": 0.5468867390290717,
+                    "LIR": 0.34309987045789436,
+                    "ETD": 0.5929843199883658,
+                    "TID": 3700,
+                    "TPD": 1170,
+                    "MID": 1.5928337236533956,
+                    "Overlap-Attributes": 0.5929843199883658,
+                    "Overlap-Items": 0.6275476621481678,
+                    "Cluster-Misses": 0.056112412177985946,
+                    "Path-Misses": 39
+                },
+                "items_cluster_metrics": {
+                    "Mean Items Per Cluster": 14.283887587822015,
+                    "Std Items Per Cluster": 25.88307162516968,
+                    "Clusters Entropy": 2.5360133375151035,
+                    "Number of Clusters": 35.0
+                },
+                "cluster_metrics": {
+                    "Silhouette": 0.21251365542411804,
+                    "Calinski Harabasz Index": 26.400963908616784,
+                    "Davies Bouldin Index:": 1.2306269614721554
+                }
+            }
+        }
+    ],
+    "experiment_file": "recsys_lbr_mobile_embedding.json",
+    "rows": 3,
+    "columns": 6
+}

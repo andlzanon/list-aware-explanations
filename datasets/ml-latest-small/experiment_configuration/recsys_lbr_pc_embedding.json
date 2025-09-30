@@ -1,0 +1,30 @@
+{
+    "recommender": {
+        "name": "BPR",
+        "parameters": {
+            "k": 200,
+            "max_iter": 200,
+            "learning_rate": 0.01,
+            "lambda_reg": 0.001,
+            "seed": 42,
+            "verbose": true
+        }
+    },
+    "explainers": [
+        {
+            "name": "Embedding",
+            "parameters": {
+                "alg": "agglomerative",
+                "n_clusters": 35,
+                "kg_emb_model_name": "Rotate",
+                "emb_model_path": "./knowledge-graphs/embed_models/rotate_v1",
+                "top_n": 2,
+                "hitems_per_attr": 2,
+                "random_state": 42,
+                "embedding_model_params" : {
+                    "embedding_dim": 128
+                }
+            }
+        }
+    ]
+}
