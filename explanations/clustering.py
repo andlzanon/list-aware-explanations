@@ -55,6 +55,7 @@ class Clustering(ExplanationAlgorithm):
         self.vec_method = vec_method
         self.alpha = alpha
         self.beta = beta
+        self.global_score = None
         self.random_state = random_state
         np.random.seed(self.random_state)
         self.model_name = (f"Cluster&alg={str(self.alg)}&method={str(self.method)}&criterion={str(self.criterion)}"
@@ -111,6 +112,22 @@ class Clustering(ExplanationAlgorithm):
             prop_dict = self.__user_semantic_profile_explod(items_historic, list(map(int, ranked_items)))
         elif self.vec_method == 'count':
             prop_dict = self.__user_semantic_profile(items_historic)[1]
+        elif self.vec_method == 'balance':
+            prop_dict_raw = self.__user_semantic_profile(items_historic)[0]
+            min_v = min(prop_dict_raw.values())
+            max_v = max(prop_dict_raw.values())
+            global_scores = self.global_score[1]
+            # normalizing local relevance score
+            local_rel_dict = {k: (v - min_v) / (max_v - min_v) for k, v in prop_dict_raw.items()}
+            prop_dict = {}
+            all_keys = set(local_rel_dict.keys()).union(set(global_scores.keys()))
+            for key in all_keys:
+                if key in local_rel_dict.keys() and key in global_scores.keys():
+                    prop_dict[key] = (self.alpha * local_rel_dict[key]) + (self.beta * global_scores[key])
+                elif key in local_rel_dict.keys() and key not in global_scores.keys():
+                    prop_dict[key] = self.alpha * local_rel_dict[key]
+                else:
+                    prop_dict[key] = self.beta * global_scores[key]
 
         # create clustering dataset based on intersection
         clustering_df = pd.DataFrame(columns=inter)
@@ -127,7 +144,7 @@ class Clustering(ExplanationAlgorithm):
             if self.vec_method == 'binary':
                 vectorize = np.isin(inter, rec_attr).astype(int)
             # create the vector array (vectorize) of a recommended item based on TF-IDF relevance score
-            elif self.vec_method in ['relevance', 'count', 'explod']:
+            elif self.vec_method in ['relevance', 'count', 'explod', 'balance']:
                 l_rec_attr = list(rec_attr)
                 vectorize = np.array([prop_dict[attr] if attr in l_rec_attr else 0 for attr in inter])
 
@@ -178,7 +195,7 @@ class Clustering(ExplanationAlgorithm):
                 if expl_attr_names.empty:
                     cluster_misses = cluster_misses + 1
                 expl_attr_names = expl_attr_names.sample(frac=1, random_state=self.random_state).index[:self.top_n]
-            elif self.vec_method in ['relevance', 'count', 'explod']:
+            elif self.vec_method in ['relevance', 'count', 'explod', 'balance']:
                 # Keep only columns where all values are different from 0 and take mean
                 cluster_nonzero = cluster_attr.loc[:, cluster_attr.ne(0).all(axis=0)]
                 if cluster_nonzero.empty:
@@ -331,6 +348,9 @@ class Clustering(ExplanationAlgorithm):
             }
         }
 
+        if self.vec_method == "balance":
+            self.global_score = self.__compute_global_score()
+
         all_user_ret = {}
         users = self.dataset.get_users('test')
         if verbose: print(f'''Explanation Algorithm {self.model_name}\n''')
@@ -456,3 +476,35 @@ class Clustering(ExplanationAlgorithm):
 
         return fav_prop
 
+    def __compute_global_score(self):
+        """
+        Generate a global popularity score of edges (called in this code as prop) and attributes.
+        It is the normalized value of the quantity of items an attribute is connected to.
+        For edges, it is the normalized value of the frequency of the edge across items.
+        :return: two dictionaries: one for the attribute score and another to the edges scores
+        """
+        prop_col = self.dataset.prop_set.columns[-2]
+        obj_col = self.dataset.prop_set.columns[-1]
+
+        item_kg = self.dataset.prop_set.copy()
+        item_kg['obj_count'] = item_kg.groupby(obj_col)[prop_col].transform(
+            lambda x: x.index.nunique())
+        item_kg['global_count_norm'] = (
+                (item_kg["obj_count"] - item_kg["obj_count"].min()) / (item_kg["obj_count"].max() - item_kg["obj_count"].min()))
+
+        item_kg['prop_count'] = item_kg.groupby([prop_col])[
+            item_kg.columns[-1]].transform(
+            'count')
+        item_kg['prop_count_norm'] = (item_kg["prop_count"] - item_kg["prop_count"].min()) / (
+                    item_kg["prop_count"].max() - item_kg["prop_count"].min())
+
+        obj_dict = item_kg[[obj_col, 'global_count_norm']].drop_duplicates().\
+            sort_values(by='global_count_norm', ascending=False).\
+            set_index(obj_col).\
+            to_dict()['global_count_norm']
+
+        prop_dict = item_kg[[prop_col, 'prop_count_norm']].drop_duplicates().\
+            sort_values(by='prop_count_norm',ascending=False).\
+            set_index(prop_col).to_dict()['prop_count_norm']
+
+        return prop_dict, obj_dict
