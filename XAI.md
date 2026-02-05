@@ -1,4 +1,4 @@
-# AICS Conference
+# XAI Conference
 
 This paper propose to cluster items based on their metadata to automatically generate carousels and corresponding 
 descriptive titles. Each carousel represents a cluster of items sharing similar metadata, which is then used to create 
@@ -8,7 +8,7 @@ the carousel’s descriptive title.
 
 If you use any of the results or code from these experiments please cite us:
 
-Paper submitted to the AICS Conference. 
+Paper submitted to the XAI Conference. 
 
 ## 💻 Experiments Commands 
 
