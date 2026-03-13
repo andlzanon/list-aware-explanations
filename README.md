@@ -157,3 +157,8 @@ code repository. If you use any of the results or code from this project please 
 
 - [XAI Conference](XAI.md)
 
+## Example of generated Carousel
+Example of screen generated for the user with id 1 on the MovieLens dataset.
+
+![Home Screen with Carousels](pics/screenshot.PNG)
+
